@@ -75,6 +75,7 @@ Das 10×10-Schlachtfeld enthält **5 Geländearten**, die jeweils Bewegung, Kamp
 | **Wald**  | Normal: 2, Luft: 1 (fliegend)  | +2 Verteidigung    | Blockiert Fernkampfangriffe (Sichtlinie) / Feuerangriffe können entzünden (→ Lava)         | Waldbrand-Ereignis breitet sich hier aus          |  
 | **Wüste** | Normal: 1                      | 0                  | Neutrales Gelände, keine Boni                                                              | Standard-Gelände, entsteht durch schmelzendes Eis |  
 | **Stein** | Normal: 3, Erde: 2             | +3 Verteidigung    | **Erde:** +2 Verteidigung / Unpassierbar für nicht-fliegende Einheiten wenn gestapelt      | Kann nicht durch Ereignisse verändert werden      |    
+
 **Gelände-Verteilung:** Das Schlachtfeld startet mit zufälligem Gelände (30% Wüste, 20% Wald, 20% Stein, 15% Lava, 15% Eis).
     
 ---    
