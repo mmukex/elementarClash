@@ -40,6 +40,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Gezeiten-Wächter** | 120    | 10          | 8                | 2            | 1              | +3 Verteidigung auf Eis-Gelände<br>                     |
 | **Frost-Magier**     | 60     | 13          | 4                | 3            | 4              | Angriffe verlangsamen Gegner (-1 Bewegung für 2 Runden) |
 | **Wellen-Reiter**    | 90     | 11          | 6                | 4            | 1              | Kann durch Wasser/Eis mit Kosten 1 ziehen               |
+
 **Passiver Fraktions-Bonus:** Wasser-Einheiten verursachen +25% Schaden gegen Feuer, -25% gegen Erde. Heilt 5 LP pro Runde auf Eis-Gelände.
 
 ### **Erde-Fraktion** (Kontrollierend)
@@ -49,6 +50,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Stein-Golem**     | 140    | 8           | 10               | 2            | 1              | Unbeweglich (kann nicht verschoben werden)<br>  |
 | **Terrar-Schamane** | 70     | 9           | 5                | 3            | 3              | Kann Stein-Gelände erschaffen (1× pro 3 Runden) |
 | **Erdbeben-Titan**  | 110    | 14          | 7                | 2            | 1              | Angriffe treffen auch benachbarte Gegner        |
+
 **Passiver Fraktions-Bonus:** Erde-Einheiten verursachen +25% Schaden gegen Wasser, -25% gegen Luft. +2 Verteidigung auf Stein-Gelände.
 
 ### **Luft-Fraktion** (Mobil)
@@ -58,6 +60,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Wind-Tänzer**     | 65     | 13          | 3                | 6            | 1              | Fliegend, kann ohne Gelegenheitsangriffe ausweichen<br> |
 | **Sturm-Rufer**     | 75     | 14          | 4                | 5            | 4              | Angriffe stoßen Gegner 1 Feld zurück                    |
 | **Himmels-Wächter** | 85     | 11          | 5                | 5            | 2              | Fliegt, gewährt Sicht                                   |
+
 **Passiver Fraktions-Bonus:** Luft-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Feuer. Alle Einheiten haben Fliegend (ignorieren Gelände-Bewegungsstrafen).
 
 ---    
