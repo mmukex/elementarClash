@@ -32,7 +32,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Flammen-Bogenschütze** | 70     | 12          | 3                | 4            | 3              | Ignoriert Wald-Verteidigungsbonus                            |
 | **Phönix**               | 80     | 10          | 4                | 5            | 1              | **F**liegend (ignoriert Gelände), Wiederbelebung 1× (50% LP) |
 
-**Passiver Fraktions-Bonus:** Feuer-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Wasser. Benachbarte Feuer-Einheiten gewähren einander +1 Angriff.
+**Passiver Fraktions-Bonus:** Feuer-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Wasser. Benachbarte Feuer-Einheiten gewähren einander +1 Angriff.
 ### **Wasser-Fraktion** (Defensiv)
 
 | **Einheit**          | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Spezial**                                             |
