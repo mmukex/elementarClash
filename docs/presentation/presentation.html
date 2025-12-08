@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElementarClash - Design Patterns</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reset.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/theme/black.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/monokai.css">
+    <style>
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        .reveal pre { width: 100%; }
+        .reveal pre code { max-height: 500px; padding: 20px; }
+        .pattern-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #2a76dd;
+            border-radius: 5px;
+            font-size: 0.7em;
+            margin: 5px;
+        }
+        .why-box {
+            background: #1a1a1a;
+            border-left: 5px solid #42affa;
+            padding: 20px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+
+            <!-- Titel -->
+            <section>
+                <h1>ElementarClash</h1>
+                <h3>"Design Pattern in der OOP"</h3>
+                <p>Wintersemester 25/26</p>
+                <p style="font-size: 0.8em; margin-top: 2em;">Christian Stiens & Max Meier</p>
+            </section>
+
+            <!-- Projektübersicht -->
+            <section>
+                <section></section>
+                <h2>Was ist ElementarClash?</h2>
+                <p style="font-size: 0.9em; margin-bottom: 30px;">Rundenbasiertes Strategiespiel mit 10 GoF Design Patterns</p>
+
+                <!-- Visuelle Elemente: Icons -->
+                <div style="display: flex; justify-content: center; gap: 40px; margin: 20px 0; font-size: 1.5em;">
+                    <div style="text-align: center;">
+                        <div style="font-size: 1em;">🔥 💧 🌍 💨</div>
+                        <div style="font-size: 0.5em; margin-top: 5px;">4 Fraktionen</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 1em;">🔥 ❄️ 🌲 🌵 ⛰️</div>
+                        <div style="font-size: 0.5em; margin-top: 5px;">5 Geländearten</div>
+                    </div>
+                </div>
+
+                <!-- Kennzahlen -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 30px 0; font-size: 0.75em;">
+                    <div style="background: #1a3a52; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; color: #42affa;">12</div>
+                        <div>Einheitentypen<br/>(4×3)</div>
+                    </div>
+                    <div style="background: #1a3a52; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; color: #42affa;">20</div>
+                        <div>Gelände-Interaktionen<br/>(5×4)</div>
+                    </div>
+                    <div style="background: #1a3a52; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; color: #42affa;">100</div>
+                        <div>Spielfeld-Zellen<br/>(10×10)</div>
+                    </div>
+                    <div style="background: #1a3a52; padding: 15px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 2em; color: #42affa;">10</div>
+                        <div>Design Patterns</div>
+                    </div>
+                </div>
+            </section>
+            <section>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-top: 30px;">
+                    <!-- Kern-Prinzipien -->
+                    <div>
+                        <h3 style="font-size: 1em; margin-bottom: 20px;">Architektur-Prinzipien</h3>
+                        <ul style="font-size: 0.85em; text-align: left;">
+                            <li style="margin-bottom: 15px;">
+                                <strong>Modular</strong><br/>
+                                <span style="font-size: 0.9em;">Neue Fraktionen/Gelände ohne Core-Änderungen</span>
+                            </li>
+                            <li style="margin-bottom: 15px;">
+                                <strong>Testbar</strong><br/>
+                                <span style="font-size: 0.9em;">Jede Komponente isoliert testbar</span>
+                            </li>
+                            <li style="margin-bottom: 15px;">
+                                <strong>Erweiterbar</strong><br/>
+                                <span style="font-size: 0.9em;">SOLID-Prinzipien durchgängig</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Technologie -->
+                    <div>
+                        <h3 style="font-size: 1em; margin-bottom: 20px;">Technologie-Stack</h3>
+                        <ul style="font-size: 0.85em; text-align: left;">
+                            <li style="margin-bottom: 10px;">Java 21</li>
+                            <li style="margin-bottom: 10px;">Gradle 8.14</li>
+                            <li style="margin-bottom: 10px;">JUnit 5</li>
+                            <li style="margin-bottom: 10px;">PlantUML (UML-Diagramme)</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+            </section>
+
+            <!-- Pattern-Übersicht -->
+            <section>
+                <h2>10 Design Patterns - Aufgabenteilung</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; font-size: 0.75em;">
+                    <div>
+                        <h4 style="color: #42affa;">Spielfeld & Spieler-Aktionen (@Max)</h4>
+                        <div class="pattern-badge">Builder</div>
+                        <div class="pattern-badge">Composite</div>
+                        <div class="pattern-badge">Strategy</div>
+                        <div class="pattern-badge">Command</div>
+                        <div class="pattern-badge">Visitor</div>
+                    </div>
+                    <div style="opacity: 0.5;">
+                        <h4>Einheiten & Kampfsystem (@Chris)</h4>
+                        <div class="pattern-badge">Factory Method</div>
+                        <div class="pattern-badge">Decorator</div>
+                        <div class="pattern-badge">State</div>
+                        <div class="pattern-badge">Observer</div>
+                        <div class="pattern-badge">Chain of Resp.</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Builder Pattern -->
+            <section>
+                <section>
+                    <h2>1. Builder Pattern</h2>
+                    <p class="pattern-badge">Erzeugungsmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Komplexe Spielfeld-Erstellung:</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>10×10 Raster = 100 Zellen</li>
+                            <li>5 Geländetypen mit Prozent-Verteilung (30% Wüste, 20% Wald, ...)</li>
+                            <li>Faire Startpositionen für 2-4 Fraktionen</li>
+                            <li>Verschiedene Szenarien (Standard, Eis-Welt, Vulkan-Arena)</li>
+                            <li>Validierung: Keine Einheiten auf Lava, symmetrische Starts, ...</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">Konstruktor mit 15+ Parametern? Unlesbar!</p>
+                </section>
+
+                <section>
+                    <h3>Warum Builder?</h3>
+                    <div style="text-align: left; font-size: 0.85em;">
+                        <p><strong>Schrittweise Konfiguration:</strong> Komplexität aufteilen</p>
+                        <p><strong>Lesbar:</strong> Fluent API statt Parameter-Chaos</p>
+                        <p><strong>Flexibel:</strong> Verschiedene Konfigurationen wiederverwendbar</p>
+                        <p><strong>Validierung:</strong> Vor dem Build prüfen</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Composite Pattern -->
+            <section>
+                <section>
+                    <h2>2. Composite Pattern</h2>
+                    <p class="pattern-badge">Strukturmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Hierarchische Strukturen behandeln:</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li><strong>Battlefield</strong> → 10 <strong>Rows</strong> → je 10 <strong>Cells</strong></li>
+                            <li>Operationen auf einzelnen Zellen UND ganzen Regionen</li>
+                            <li>Beispiel: Waldbrand breitet sich aus → mehrere Zellen zu Lava</li>
+                            <li><strong>Einheitengruppen:</strong> Armee vs. einzelne Einheit</li>
+                            <li>Synergien: "Alle benachbarten Feuer-Einheiten +1 Angriff"</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">Separate Logik für Zelle vs. Region? Code-Duplikation!</p>
+                </section>
+
+                <section>
+                    <h3>Warum Composite?</h3>
+                    <div style="text-align: left; font-size: 0.85em;">
+                        <p><strong>Einheitliche Schnittstelle:</strong> Teil = Ganzes</p>
+                        <p><strong>Rekursive Operationen:</strong> Automatische Propagierung</p>
+                        <p><strong>Flexible Gruppierung:</strong> Beliebige Hierarchien</p>
+                        <p><strong>Code-Wiederverwendung:</strong> Eine Methode für alles</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Strategy Pattern -->
+            <section>
+                <section>
+                    <h2>3. Strategy Pattern</h2>
+                    <p class="pattern-badge">Verhaltensmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Fraktionsspezifisches Verhalten:</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li><strong>Bewegung:</strong> Luft-Einheiten fliegen (ignorieren Gelände)</li>
+                            <li><strong>Bewegung:</strong> Boden-Einheiten zahlen Geländekosten</li>
+                            <li><strong>Angriff:</strong> Nahkampf (Reichweite 1)</li>
+                            <li><strong>Angriff:</strong> Fernkampf (Reichweite 3-4, Sichtlinie)</li>
+                            <li><strong>Angriff:</strong> Flächenschaden (Erdbeben-Titan trifft Nachbarn)</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">ständiges if-else checken? Unmaintainable!</p>
+                </section>
+
+                <section>
+                    <h3>Warum Strategy?</h3>
+                    <div style="text-align: left; font-size: 0.85em;">
+                        <p><strong>Algorithmen kapseln:</strong> Verhalten austauschbar</p>
+                        <p><strong>Open/Closed Principle:</strong> Neue Strategien ohne Unit ändern</p>
+                        <p><strong>Testbar:</strong> Jede Strategie isoliert testbar</p>
+                        <p><strong>Fraktionsspezifisch:</strong> Luft ≠ Feuer ≠ Erde</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Command Pattern -->
+            <section>
+                <section>
+                    <h2>4. Command Pattern</h2>
+                    <p class="pattern-badge">Verhaltensmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Komplexes Aktionssystem:</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>3 Aktionen pro Runde: Bewegen, Angreifen, Fähigkeiten</li>
+                            <li>Jede Aktion hat <strong>eigene Validierung</strong> (Reichweite, Cooldown, ...)</li>
+                            <li><strong>Undo/Redo</strong> für Spielzüge</li>
+                            <li><strong>Replay-System:</strong> Commands speichern und abspielen</li>
+                            <li><strong>Netzwerk-Sync:</strong> Commands zwischen Clients übertragen</li>
+                        </ul>
+                    </div>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">Direkte Methodenaufrufe? Keine Kontrolle, kein Undo!</p>
+                </section>
+
+                <section>
+                    <h3>Warum Command?</h3>
+                    <div style="text-align: left; font-size: 0.85em;">
+                        <p><strong>Aktionen als Objekte:</strong> Speichern, übertragen, verarbeiten</p>
+                        <p><strong>Eingebaute Validierung:</strong> Vor Ausführung prüfen</p>
+                        <p><strong>Undo/Redo:</strong> Zustand wiederherstellen</p>
+                        <p><strong>Command Queue:</strong> "3 Aktionen pro Runde" = 3 Commands</p>
+                        <p><strong>Entkopplung:</strong> Aufrufer kennt nicht die Details</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Visitor Pattern -->
+            <section>
+                <section>
+                    <h2>5. Visitor Pattern</h2>
+                    <p class="pattern-badge">Verhaltensmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Gelände-Effekte auf Einheiten:</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li><strong>Lava:</strong> Feuer +2 Angriff, Wasser -5 LP/Runde</li>
+                            <li><strong>Eis:</strong> Wasser +3 Verteidigung + Heilung, Feuer schmilzt zu Wüste</li>
+                            <li><strong>Wald:</strong> +2 Verteidigung, Feuer entzündet → Lava</li>
+                            <li><strong>Stein:</strong> Erde +2 Verteidigung</li>
+                            <li><strong>Wüste:</strong> Keine Boni</li>
+                        </ul>
+                        <p style="margin-top: 15px;">→ <strong>5 Gelände × 4 Fraktionen = 20 Kombinationen!</strong></p>
+                    </div>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">20 if-Statements? Neue Geländetypen = überall Code ändern!</p>
+                </section>
+
+                <section>
+                    <h3>Warum Visitor?</h3>
+                    <div style="text-align: left; font-size: 0.85em;">
+                        <p><strong>Double Dispatch:</strong> Kombination aus Gelände × Fraktion</p>
+                        <p><strong>Open/Closed:</strong> Neue Geländetypen ohne Unit ändern</p>
+                        <p><strong>Separation of Concerns:</strong> Gelände-Logik in Terrain-Klassen</p>
+                        <p><strong>Erweiterbar:</strong> Neue Fraktionen/Gelände = nur neue Visitor</p>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Zusammenfassung Spielfeld & Spieler-Aktionen -->
+            <section>
+                <section>
+                    <h2>Zusammenfassung:</h2>
+                    <h3>Spielfeld & Spieler-Aktionen</h3>
+                    <table style="font-size: 0.65em; margin-top: 30px;">
+                        <thead>
+                            <tr>
+                                <th>Pattern</th>
+                                <th>Problem</th>
+                                <th>Lösung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Builder</strong></td>
+                                <td>Komplexe Spielfeld-Erstellung mit vielen Parametern</td>
+                                <td>Schrittweise Konfiguration, fluent API</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Composite</strong></td>
+                                <td>Operationen auf Zellen vs. Regionen, Einheiten vs. Armeen</td>
+                                <td>Einheitliche Schnittstelle für Teil & Ganzes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Strategy</strong></td>
+                                <td>Fraktionsspezifische Bewegung/Angriff-Logik</td>
+                                <td>Algorithmen als austauschbare Objekte</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Command</strong></td>
+                                <td>Aktionssystem mit Validierung, Undo, Replay</td>
+                                <td>Aktionen als Objekte mit eigenem Lifecycle</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Visitor</strong></td>
+                                <td>20 Gelände×Fraktions-Kombinationen</td>
+                                <td>Double Dispatch für saubere Erweiterbarkeit</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </section>
+
+            <!-- Q&A -->
+            <section>
+                <h2>Fragen?</h2>
+                <h3>ElementarClash</h3>
+                <p style="font-size: 0.7em; color: #888;">Christian Stiens & Max Meier</p>
+            </section>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/highlight/highlight.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@4.5.0/plugin/notes/notes.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            slideNumber: true,
+            transition: 'slide',
+            plugins: [ RevealHighlight, RevealNotes ],
+            highlight: {
+                highlightOnLoad: true
+            }
+        });
+    </script>
+</body>
+</html>
