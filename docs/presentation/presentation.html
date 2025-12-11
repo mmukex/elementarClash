@@ -346,6 +346,138 @@
                     </table>
                 </section>
             </section>
+            <!-- Christian -->
+            <section>
+                <section>
+                    <h2>6. Factory Method</h2>
+                    <p class="pattern-badge">Erzeugungsuster</p>
+                </section>
+
+                <section>
+                     <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Einheitliche Erzeugung von Einheiten</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>4×3 Einheitentypen</li>
+                            <li>Einfache Erweiterung um mögliche weitere Einheiten</li>
+                            <li>Ohne Änderungen am Core Code</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+            <section>
+                <section>
+                    <h2>7. Decorator</h2>
+                    <p class="pattern-badge">Strukturmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Dynamische Boni für Einheiten</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>Einheiten müssen unter definierten Umständen Boni gewährt werden</li>
+                            <li>Decorator ermöglicht zur Laufzeit die Erweiterung eines Objektes (Einheit)</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+            <section>
+                <section>
+                    <h2>8. State</h2>
+                    <p class="pattern-badge">Verhaltensmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Zustände von Einheiten und Spielphasen</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>Einheiten können manche Aktionen nur in bestimmten Zuständen ausführen (angreifen nur, wenn nicht betäubt)</li>
+                            <li>Spielphasen (Runden)</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+            <section>
+                <section>
+                    <h2>9. Observer</h2>
+                    <p class="pattern-badge">Verhaltensmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>UI Updates und dynamische Events</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>Stirbt eine Einheit, muss sie aus der UI entfernt werden</li>
+                            <li>Dynamische Ereignisse (z.B. Schneestürme) müssen im UI angezeigt werden</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+            <section>
+                <section>
+                    <h2>10. Chain of Resp.</h2>
+                    <p class="pattern-badge">Verhaltensmuster</p>
+                </section>
+
+                <section>
+                    <h3>Das Problem</h3>
+                    <div class="why-box">
+                        <p><strong>Schadensberechnung</strong></p>
+                        <ul style="font-size: 0.85em;">
+                            <li>Schaden wird berechnet durch:</li>
+                            <li>Elementarvorteile (Eis vs. Feuer)</li>
+                            <li>Geländemodifikator</li>
+                        </ul>
+                    </div>
+                </section>
+            </section>
+
+            <!-- Zusammenfassung Einheiten & Kampfsystem -->
+            <section>
+                <section>
+                    <h2>Zusammenfassung:</h2>
+                    <h3>Einheiten & Kampfsystem</h3>
+                    <table style="font-size: 0.65em; margin-top: 30px;">
+                        <thead>
+                            <tr>
+                                <th>Pattern</th>
+                                <th>Problem</th>
+                                <th>Lösung</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Factory Method</strong></td>
+                                <td>Einheitliche Erzeugung von 12 Einheitentypen</td>
+                                <td>Erweiterbare Fabrik ohne Core-Änderungen</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Decorator</strong></td>
+                                <td>Dynamische Boni zur Laufzeit</td>
+                                <td>Flexible Erweiterung von Einheiten-Objekten</td>
+                            </tr>
+                            <tr>
+                                <td><strong>State</strong></td>
+                                <td>Zustandsabhängige Aktionen & Spielphasen</td>
+                                <td>Zustand als Objekt mit eigenem Verhalten</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Observer</strong></td>
+                                <td>UI-Updates bei Spielereignissen</td>
+                                <td>Event-System für lose Kopplung</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Chain of Resp.</strong></td>
+                                <td>Komplexe Schadensberechnung mit mehreren Faktoren</td>
+                                <td>Verkettete Handler für modulare Berechnung</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </section>
+            </section>
 
             <!-- Q&A -->
             <section>
