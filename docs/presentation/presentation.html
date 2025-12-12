@@ -303,50 +303,6 @@
                 </section>
             </section>
 
-            <!-- Zusammenfassung Spielfeld & Spieler-Aktionen -->
-            <section>
-                <section>
-                    <h2>Zusammenfassung:</h2>
-                    <h3>Spielfeld & Spieler-Aktionen</h3>
-                    <table style="font-size: 0.65em; margin-top: 30px;">
-                        <thead>
-                            <tr>
-                                <th>Pattern</th>
-                                <th>Problem</th>
-                                <th>Lösung</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Builder</strong></td>
-                                <td>Komplexe Spielfeld-Erstellung mit vielen Parametern</td>
-                                <td>Schrittweise Konfiguration, fluent API</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Composite</strong></td>
-                                <td>Operationen auf Zellen vs. Regionen, Einheiten vs. Armeen</td>
-                                <td>Einheitliche Schnittstelle für Teil & Ganzes</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Strategy</strong></td>
-                                <td>Fraktionsspezifische Bewegung/Angriff-Logik</td>
-                                <td>Algorithmen als austauschbare Objekte</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Command</strong></td>
-                                <td>Aktionssystem mit Validierung, Undo, Replay</td>
-                                <td>Aktionen als Objekte mit eigenem Lifecycle</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Visitor</strong></td>
-                                <td>20 Gelände×Fraktions-Kombinationen</td>
-                                <td>Double Dispatch für saubere Erweiterbarkeit</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </section>
-            </section>
-
             <section>
                 <h2>10 Design Patterns - Aufgabenteilung</h2>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px; font-size: 0.75em;">
@@ -455,50 +411,6 @@
                             <li>Geländemodifikator</li>
                         </ul>
                     </div>
-                </section>
-            </section>
-
-            <!-- Zusammenfassung Einheiten & Kampfsystem -->
-            <section>
-                <section>
-                    <h2>Zusammenfassung:</h2>
-                    <h3>Einheiten & Kampfsystem</h3>
-                    <table style="font-size: 0.65em; margin-top: 30px;">
-                        <thead>
-                            <tr>
-                                <th>Pattern</th>
-                                <th>Problem</th>
-                                <th>Lösung</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Factory Method</strong></td>
-                                <td>Einheitliche Erzeugung von 12 Einheitentypen</td>
-                                <td>Erweiterbare Fabrik ohne Core-Änderungen</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Decorator</strong></td>
-                                <td>Dynamische Boni zur Laufzeit</td>
-                                <td>Flexible Erweiterung von Einheiten-Objekten</td>
-                            </tr>
-                            <tr>
-                                <td><strong>State</strong></td>
-                                <td>Zustandsabhängige Aktionen & Spielphasen</td>
-                                <td>Zustand als Objekt mit eigenem Verhalten</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Observer</strong></td>
-                                <td>UI-Updates bei Spielereignissen</td>
-                                <td>Event-System für lose Kopplung</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Chain of Resp.</strong></td>
-                                <td>Komplexe Schadensberechnung mit mehreren Faktoren</td>
-                                <td>Verkettete Handler für modulare Berechnung</td>
-                            </tr>
-                        </tbody>
-                    </table>
                 </section>
             </section>
 
