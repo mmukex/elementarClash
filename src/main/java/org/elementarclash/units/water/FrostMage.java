@@ -5,7 +5,7 @@ import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
 
-public class FrostMage extends Unit {
+class FrostMage extends Unit {
     public FrostMage(String id, UnitStats stats) {
         super(id, "Frost-Magier", Faction.WATER, UnitType.FROST_MAGE, stats);
     }

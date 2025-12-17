@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Sky Guardian - Air faction flying defender.
  * Special: Flying (ignores terrain), +2 defense when on high ground.
  */
-public class SkyGuardian extends Unit {
+class SkyGuardian extends Unit {
     private static final int HIGH_GROUND_DEFENSE_BONUS = 2;
 
     public SkyGuardian(String id, UnitStats stats) {

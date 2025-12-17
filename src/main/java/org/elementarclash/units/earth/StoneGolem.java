@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Stone Golem - Earth faction tank unit.
  * Special: Regenerates 5 HP per turn on mountain terrain.
  */
-public class StoneGolem extends Unit {
+class StoneGolem extends Unit {
     private static final int MOUNTAIN_REGEN = 5;
 
     public StoneGolem(String id, UnitStats stats) {

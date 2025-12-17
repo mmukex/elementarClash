@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Earthquake Titan - Earth faction heavy damage dealer.
  * Special: Area-of-effect attack (damages all adjacent enemies).
  */
-public class EarthquakeTitan extends Unit {
+class EarthquakeTitan extends Unit {
     private static final int AOE_DAMAGE_MULTIPLIER = 75; // 75% of normal damage
 
     public EarthquakeTitan(String id, UnitStats stats) {

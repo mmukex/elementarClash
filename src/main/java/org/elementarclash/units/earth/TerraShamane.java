@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Terra Shaman - Earth faction support unit.
  * Special: Can create earth walls (blocks movement for 2 turns).
  */
-public class TerraShamane extends Unit {
+class TerraShamane extends Unit {
     private static final int WALL_DURATION = 2;
 
     public TerraShamane(String id, UnitStats stats) {

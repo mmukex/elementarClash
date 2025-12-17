@@ -5,7 +5,7 @@ import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
 
-public class TideGuardian extends Unit {
+class TideGuardian extends Unit {
     public TideGuardian(String id, UnitStats stats) {
         super(id, "Gezeiten-Wächter", Faction.WATER, UnitType.TIDE_GUARDIAN, stats);
     }

@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Wind Dancer - Air faction fast melee unit.
  * Special: Can attack twice per turn if it moves at least 3 tiles.
  */
-public class WindDancer extends Unit {
+class WindDancer extends Unit {
     private static final int DOUBLE_ATTACK_MOVEMENT_THRESHOLD = 3;
 
     public WindDancer(String id, UnitStats stats) {

@@ -5,7 +5,7 @@ import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
 
-public class WaveRider extends Unit {
+class WaveRider extends Unit {
     public WaveRider(String id, UnitStats stats) {
         super(id, "Wellen-Reiter", Faction.WATER, UnitType.WAVE_RIDER, stats);
     }

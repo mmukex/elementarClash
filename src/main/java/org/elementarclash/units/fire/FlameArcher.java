@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Flame Archer - Fire faction ranged unit.
  * Special: Ignores forest defense bonus (range 3).
  */
-public class FlameArcher extends Unit {
+class FlameArcher extends Unit {
 
     public FlameArcher(String id, UnitStats stats) {
         super(id, "Flammen-Bogenschütze", Faction.FIRE, UnitType.FLAME_ARCHER, stats);

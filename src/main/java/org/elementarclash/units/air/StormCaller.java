@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Storm Caller - Air faction ranged damage dealer.
  * Special: Chain lightning (attacks jump to nearby enemies, -2 damage per jump).
  */
-public class StormCaller extends Unit {
+class StormCaller extends Unit {
     private static final int CHAIN_DAMAGE_REDUCTION = 2;
     private static final int MAX_CHAIN_TARGETS = 3;
 

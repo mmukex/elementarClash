@@ -9,7 +9,7 @@ import org.elementarclash.units.UnitType;
  * Phoenix - Fire faction flying unit.
  * Special: Flying (ignores terrain), one-time resurrection at 50% HP.
  */
-public class Phoenix extends Unit {
+class Phoenix extends Unit {
     private boolean hasResurrected = false;
 
     public Phoenix(String id, UnitStats stats) {
