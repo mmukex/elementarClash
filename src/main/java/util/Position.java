@@ -3,11 +3,6 @@ package util;
 /**
  * Immutable value object representing a position on the 10x10 battlefield grid.
  *
- * Uses Java Record for automatic implementation of:
- * - equals() / hashCode() (important for Map keys)
- * - toString()
- * - Getters (x(), y())
- *
  * @param x X-coordinate (0-9)
  * @param y Y-coordinate (0-9)
  */
