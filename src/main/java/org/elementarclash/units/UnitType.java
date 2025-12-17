@@ -1,4 +1,4 @@
-package units;
+package org.elementarclash.units;
 
 /**
  * Defines the three unit types per faction.

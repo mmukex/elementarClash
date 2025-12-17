@@ -1,4 +1,4 @@
-package units;
+package org.elementarclash.units;
 
 /**
  * Immutable value object holding unit statistics.

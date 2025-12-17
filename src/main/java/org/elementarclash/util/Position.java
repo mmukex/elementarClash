@@ -1,4 +1,4 @@
-package util;
+package org.elementarclash.util;
 
 /**
  * Immutable value object representing a position on the 10x10 battlefield grid.
@@ -123,6 +123,7 @@ public record Position(int x, int y) {
 
     /**
      * Human-readable string format for debugging.
+     *
      * @return "(x, y)" format
      */
     @Override

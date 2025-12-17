@@ -1,9 +1,9 @@
-package units.impl.earth;
+package org.elementarclash.units.earth;
 
-import faction.Faction;
-import units.Unit;
-import units.UnitStats;
-import units.UnitType;
+import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Unit;
+import org.elementarclash.units.UnitStats;
+import org.elementarclash.units.UnitType;
 
 /**
  * Stone Golem - Earth faction tank unit.

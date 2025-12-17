@@ -1,9 +1,14 @@
-package faction;
+package org.elementarclash.faction;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Represents the four elemental factions in ElementarClash.
  * Each faction has unique units, playstyles, and elemental advantages.
  */
+@Getter
+@RequiredArgsConstructor
 public enum Faction {
     FIRE("Feuer", "🔥", "Aggressiv"),
     WATER("Wasser", "💧", "Defensiv"),
@@ -13,14 +18,4 @@ public enum Faction {
     private final String germanName;
     private final String icon;
     private final String playstyle;
-
-    Faction(String germanName, String icon, String playstyle) {
-        this.germanName = germanName;
-        this.icon = icon;
-        this.playstyle = playstyle;
-    }
-
-    public String getGermanName() { return germanName; }
-    public String getIcon() { return icon; }
-    public String getPlaystyle() { return playstyle; }
 }

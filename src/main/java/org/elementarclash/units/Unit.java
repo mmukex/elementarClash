@@ -1,14 +1,17 @@
-package units;
+package org.elementarclash.units;
 
-import faction.Faction;
-import util.Position;
+import org.elementarclash.faction.Faction;
+import lombok.Getter;
+import lombok.Setter;
+import org.elementarclash.util.Position;
 
 /**
  * Abstract base class for all units in ElementarClash.
  * Defines common properties and behavior for all unit types.
- *
+ * <p>
  * Design Pattern: Factory Method creates instances of Unit subclasses.
  */
+@Getter
 public abstract class Unit {
     private final String id;
     private final String name;
@@ -17,8 +20,9 @@ public abstract class Unit {
     private final UnitStats baseStats;
 
     private int currentHealth;
+    @Setter
     private Position position;
-    private boolean hasActed;
+    private boolean acted;
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -27,24 +31,11 @@ public abstract class Unit {
         this.type = type;
         this.baseStats = stats;
         this.currentHealth = stats.maxHealth();
-        this.hasActed = false;
+        this.acted = false;
     }
 
-    // ========== Getters ==========
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public Faction getFaction() { return faction; }
-    public UnitType getType() { return type; }
-    public UnitStats getBaseStats() { return baseStats; }
-    public int getCurrentHealth() { return currentHealth; }
-    public Position getPosition() { return position; }
-    public boolean hasActed() { return hasActed; }
-
-    public boolean isAlive() { return currentHealth > 0; }
-
-    // ========== State Management ==========
-    public void setPosition(Position position) {
-        this.position = position;
+    public boolean isAlive() {
+        return currentHealth > 0;
     }
 
     public void takeDamage(int damage) {
@@ -56,14 +47,15 @@ public abstract class Unit {
     }
 
     public void resetTurn() {
-        hasActed = false;
+        acted = false;
     }
 
     public void markAsActed() {
-        hasActed = true;
+        acted = true;
     }
 
     // ========== Abstract Methods (Template Method Pattern) ==========
+
     /**
      * Returns the unit's special ability description.
      * Implemented by each concrete unit type.

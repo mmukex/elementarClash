@@ -1,12 +1,10 @@
-package units.factory;
+package org.elementarclash.units;
 
-import faction.Faction;
-import units.Unit;
-import units.UnitType;
+import org.elementarclash.faction.Faction;
 
 /**
  * Abstract Factory for creating faction-specific units.
- *
+ * <p>
  * Design Pattern: Factory Method
  * - Each faction has its own concrete factory (FireUnitFactory, etc.)
  * - Encapsulates unit creation logic
