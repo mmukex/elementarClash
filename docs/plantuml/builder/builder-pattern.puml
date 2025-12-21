@@ -1,0 +1,258 @@
+@startuml Builder Pattern - ElementarClash
+
+!define ABSTRACT_CLASS abstract class
+!define INTERFACE interface
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Builder>> LightGreen
+    BorderColor<<Builder>> DarkGreen
+    BackgroundColor<<Product>> LightBlue
+    BorderColor<<Product>> DarkBlue
+    BackgroundColor<<Component>> LightYellow
+    BorderColor<<Component>> DarkOrange
+}
+
+package "org.elementarclash.game" {
+
+    ' ===== Builder =====
+    class GameBuilder <<Builder>> {
+        - {static} MIN_FACTIONS: int = 2
+        - {static} MAX_FACTIONS: int = 4
+        - {static} SPAWN_REGION_SIZE: int = 3
+        - {static} TOP_LEFT_X/Y, TOP_RIGHT_X/Y, etc.: int
+        - {static} FIRST_FACTION_INDEX: int = 0
+        - {static} MAX_COORDINATE: int = 9
+        __
+        - factions: Set<Faction>
+        - unitPlacements: List<UnitPlacement>
+        - customTerrainDistribution: Map<Terrain, Integer>
+        - randomSeed: Long
+        __
+        + withFactions(factions: Faction...): GameBuilder
+        + withCustomTerrain(distribution: Map<Terrain, Integer>): GameBuilder
+        + withRandomSeed(seed: long): GameBuilder
+        + addUnit(unit: Unit, faction: Faction): GameBuilder
+        + build(): Game
+  }
+
+    class "UnitPlacement" as UP <<record>> {
+        + unit: Unit
+        + faction: Faction
+    }
+
+    ' ===== Product =====
+    class Game <<Product>> {
+        - {static} INITIAL_ROUND: int = 0
+        - {static} STARTING_ROUND: int = 1
+        - {static} SINGLE_FACTION_REMAINING: int = 1
+        __
+        - battlefield: Battlefield
+        - units: List<Unit>
+        - positionToUnit: Map<Position, Unit>
+        - currentRound: int
+        - activeFaction: Faction
+        - status: GameStatus
+        __
+        ~ Game(battlefield: Battlefield)
+        __
+        + isPositionOccupied(position: Position): boolean
+        + addUnit(unit: Unit, position: Position): void
+        + removeUnit(unit: Unit): void
+        + moveUnit(unit: Unit, newPosition: Position): boolean
+        + getUnitAt(position: Position): Unit
+        + getUnitsOfFaction(faction: Faction): List<Unit>
+        + getEnemiesOf(faction: Faction): List<Unit>
+        + getUnitsAdjacentTo(position: Position): List<Unit>
+        + getUnitsInRange(position: Position, range: int): List<Unit>
+        + canAttack(attacker: Unit, target: Unit): boolean
+        + isValidMove(unit: Unit, target: Position): boolean
+        ~ setInitialActiveFaction(faction: Faction): void
+        + startGame(): void
+        + nextTurn(): void
+        + getWinner(): Faction
+        + toString(): String
+   }
+
+    enum GameStatus {
+        SETUP
+        IN_PROGRESS
+        GAME_OVER
+    }
+}
+
+package "org.elementarclash.battlefield" {
+
+    ' ===== Component =====
+    class Battlefield <<Component>> {
+        + {static} GRID_SIZE: int = 10
+        - {static} TOTAL_CELLS: int = 100
+        - {static} PERCENTAGE_DIVISOR: int = 100
+        __
+        - terrainGrid: Terrain[][]
+        __
+        + Battlefield()
+        + initializeTerrain(distribution: Map<Terrain, Integer>, randomSeed: Long): void
+        + getTerrainAt(position: Position): Terrain
+        + setTerrainAt(position: Position, terrain: Terrain): void
+  }
+
+    enum Terrain {
+        LAVA("Lava", , 15)
+        ICE("Eis", "❄️", 15)
+        FOREST("Wald", "🌲", 20)
+        DESERT("Wüste", "🌵", 30)
+        STONE("Stein", "⛰️", 20)
+    }
+}
+
+package "org.elementarclash.faction" {
+    enum Faction {
+        FIRE
+        WATER
+        EARTH
+        AIR
+    }
+}
+
+package "org.elementarclash.units" {
+    ABSTRACT_CLASS Unit <<Abstract>> {
+        - id: String
+        - name: String
+        - faction: Faction
+        - type: UnitType
+        - baseStats: UnitStats
+        - currentHealth: int
+        - position: Position
+        - acted: boolean
+        __
+        + isAlive(): boolean
+        + resetTurn(): void
+        + setPosition(position: Position): void
+    }
+}
+
+package "org.elementarclash.util" {
+    class Position <<record>> {
+        + x: int
+        + y: int
+        __
+        + manhattanDistanceTo(other: Position): int
+        + isInRange(other: Position, range: int): boolean
+        + getAdjacentPositions(): Position[]
+    }
+}
+
+' ===== Builder Pattern Relationships =====
+GameBuilder ..> Game : <<builds>>
+GameBuilder ..> Battlefield : <<creates>>
+GameBuilder +-- UP : <<uses>>
+
+' ===== Product Composition =====
+Game *-- Battlefield : contains
+Game o-- "0..*" Unit : manages
+Game ..> GameStatus : <<uses>>
+
+' ===== Component Relationships =====
+Battlefield o-- "100" Terrain : grid cells
+
+' ===== Dependencies =====
+GameBuilder ..> Faction : <<configures>>
+GameBuilder ..> Terrain : <<configures>>
+GameBuilder ..> Unit : <<places>>
+GameBuilder ..> Position : <<calculates>>
+
+Game ..> Faction : <<uses>>
+Game ..> Position : <<uses>>
+
+' ===== Package-Private Access =====
+Game -[hidden]-> GameBuilder
+note on link
+  Package-private constructor
+  Only GameBuilder can create Game
+end note
+
+' ===== Notes =====
+note right of GameBuilder
+  **Builder Pattern (GoF #2)**
+
+  **Why Builder?**
+  Complex construction with:
+  • 100 cells terrain distribution
+  • Spawn positions for 2-4 factions
+  • Unit placement validation
+  • Fair spawn zone calculation
+
+  **Fluent API:**
+  Game game = new GameBuilder()
+      .withFactions(FIRE, WATER)
+      .withCustomTerrain(Map.of(
+          LAVA, 50, ICE, 50))
+      .withRandomSeed(12345L)
+      .addUnit(warrior, FIRE)
+      .addUnit(mage, WATER)
+      .build();
+
+  **Validation:**
+  • 2-4 factions required
+  • Each faction needs ≥1 unit
+  • Terrain distribution sums to 100%
+  • Unique spawn positions per faction
+end note
+
+note bottom of Game
+  **Complex Product**
+
+  Game encapsulates:
+  • Battlefield with terrain
+  • Unit management & positioning
+  • Turn-based game state
+  • Combat validation
+  • Victory conditions
+
+  **Encapsulation:**
+  Package-private constructor ensures
+  Game can ONLY be created via GameBuilder.
+
+  **Single Responsibility:**
+  Game handles gameplay logic.
+  GameBuilder handles construction logic.
+end note
+
+note bottom of Battlefield
+  **Separation of Concerns**
+
+  Battlefield only manages terrain.
+  No units, no game logic.
+
+  **Reproducibility:**
+  Random seed allows identical
+  terrain generation for testing.
+
+  **Terrain Distribution:**
+  Configurable via percentages
+  (must sum to 100%).
+  Default: Terrain enum values.
+end note
+
+note right of UP
+  **Helper Record**
+
+  Private record for
+  tracking unit-to-faction
+  assignments during
+  builder configuration.
+end note
+
+note left of GameStatus
+  **Game Lifecycle**
+
+  SETUP → IN_PROGRESS → GAME_OVER
+
+  Game starts in SETUP,
+  transitions to IN_PROGRESS on startGame(),
+  ends in GAME_OVER when ≤1 faction remains.
+end note
+
+@enduml
