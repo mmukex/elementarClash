@@ -1,0 +1,268 @@
+@startuml Composite Pattern - ElementarClash
+
+!define ABSTRACT_CLASS abstract class
+!define INTERFACE interface
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Component>> LightYellow
+    BorderColor<<Component>> DarkOrange
+    BackgroundColor<<Leaf>> LightGreen
+    BorderColor<<Leaf>> DarkGreen
+    BackgroundColor<<Composite>> LightBlue
+    BorderColor<<Composite>> DarkBlue
+}
+
+package "org.elementarclash.battlefield" {
+
+    ' ===== Component =====
+    INTERFACE BattlefieldComponent <<Component>> {
+        + cells(): List<Cell>
+        + {default} applyEffect(effect: TerrainEffect): void
+        + {default} getCell(index: int): Cell
+    }
+
+    ' ===== Leaf =====
+    class Cell <<Leaf>> {
+        - position: Position
+        - terrain: Terrain
+        __
+        + Cell(position: Position, terrain: Terrain)
+        __
+        + cells(): List<Cell>
+        + applyEffect(effect: TerrainEffect): void
+        + getTerrain(): Terrain
+        + setTerrain(terrain: Terrain): void
+    }
+
+    ' ===== Composites =====
+    class Row <<Composite>> <<record>> {
+        - cells: List<Cell>
+        __
+        + Row(cells: List<Cell>)
+        __
+        + cells(): List<Cell>
+    }
+
+    class Region <<Composite>> <<record>> {
+        - cells: List<Cell>
+        __
+        + Region(cells: List<Cell>)
+        __
+        + cells(): List<Cell>
+    }
+
+    class Battlefield <<Composite>> {
+        + {static} GRID_SIZE: int = 10
+        - {static} TOTAL_CELLS: int = 100
+        __
+        - rows: List<Row>
+        __
+        + Battlefield()
+        __
+        + cells(): List<Cell>
+        + initializeTerrain(distribution: Map<Terrain, Integer>, seed: Long): void
+        + getTerrainAt(position: Position): Terrain
+        + setTerrainAt(position: Position, terrain: Terrain): void
+        + getCell(x: int, y: int): Cell
+        + getRegion(x1: int, y1: int, x2: int, y2: int): Region
+    }
+
+    ' ===== Strategy Pattern (works with Composite) =====
+    INTERFACE TerrainEffect {
+        + apply(cell: Cell): Terrain
+    }
+
+    enum Terrain {
+        LAVA
+        ICE
+        FOREST
+        DESERT
+        STONE
+    }
+
+    class Position <<record>> {
+        + x: int
+        + y: int
+    }
+}
+
+package "org.elementarclash.battlefield.effects" {
+    class ForestFireEffect {
+        + apply(cell: Cell): Terrain
+    }
+
+    class GeysirEffect {
+        + apply(cell: Cell): Terrain
+    }
+
+    class IceMeltEffect {
+        + apply(cell: Cell): Terrain
+    }
+}
+
+package "org.elementarclash.units" {
+
+    ' ===== Component =====
+    INTERFACE UnitComponent <<Component>> {
+        + getAllUnits(): List<Unit>
+        + getTotalHealth(): int
+        + isAlive(): boolean
+    }
+
+    ' ===== Leaf =====
+    ABSTRACT_CLASS Unit <<Leaf>> {
+        - id: String
+        - name: String
+        - faction: Faction
+        - type: UnitType
+        - baseStats: UnitStats
+        - currentHealth: int
+        - position: Position
+        - acted: boolean
+        __
+        + getAllUnits(): List<Unit>
+        + getTotalHealth(): int
+        + isAlive(): boolean
+        + takeDamage(damage: int): void
+        + heal(amount: int): void
+        + resetTurn(): void
+        + {abstract} getSpecialAbility(): String
+    }
+
+    ' ===== Composite =====
+    class UnitGroup <<Composite>> {
+        - units: List<UnitComponent>
+        __
+        + UnitGroup(units: List<? extends UnitComponent>)
+        __
+        + getAllUnits(): List<Unit>
+        + getTotalHealth(): int
+        + isAlive(): boolean
+        + add(unit: UnitComponent): void
+        + remove(unit: UnitComponent): void
+    }
+}
+
+' ===== Composite Pattern Relationships (Battlefield) =====
+BattlefieldComponent <|.. Cell
+BattlefieldComponent <|.. Row
+BattlefieldComponent <|.. Region
+BattlefieldComponent <|.. Battlefield
+
+Battlefield *-- "10" Row : contains
+Row *-- "10" Cell : contains
+Region o-- "1..*" Cell : subset
+Cell --> Position
+Cell --> Terrain
+
+' ===== Strategy Pattern Integration =====
+TerrainEffect <|.. ForestFireEffect
+TerrainEffect <|.. GeysirEffect
+TerrainEffect <|.. IceMeltEffect
+BattlefieldComponent ..> TerrainEffect : <<uses>>
+
+' ===== Composite Pattern Relationships (Units) =====
+UnitComponent <|.. Unit
+UnitComponent <|.. UnitGroup
+
+UnitGroup o-- "0..*" UnitComponent : manages
+
+' ===== Notes =====
+note right of BattlefieldComponent
+  **Composite Pattern (GoF #3)**
+
+  **Component Interface**
+  - Defines uniform interface for all nodes
+  - Default methods reduce code duplication
+
+  **DRY Principle:**
+  applyEffect() and getCell() implemented
+  once as default methods, reused by all
+  composites (Row, Region, Battlefield)
+
+  **KISS Principle:**
+  Simple interface with only essential methods
+end note
+
+note bottom of Cell
+  **Leaf**
+
+  Smallest unit in hierarchy.
+  Cannot contain other components.
+
+  Overrides applyEffect() to actually
+  transform terrain (not delegate).
+end note
+
+note bottom of Battlefield
+  **Root Composite**
+
+  Hierarchy: Battlefield → 10 Rows → 100 Cells
+
+  **Usage Examples:**
+
+  // Single cell
+  Cell cell = battlefield.getCell(5, 5);
+  cell.setTerrain(Terrain.FOREST);
+
+  // Region (3x3 area)
+  Region region = battlefield.getRegion(4, 4, 6, 6);
+  region.applyEffect(new ForestFireEffect());
+
+  // Entire battlefield
+  battlefield.applyEffect(new ForestFireEffect());
+
+  All use same interface!
+end note
+
+note right of TerrainEffect
+  **Strategy Pattern Integration**
+
+  TerrainEffect works seamlessly
+  with Composite Pattern:
+
+  - Can be applied to single Cell (Leaf)
+  - Can be applied to Region (Composite)
+  - Can be applied to Battlefield (Root)
+
+  Same effect, different scope!
+end note
+
+note bottom of UnitGroup
+  **Composite for Units**
+
+  Allows grouping units for:
+  - Faction armies
+  - Synergy calculations
+  - Nested hierarchies
+
+  **Example:**
+  UnitGroup fireArmy = game.getUnitGroupOfFaction(FIRE);
+  int totalHP = fireArmy.getTotalHealth();
+
+  UnitGroup allArmies = new UnitGroup(
+      List.of(fireArmy, waterArmy)
+  );  // Nested composite!
+end note
+
+note as N1
+  **Two Composite Hierarchies**
+
+  1. **Battlefield Hierarchy:**
+     BattlefieldComponent
+     ├── Cell (Leaf)
+     ├── Row (Composite: 10 Cells)
+     ├── Region (Composite: Dynamic subset)
+     └── Battlefield (Root: 10 Rows)
+
+  2. **Unit Hierarchy:**
+     UnitComponent
+     ├── Unit (Leaf)
+     └── UnitGroup (Composite: N Units/Groups)
+
+  Both follow same pattern, different domains!
+end note
+
+@enduml

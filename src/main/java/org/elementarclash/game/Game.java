@@ -5,14 +5,25 @@ import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
 import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
+import org.elementarclash.units.UnitGroup;
 import org.elementarclash.util.Position;
 
 import java.util.*;
 
 /**
  * Central game manager for ElementarClash.
- * Manages units, game state, and coordinates with the battlefield.
+ * Manages units, game state, turn-based mechanics, and combat validation.
+ * Coordinates interaction between units and battlefield.
+ * <p>
  * Design Pattern: Builder (see GameBuilder for construction)
+ * Why: Complex construction with terrain distribution, faction setup, and unit placement.
+ * Package-private constructor enforces use of GameBuilder.
+ * <p>
+ * Responsibilities:
+ * - Unit management (add, move, remove, query)
+ * - Turn-based game flow (rounds, faction turns, victory conditions)
+ * - Combat validation (attack range, move validation)
+ * - Game state tracking (SETUP → IN_PROGRESS → GAME_OVER)
  */
 @Getter
 public class Game {
@@ -83,6 +94,10 @@ public class Game {
         return units.stream()
                 .filter(u -> u.getFaction() != faction)
                 .toList();
+    }
+
+    public UnitGroup getUnitGroupOfFaction(Faction faction) {
+        return new UnitGroup(getUnitsOfFaction(faction));
     }
 
     public List<Unit> getUnitsAdjacentTo(Position position) {
