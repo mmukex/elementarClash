@@ -1,0 +1,356 @@
+@startuml command-pattern
+
+skinparam componentStyle rectangle
+skinparam class {
+    BackgroundColor<<Command>> LightBlue
+    BackgroundColor<<ConcreteCommand>> LightGreen
+    BackgroundColor<<Invoker>> LightYellow
+    BackgroundColor<<History>> LightCoral
+    BackgroundColor<<ValueObject>> LightGray
+}
+
+title Command Pattern - ElementarClash Game Actions\nGoF #4: Encapsulating Requests as Objects
+
+package "org.elementarclash.game.command" {
+
+    interface Command <<Command>> {
+        + ValidationResult validate(Game game)
+        + void execute(Game game)
+        + void undo(Game game)
+        + Unit getActor()
+        + CommandType getType()
+        --
+        + {static} ValidationResult validateActorExists(Game, Unit)
+        + {static} ValidationResult validateActorAlive(Unit)
+        + {static} ValidationResult validateTargetExists(Game, Unit)
+    }
+
+    enum CommandType {
+        MOVE
+        ATTACK
+        USE_ABILITY
+    }
+
+    class MoveCommand <<ConcreteCommand>> {
+        - Unit actor
+        - Position targetPosition
+        - Position previousPosition
+        - boolean wasExecuted
+        --
+        + MoveCommand(Unit, Position)
+        + ValidationResult validate(Game)
+        + void execute(Game)
+        + void undo(Game)
+    }
+
+    class AttackCommand <<ConcreteCommand>> {
+        - Unit attacker
+        - Unit target
+        - int targetPreviousHealth
+        - int damageDealt
+        - boolean wasExecuted
+        --
+        + AttackCommand(Unit, Unit)
+        + ValidationResult validate(Game)
+        + void execute(Game)
+        + void undo(Game)
+    }
+
+    class UseAbilityCommand <<ConcreteCommand>> {
+        - Unit actor
+        - Ability ability
+        - Object[] targets
+        - Object undoState
+        - boolean wasExecuted
+        --
+        + UseAbilityCommand(Unit, Ability, Object[])
+        + ValidationResult validate(Game)
+        + void execute(Game)
+        + void undo(Game)
+    }
+
+    class CommandHistory <<History>> {
+        - Stack<Command> executedCommands
+        - Stack<Command> undoneCommands
+        --
+        + void push(Command)
+        + Command popForUndo()
+        + Command popForRedo()
+        + void pushUndone(Command)
+        + void clear()
+        + boolean canUndo()
+        + boolean canRedo()
+    }
+
+    record ValidationResult <<ValueObject>> {
+        + boolean isValid
+        + String errorMessage
+        --
+        + {static} ValidationResult success()
+        + {static} ValidationResult failure(String)
+    }
+
+    Command .down.> ValidationResult : returns
+    Command .down.> CommandType : uses
+    MoveCommand .up.|> Command : implements
+    AttackCommand .up.|> Command : implements
+    UseAbilityCommand .up.|> Command : implements
+
+    CommandHistory o-right-> "0..*" Command : manages
+}
+
+package "org.elementarclash.game" {
+    class Game <<Invoker>> {
+        - CommandHistory commandHistory
+        - List<Unit> units
+        - Map<Position, Unit> positionToUnit
+        --
+        + ValidationResult executeCommand(Command)
+        + boolean undoLastCommand()
+        + boolean redoLastCommand()
+        + boolean canUndo()
+        + boolean canRedo()
+        --
+        + boolean moveUnitInternal(Unit, Position)
+        + void handleUnitDeath(Unit)
+        + boolean isValidMove(Unit, Position)
+        + boolean canAttack(Unit, Unit)
+    }
+
+    Game *-down-> CommandHistory : contains
+    Game ..> Command : validates and executes
+}
+
+package "org.elementarclash.units" {
+    class Unit {
+        - boolean movedThisTurn
+        - boolean attackedThisTurn
+        --
+        + void markMovedThisTurn()
+        + void markAttackedThisTurn()
+        + void clearMovedThisTurn()
+        + void clearAttackedThisTurn()
+        + boolean hasMovedThisTurn()
+        + boolean hasAttackedThisTurn()
+        + boolean canAct()
+        + void resetTurn()
+    }
+
+    MoveCommand ..> Unit : modifies
+    AttackCommand ..> Unit : modifies
+}
+
+package "org.elementarclash.game.ability" {
+    interface Ability {
+        + String getName()
+        + String getDescription()
+        + ValidationResult validate(Game, Unit, Object[])
+        + Object execute(Game, Unit, Object[])
+        + void undo(Game, Unit, Object)
+        --
+        + boolean consumesAction()
+        + int getCooldown()
+    }
+
+    class HealAbility {
+        - int healAmount
+        --
+        + HealAbility(int)
+        + ValidationResult validate(Game, Unit, Object[])
+        + HealUndoState execute(Game, Unit, Object[])
+        + void undo(Game, Unit, HealUndoState)
+        --
+        + record HealUndoState(int amountHealed)
+    }
+
+    HealAbility .up.|> Ability : implements
+    UseAbilityCommand ..> Ability : delegates to
+}
+
+note right of Command
+**Command Pattern (GoF #4)**
+
+**Purpose:**
+Encapsulates player actions (move, attack, abilities)
+as objects with validation, execution, and undo logic.
+
+**Key Benefits:**
+• Undo/Redo capability with full state rollback
+• Action history tracking per turn
+• Separation of validation (Strategy) and execution
+• Open/Closed Principle: Add new commands without
+  modifying Game class
+• Testable in isolation from Game
+
+**Integration with Strategy Pattern:**
+Commands delegate validation to Strategy:
+• MoveCommand → MovementStrategy.canMoveTo()
+• AttackCommand → AttackStrategy.canAttack()
+• UseAbilityCommand → Ability.validate()
+
+**Design Decision:**
+Validation in validate(), not in execute()
+→ DRY: Game.executeCommand() validates once
+→ Commands assume pre-validated state in execute()
+end note
+
+note right of CommandHistory
+**Two-Stack Undo/Redo**
+
+**executedCommands:**
+Commands successfully executed
+(LIFO for undo)
+
+**undoneCommands:**
+Commands that were undone
+(LIFO for redo)
+
+**Flow:**
+1. execute() → push to executedCommands
+2. undo() → pop from executedCommands,
+            push to undoneCommands
+3. redo() → pop from undoneCommands,
+            push to executedCommands
+
+**Per-Turn Scope:**
+History cleared on nextTurn()
+→ Simpler state management
+→ No cross-turn dependencies
+
+**Error Recovery:**
+pushUndone() restores redo stack
+when redo fails
+end note
+
+note bottom of Game
+**Invoker Role**
+
+Game executes commands without
+knowing their concrete types:
+
+**executeCommand(Command cmd):**
+1. result = cmd.validate(this)
+2. if (!result.isValid()) return result
+3. cmd.execute(this)
+4. commandHistory.push(cmd)
+5. return success()
+
+**undoLastCommand():**
+1. cmd = commandHistory.popForUndo()
+2. cmd.undo(this)
+
+**redoLastCommand():**
+1. cmd = commandHistory.popForRedo()
+2. cmd.execute(this)
+
+Game provides internal methods
+for commands to modify state:
+• moveUnitInternal()
+• handleUnitDeath()
+end note
+
+note bottom of MoveCommand
+**Example: MoveCommand**
+
+**Validation:**
+1. Actor exists in game
+2. Actor is alive
+3. Actor hasn't moved this turn
+4. Delegates to Strategy:
+   game.isValidMove(actor, target)
+   → MovementStrategy.canMoveTo()
+
+**Execute:**
+1. Store undo state:
+   previousPosition = actor.getPosition()
+2. Move unit:
+   game.moveUnitInternal(actor, target)
+3. Update flag:
+   actor.markMovedThisTurn()
+4. Set wasExecuted = true
+
+**Undo:**
+1. Check wasExecuted
+2. Restore position:
+   game.moveUnitInternal(actor, previousPosition)
+3. Clear flag:
+   actor.clearMovedThisTurn()
+end note
+
+note bottom of AttackCommand
+**Example: AttackCommand**
+
+**Validation:**
+1. Attacker and target exist
+2. Both are alive
+3. Attacker hasn't attacked this turn
+4. Delegates to Strategy:
+   game.canAttack(attacker, target)
+   → AttackStrategy.canAttack()
+
+**Execute:**
+1. Store undo state:
+   targetPreviousHealth = target.getCurrentHealth()
+2. Calculate damage with terrain bonuses
+3. Apply damage:
+   target.takeDamage(damageDealt)
+4. Update flag:
+   attacker.markAttackedThisTurn()
+5. Handle death:
+   game.handleUnitDeath(target)
+6. Set wasExecuted = true
+
+**Undo:**
+1. Check wasExecuted
+2. Restore health:
+   heal(targetPreviousHealth - currentHealth)
+3. Clear flag:
+   attacker.clearAttackedThisTurn()
+4. Restore alive state if needed
+end note
+
+note bottom of UseAbilityCommand
+**Generic Ability Execution**
+
+**Type Safety:**
+Uses generic Object for ability-specific
+undo state (e.g., HealUndoState record)
+
+**Validation:**
+Fully delegated to Ability interface
+
+**Execute:**
+1. undoState = ability.execute(game, actor, targets)
+2. Set wasExecuted = true
+
+**Undo:**
+1. Check wasExecuted
+2. ability.undo(game, actor, undoState)
+
+**Design Pattern:**
+Strategy + Command combination
+→ Ability defines algorithm
+→ UseAbilityCommand manages state
+end note
+
+note top of Unit
+**Action Tracking**
+
+**Per-Turn Flags:**
+• movedThisTurn: Set by MoveCommand
+• attackedThisTurn: Set by AttackCommand
+
+**Action Limit:**
+1 Move + 1 Attack per turn
+
+**Reset:**
+resetTurn() clears both flags
+Called by Game.nextTurn()
+
+**Undo Support:**
+clearMovedThisTurn() and
+clearAttackedThisTurn() restore
+unit state during undo
+end note
+
+@enduml

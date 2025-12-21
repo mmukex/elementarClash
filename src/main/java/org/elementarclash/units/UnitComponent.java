@@ -17,9 +17,26 @@ import java.util.List;
  * - Nested grouping (UnitGroup containing other UnitGroups)
  */
 public interface UnitComponent {
+    /**
+     * Returns all individual units in this component (flattened list).
+     * For single units: returns list containing itself.
+     * For groups: returns all nested units recursively.
+     *
+     * @return list of all units
+     */
     List<Unit> getAllUnits();
 
+    /**
+     * Returns combined health of all units in this component.
+     *
+     * @return total health points
+     */
     int getTotalHealth();
 
+    /**
+     * Returns whether any unit in this component is alive.
+     *
+     * @return true if at least one unit is alive
+     */
     boolean isAlive();
 }

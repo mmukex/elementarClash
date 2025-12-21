@@ -6,8 +6,12 @@ import org.elementarclash.game.Game;
 import org.elementarclash.util.Position;
 
 /**
- * Ground-based movement strategy.
+ * Ground-based movement strategy with faction-specific terrain modifiers.
  * Units pay full terrain movement costs based on terrain type and faction bonuses.
+ * <p>
+ * Design Pattern: Strategy (GoF #5)
+ * Why: Different factions have unique terrain affinities (Fire on Lava, Water on Ice).
+ * Strategy pattern encapsulates faction-specific movement rules as interchangeable algorithms.
  * <p>
  * Used by: Fire, Water, Earth factions (all non-flying units).
  * <p>

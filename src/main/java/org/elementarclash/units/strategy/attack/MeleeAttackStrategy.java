@@ -6,7 +6,11 @@ import org.elementarclash.units.Unit;
 import java.util.List;
 
 /**
- * Melee attack strategy - range 1 (adjacent cells only).
+ * Melee attack strategy for close-range combat (range 1, adjacent cells only).
+ * <p>
+ * Design Pattern: Strategy (GoF #5)
+ * Why: Different unit types have different attack patterns (melee vs ranged).
+ * Strategy pattern encapsulates attack validation logic as interchangeable algorithm.
  * <p>
  * Used by: Inferno Warrior, Tide Guardian, Stone Golem, Wind Dancer, Wave Rider, Phoenix.
  * <p>
