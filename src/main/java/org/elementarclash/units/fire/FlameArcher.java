@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
+import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
  * Flame Archer - Fire faction ranged unit.
@@ -13,6 +15,8 @@ class FlameArcher extends Unit {
 
     public FlameArcher(String id, UnitStats stats) {
         super(id, "Flammen-Bogenschütze", Faction.FIRE, UnitType.FLAME_ARCHER, stats);
+        setMovementStrategy(new GroundMovementStrategy(Faction.FIRE));
+        setAttackStrategy(new RangedAttackStrategy(true));
     }
 
     @Override

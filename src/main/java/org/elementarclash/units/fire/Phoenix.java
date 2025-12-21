@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
+import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
  * Phoenix - Fire faction flying unit.
@@ -14,6 +16,8 @@ class Phoenix extends Unit {
 
     public Phoenix(String id, UnitStats stats) {
         super(id, "Phönix", Faction.FIRE, UnitType.PHOENIX, stats);
+        setMovementStrategy(new FlyingMovementStrategy());
+        setAttackStrategy(new MeleeAttackStrategy());
     }
 
     @Override

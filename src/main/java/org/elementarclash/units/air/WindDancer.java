@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
+import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
  * Wind Dancer - Air faction fast melee unit.
@@ -14,6 +16,8 @@ class WindDancer extends Unit {
 
     public WindDancer(String id, UnitStats stats) {
         super(id, "Wind-Tänzer", Faction.AIR, UnitType.WIND_DANCER, stats);
+        setMovementStrategy(new FlyingMovementStrategy());
+        setAttackStrategy(new MeleeAttackStrategy());
     }
 
     @Override

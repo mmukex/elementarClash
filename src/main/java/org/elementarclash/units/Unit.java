@@ -3,6 +3,10 @@ package org.elementarclash.units;
 import lombok.Getter;
 import lombok.Setter;
 import org.elementarclash.faction.Faction;
+import org.elementarclash.units.strategy.attack.AttackStrategy;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
+import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
+import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
 
 import java.util.List;
@@ -26,6 +30,9 @@ public abstract class Unit implements UnitComponent {
     @Setter
     private Position position;
     private boolean acted;
+
+    private MovementStrategy movementStrategy;
+    private AttackStrategy attackStrategy;
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -55,6 +62,28 @@ public abstract class Unit implements UnitComponent {
 
     public void markAsActed() {
         acted = true;
+    }
+
+    public MovementStrategy getMovementStrategy() {
+        if (movementStrategy == null) {
+            movementStrategy = new GroundMovementStrategy(faction);
+        }
+        return movementStrategy;
+    }
+
+    public AttackStrategy getAttackStrategy() {
+        if (attackStrategy == null) {
+            attackStrategy = new MeleeAttackStrategy();
+        }
+        return attackStrategy;
+    }
+
+    protected void setMovementStrategy(MovementStrategy strategy) {
+        this.movementStrategy = strategy;
+    }
+
+    protected void setAttackStrategy(AttackStrategy strategy) {
+        this.attackStrategy = strategy;
     }
 
     @Override

@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
+import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
  * Inferno Warrior - Fire faction melee unit.
@@ -14,6 +16,8 @@ class InfernoWarrior extends Unit {
 
     public InfernoWarrior(String id, UnitStats stats) {
         super(id, "Inferno-Krieger", Faction.FIRE, UnitType.INFERNO_WARRIOR, stats);
+        setMovementStrategy(new GroundMovementStrategy(Faction.FIRE));
+        setAttackStrategy(new MeleeAttackStrategy());
     }
 
     @Override

@@ -4,6 +4,9 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.attack.AreaAttackStrategy;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
+import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
  * Earthquake Titan - Earth faction heavy damage dealer.
@@ -14,6 +17,11 @@ class EarthquakeTitan extends Unit {
 
     public EarthquakeTitan(String id, UnitStats stats) {
         super(id, "Erdbeben-Titan", Faction.EARTH, UnitType.EARTHQUAKE_TITAN, stats);
+        setMovementStrategy(new GroundMovementStrategy(Faction.EARTH));
+        setAttackStrategy(new AreaAttackStrategy(
+                new MeleeAttackStrategy(),
+                0.75
+        ));
     }
 
     @Override

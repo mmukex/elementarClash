@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
+import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
  * Storm Caller - Air faction ranged damage dealer.
@@ -15,6 +17,8 @@ class StormCaller extends Unit {
 
     public StormCaller(String id, UnitStats stats) {
         super(id, "Sturm-Rufer", Faction.AIR, UnitType.STORM_CALLER, stats);
+        setMovementStrategy(new FlyingMovementStrategy());
+        setAttackStrategy(new RangedAttackStrategy(false));
     }
 
     @Override
