@@ -3,6 +3,9 @@ package org.elementarclash.game;
 import lombok.Getter;
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
+import org.elementarclash.battlefield.visitor.TerrainEffectResult;
+import org.elementarclash.battlefield.visitor.TerrainVisitor;
+import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
 import org.elementarclash.faction.Faction;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.game.command.CommandHistory;
@@ -76,16 +79,14 @@ public class Game {
         positionToUnit.remove(unit.getPosition());
     }
 
-    public boolean moveUnitInternal(Unit unit, Position newPosition) {
+    public void moveUnitInternal(Unit unit, Position newPosition) {
         if (!units.contains(unit) || isPositionOccupied(newPosition)) {
-            return false;
+            return;
         }
 
         positionToUnit.remove(unit.getPosition());
         positionToUnit.put(newPosition, unit);
         unit.setPosition(newPosition);
-
-        return true;
     }
 
     public ValidationResult executeCommand(Command command) {
@@ -241,8 +242,31 @@ public class Game {
     public void nextTurn() {
         List<Faction> aliveFactions = getAliveFactions();
         resetCurrentFactionUnits();
+        applyPerTurnTerrainEffects();
         activeFaction = determineNextFaction(aliveFactions);
         updateGameStatus();
+    }
+
+    private void applyPerTurnTerrainEffects() {
+        for (Unit unit : units) {
+            if (!unit.isAlive()) {
+                continue;
+            }
+
+            Terrain terrain = battlefield.getTerrainAt(unit.getPosition());
+            TerrainVisitor visitor =
+                TerrainVisitorFactory.getVisitor(terrain);
+            TerrainEffectResult effect = unit.accept(visitor);
+
+            if (effect.hasPerTurnEffect()) {
+                int hpChange = effect.hpPerTurn();
+                if (hpChange > 0) {
+                    unit.heal(hpChange);
+                } else {
+                    unit.takeDamage(-hpChange); // Convert negative to positive
+                }
+            }
+        }
     }
 
     private List<Faction> getAliveFactions() {

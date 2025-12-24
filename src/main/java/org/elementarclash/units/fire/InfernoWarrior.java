@@ -24,11 +24,4 @@ class InfernoWarrior extends Unit {
     public String getSpecialAbility() {
         return "+2 Angriff auf Lava-Gelände";
     }
-
-    // Placeholder - will be replaced by Visitor pattern later
-    @Override
-    public int getTerrainAttackBonus() {
-        // TODO: Replace with Visitor pattern when terrain system is implemented
-        return 0; // Will be handled by TerrainVisitor
-    }
 }

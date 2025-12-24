@@ -25,12 +25,6 @@ class StoneGolem extends Unit {
         return "Regeneriert 5 LP pro Runde auf Berg-Gelände";
     }
 
-    @Override
-    public int getTerrainDefenseBonus() {
-        // TODO: Replace with Visitor pattern when terrain system is implemented
-        return 0; // Will be handled by TerrainVisitor
-    }
-
     /**
      * Returns regeneration amount on mountain terrain.
      * Will be used by terrain/turn system later.

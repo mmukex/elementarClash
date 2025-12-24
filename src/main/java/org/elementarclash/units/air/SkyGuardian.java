@@ -32,12 +32,6 @@ class SkyGuardian extends Unit {
         return true;
     }
 
-    @Override
-    public int getTerrainDefenseBonus() {
-        // TODO: Replace with Visitor pattern when terrain system is implemented
-        return 0; // Will be handled by TerrainVisitor
-    }
-
     public int getHighGroundDefenseBonus() {
         return HIGH_GROUND_DEFENSE_BONUS;
     }

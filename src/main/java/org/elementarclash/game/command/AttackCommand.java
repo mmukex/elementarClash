@@ -1,6 +1,10 @@
 package org.elementarclash.game.command;
 
 import lombok.Getter;
+import org.elementarclash.battlefield.Terrain;
+import org.elementarclash.battlefield.visitor.TerrainEffectResult;
+import org.elementarclash.battlefield.visitor.TerrainVisitor;
+import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
 import org.elementarclash.game.Game;
 import org.elementarclash.units.Unit;
 
@@ -76,9 +80,18 @@ public class AttackCommand implements Command {
 
         int baseDamage = actor.getAttackStrategy().calculateBaseDamage(actor, target);
 
-        // Terrain bonuses (will be implemented with Visitor pattern)
-        int attackBonus = actor.getTerrainAttackBonus();
-        int defenseBonus = target.getTerrainDefenseBonus();
+        // Terrain bonuses using Visitor pattern
+        Terrain attackerTerrain = game.getBattlefield().getTerrainAt(actor.getPosition());
+        Terrain defenderTerrain = game.getBattlefield().getTerrainAt(target.getPosition());
+
+        TerrainVisitor attackerVisitor = TerrainVisitorFactory.getVisitor(attackerTerrain);
+        TerrainVisitor defenderVisitor = TerrainVisitorFactory.getVisitor(defenderTerrain);
+
+        TerrainEffectResult attackerEffect = actor.accept(attackerVisitor);
+        TerrainEffectResult defenderEffect = target.accept(defenderVisitor);
+
+        int attackBonus = attackerEffect.attackBonus();
+        int defenseBonus = defenderEffect.defenseBonus();
 
         int totalAttack = baseDamage + attackBonus;
         int totalDefense = target.getBaseStats().defense() + defenseBonus;
