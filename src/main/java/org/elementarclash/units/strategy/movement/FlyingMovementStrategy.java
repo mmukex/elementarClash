@@ -5,12 +5,16 @@ import org.elementarclash.game.Game;
 import org.elementarclash.util.Position;
 
 /**
- * Flying movement strategy.
- * Flying units ignore terrain movement penalties and treat all terrain as cost 1.0.
+ * Flying movement strategy that ignores terrain penalties.
+ * Flying units treat all terrain as cost 1.0 for maximum mobility.
+ * <p>
+ * Design Pattern: Strategy (GoF #5)
+ * Why: Air faction has unique mobility advantage (flying over obstacles).
+ * Strategy pattern allows swapping movement algorithms without modifying Unit class.
  * <p>
  * Used by: Phoenix (Fire), All Air faction units (Wind Dancer, Storm Caller, Sky Guardian).
  * <p>
- * Flying units have significant mobility advantages:
+ * Flying advantages:
  * - No terrain penalties (forest, ice, lava all cost 1.0)
  * - Can traverse difficult terrain without slowdown
  * - Effective movement range equals base movement stat

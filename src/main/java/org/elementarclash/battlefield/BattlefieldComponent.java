@@ -12,12 +12,28 @@ import java.util.List;
  * with the same interface.
  */
 public interface BattlefieldComponent {
+    /**
+     * Returns all cells in this component.
+     *
+     * @return list of cells
+     */
     List<Cell> cells();
 
+    /**
+     * Applies a terrain effect to all cells in this component.
+     *
+     * @param effect effect to apply
+     */
     default void applyEffect(TerrainEffect effect) {
         cells().forEach(cell -> cell.applyEffect(effect));
     }
 
+    /**
+     * Retrieves cell at specified index.
+     *
+     * @param index cell index
+     * @return cell at index
+     */
     default Cell getCell(int index) {
         return cells().get(index);
     }

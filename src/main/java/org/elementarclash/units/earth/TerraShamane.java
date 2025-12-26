@@ -4,8 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
-import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 
 /**
  * Terra Shaman - Earth faction support unit.
@@ -30,7 +30,7 @@ class TerraShamane extends Unit {
      * Will be implemented with Command pattern for abilities.
      */
     public boolean canCreateWall() {
-        return !isActed();
+        return canAct();
     }
 
     public int getWallDuration() {

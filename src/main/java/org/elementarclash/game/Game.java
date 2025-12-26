@@ -4,6 +4,9 @@ import lombok.Getter;
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
 import org.elementarclash.faction.Faction;
+import org.elementarclash.game.command.Command;
+import org.elementarclash.game.command.CommandHistory;
+import org.elementarclash.game.command.ValidationResult;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitGroup;
 import org.elementarclash.util.Position;
@@ -12,17 +15,21 @@ import java.util.*;
 
 /**
  * Central game manager for ElementarClash.
- * Manages units, game state, turn-based mechanics, and combat validation.
+ * Manages units, game state, turn-based mechanics, and command execution.
  * Coordinates interaction between units and battlefield.
  * <p>
- * Design Pattern: Builder (see GameBuilder for construction)
+ * Design Pattern: Builder (GoF #2) - see GameBuilder for construction
  * Why: Complex construction with terrain distribution, faction setup, and unit placement.
  * Package-private constructor enforces use of GameBuilder.
  * <p>
+ * Design Pattern: Command (GoF #4) - executeCommand() as primary action interface
+ * Why: All player actions (move, attack, abilities) are executed as Commands with validation and undo/redo.
+ * CommandHistory maintains per-turn action history for rollback capability.
+ * <p>
  * Responsibilities:
- * - Unit management (add, move, remove, query)
+ * - Unit management (add, remove, query)
+ * - Command execution and validation (via Strategy Pattern)
  * - Turn-based game flow (rounds, faction turns, victory conditions)
- * - Combat validation (attack range, move validation)
  * - Game state tracking (SETUP → IN_PROGRESS → GAME_OVER)
  */
 @Getter
@@ -35,7 +42,7 @@ public class Game {
     private final Battlefield battlefield;
     private final List<Unit> units;
     private final Map<Position, Unit> positionToUnit;
-
+    private final CommandHistory commandHistory;
     private int currentRound;
     private Faction activeFaction;
     private GameStatus status;
@@ -47,6 +54,7 @@ public class Game {
         this.currentRound = INITIAL_ROUND;
         this.activeFaction = null;
         this.status = GameStatus.SETUP;
+        this.commandHistory = new CommandHistory();
     }
 
     public boolean isPositionOccupied(Position position) {
@@ -68,7 +76,7 @@ public class Game {
         positionToUnit.remove(unit.getPosition());
     }
 
-    public boolean moveUnit(Unit unit, Position newPosition) {
+    public boolean moveUnitInternal(Unit unit, Position newPosition) {
         if (!units.contains(unit) || isPositionOccupied(newPosition)) {
             return false;
         }
@@ -78,6 +86,70 @@ public class Game {
         unit.setPosition(newPosition);
 
         return true;
+    }
+
+    public ValidationResult executeCommand(Command command) {
+        ValidationResult result = command.validate(this);
+        if (!result.isValid()) {
+            return result;
+        }
+
+        try {
+            command.execute(this);
+            commandHistory.push(command);
+            return ValidationResult.success();
+        } catch (Exception e) {
+            return ValidationResult.failure("Execution failed: " + e.getMessage());
+        }
+    }
+
+    public boolean undoLastCommand() {
+        Command command = commandHistory.popForUndo();
+        if (command == null) {
+            return false;
+        }
+
+        try {
+            command.undo(this);
+            return true;
+        } catch (Exception e) {
+            commandHistory.push(command);
+            throw new IllegalStateException("Undo failed: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean redoLastCommand() {
+        Command command = commandHistory.popForRedo();
+        if (command == null) {
+            return false;
+        }
+
+        try {
+            command.execute(this);
+            return true;
+        } catch (Exception e) {
+            commandHistory.pushUndone(command);
+            throw new IllegalStateException("Redo failed: " + e.getMessage(), e);
+        }
+    }
+
+    public boolean canUndo() {
+        return commandHistory.canUndo();
+    }
+
+    public boolean canRedo() {
+        return commandHistory.canRedo();
+    }
+
+    /**
+     * Handles unit death.
+     * Called by AttackCommand when target health reaches 0.
+     * Does not remove unit from list to preserve undo capability.
+     *
+     * @param unit unit that died
+     */
+    public void handleUnitDeath(Unit unit) {
+        // Future: trigger death effects, check victory conditions
     }
 
     public Unit getUnitAt(Position position) {
@@ -184,6 +256,7 @@ public class Game {
 
     private void resetCurrentFactionUnits() {
         getUnitsOfFaction(activeFaction).forEach(Unit::resetTurn);
+        commandHistory.clear();
     }
 
     private Faction determineNextFaction(List<Faction> aliveFactions) {
@@ -273,7 +346,7 @@ public class Game {
             sb.append("  ").append(terrain.getIcon()).append(" ")
                     .append(terrain.getGermanName()).append(" | ");
         }
-        sb.append("\n\n");
+        sb.append(System.lineSeparator()).append(System.lineSeparator());
 
         // Unit summary
         long livingUnits = units.stream().filter(Unit::isAlive).count();

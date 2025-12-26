@@ -4,8 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.elementarclash.faction.Faction;
 import org.elementarclash.units.strategy.attack.AttackStrategy;
-import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
 
@@ -29,7 +29,8 @@ public abstract class Unit implements UnitComponent {
     private int currentHealth;
     @Setter
     private Position position;
-    private boolean acted;
+    private boolean movedThisTurn;
+    private boolean attackedThisTurn;
 
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
@@ -41,7 +42,8 @@ public abstract class Unit implements UnitComponent {
         this.type = type;
         this.baseStats = stats;
         this.currentHealth = stats.maxHealth();
-        this.acted = false;
+        this.movedThisTurn = false;
+        this.attackedThisTurn = false;
     }
 
     public boolean isAlive() {
@@ -57,11 +59,43 @@ public abstract class Unit implements UnitComponent {
     }
 
     public void resetTurn() {
-        acted = false;
+        movedThisTurn = false;
+        attackedThisTurn = false;
     }
 
+    @Deprecated
     public void markAsActed() {
-        acted = true;
+        // Deprecated: Use markMovedThisTurn() or markAttackedThisTurn()
+        movedThisTurn = true;
+        attackedThisTurn = true;
+    }
+
+    public void markMovedThisTurn() {
+        movedThisTurn = true;
+    }
+
+    public void markAttackedThisTurn() {
+        attackedThisTurn = true;
+    }
+
+    public void clearMovedThisTurn() {
+        movedThisTurn = false;
+    }
+
+    public void clearAttackedThisTurn() {
+        attackedThisTurn = false;
+    }
+
+    public boolean hasMovedThisTurn() {
+        return movedThisTurn;
+    }
+
+    public boolean hasAttackedThisTurn() {
+        return attackedThisTurn;
+    }
+
+    public boolean canAct() {
+        return !movedThisTurn || !attackedThisTurn;
     }
 
     public MovementStrategy getMovementStrategy() {
@@ -71,15 +105,15 @@ public abstract class Unit implements UnitComponent {
         return movementStrategy;
     }
 
+    protected void setMovementStrategy(MovementStrategy strategy) {
+        this.movementStrategy = strategy;
+    }
+
     public AttackStrategy getAttackStrategy() {
         if (attackStrategy == null) {
             attackStrategy = new MeleeAttackStrategy();
         }
         return attackStrategy;
-    }
-
-    protected void setMovementStrategy(MovementStrategy strategy) {
-        this.movementStrategy = strategy;
     }
 
     protected void setAttackStrategy(AttackStrategy strategy) {

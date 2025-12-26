@@ -11,7 +11,7 @@ import java.util.List;
  * <p>
  * Design Pattern: Strategy (GoF #5)
  * Why: Different units have different attack patterns (melee, ranged, area).
- *      Strategy pattern allows switching attack algorithms without modifying Unit classes.
+ * Strategy pattern allows switching attack algorithms without modifying Unit classes.
  * <p>
  * Implementations:
  * - MeleeAttackStrategy: Range 1, adjacent cells only
@@ -20,13 +20,46 @@ import java.util.List;
  */
 public interface AttackStrategy {
 
+    /**
+     * Validates if attacker can target specific unit.
+     * Checks range, line of sight, and special attack rules.
+     *
+     * @param game     game instance for position/obstacle checks
+     * @param attacker attacking unit
+     * @param target   target unit
+     * @return true if attack is valid
+     */
     boolean canAttack(Game game, Unit attacker, Unit target);
 
+    /**
+     * Returns all units this attacker can currently target.
+     * Considers range, obstacles, and faction (cannot attack allies).
+     *
+     * @param game     game instance for unit lookup
+     * @param attacker attacking unit
+     * @return list of valid targets
+     */
     List<Unit> getValidTargets(Game game, Unit attacker);
 
+    /**
+     * Calculates base damage before modifiers.
+     * Default: returns attacker's attack stat.
+     * Can be overridden for special damage calculations.
+     *
+     * @param attacker attacking unit
+     * @param target   target unit
+     * @return base damage value
+     */
     default int calculateBaseDamage(Unit attacker, Unit target) {
         return attacker.getBaseStats().attack();
     }
 
+    /**
+     * Returns attack range of unit with this strategy.
+     * Melee: 1, Ranged: 3-4, varies by unit type.
+     *
+     * @param unit unit to get range for
+     * @return attack range in cells
+     */
     int getAttackRange(Unit unit);
 }

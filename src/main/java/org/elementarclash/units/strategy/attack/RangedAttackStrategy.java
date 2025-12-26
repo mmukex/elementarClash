@@ -8,8 +8,12 @@ import org.elementarclash.util.Position;
 import java.util.List;
 
 /**
- * Ranged attack strategy - range 3-4 with line of sight requirement.
- * Forest terrain blocks line of sight unless unit has forest-piercing ability.
+ * Ranged attack strategy for long-distance combat (range 3-4).
+ * Includes line of sight validation - forest terrain blocks attacks unless unit has piercing ability.
+ * <p>
+ * Design Pattern: Strategy (GoF #5)
+ * Why: Ranged units have complex targeting rules (range, line of sight, forest blocking).
+ * Strategy pattern encapsulates ranged attack validation separate from melee logic.
  * <p>
  * Used by:
  * - Flame Archer (range 3, ignores forest)
