@@ -247,11 +247,11 @@
                     <div class="why-box">
                         <p><strong>Komplexes Aktionssystem:</strong></p>
                         <ul style="font-size: 0.85em;">
-                            <li>3 Aktionen pro Runde: Bewegen, Angreifen, Fähigkeiten</li>
-                            <li>Jede Aktion hat <strong>eigene Validierung</strong> (Reichweite, Cooldown, ...)</li>
-                            <li><strong>Undo/Redo</strong> für Spielzüge</li>
-                            <li><strong>Replay-System:</strong> Commands speichern und abspielen</li>
-                            <li><strong>Netzwerk-Sync:</strong> Commands zwischen Clients übertragen</li>
+                            <li>Pro Einheit pro Runde: 1× Bewegen + 1× Angreifen/Fähigkeit</li>
+                            <li>Jede Aktion hat <strong>eigene Validierung</strong> (Reichweite, Status, ...)</li>
+                            <li><strong>Undo/Redo</strong> für Spielzüge (per-turn Rollback)</li>
+                            <li><strong>Command History:</strong> Tracking aller Aktionen</li>
+                            <li><strong>Integration:</strong> Validierung via Strategy Pattern</li>
                         </ul>
                     </div>
                     <p style="font-size: 0.8em; color: #ff6b6b;">Direkte Methodenaufrufe? Keine Kontrolle, kein Undo!</p>
@@ -260,11 +260,11 @@
                 <section>
                     <h3>Warum Command?</h3>
                     <div style="text-align: left; font-size: 0.85em;">
-                        <p><strong>Aktionen als Objekte:</strong> Speichern, übertragen, verarbeiten</p>
-                        <p><strong>Eingebaute Validierung:</strong> Vor Ausführung prüfen</p>
-                        <p><strong>Undo/Redo:</strong> Zustand wiederherstellen</p>
-                        <p><strong>Command Queue:</strong> "3 Aktionen pro Runde" = 3 Commands</p>
-                        <p><strong>Entkopplung:</strong> Aufrufer kennt nicht die Details</p>
+                        <p><strong>Aktionen als Objekte:</strong> Kapseln Move/Attack/Ability</p>
+                        <p><strong>Eingebaute Validierung:</strong> Delegation an Strategy Pattern</p>
+                        <p><strong>Undo/Redo:</strong> Per-turn Zustand wiederherstellen</p>
+                        <p><strong>Command History:</strong> Tracking mit Two-Stack-Mechanismus</p>
+                        <p><strong>Entkopplung:</strong> Game kennt nur Command-Interface</p>
                     </div>
                 </section>
             </section>
@@ -354,13 +354,15 @@
                 <section>
                     <h3>Das Problem</h3>
                     <div class="why-box">
-                        <p><strong>Dynamische Boni für Einheiten</strong></p>
+                        <p><strong>Stapelbare, dynamische Buffs/Debuffs für Einheiten</strong></p>
                         <ul style="font-size: 0.85em;">
-                            <li>Einheiten müssen unter definierten Umständen Boni gewährt werden</li>
-                            <li>Decorator ermöglicht zur Laufzeit die Erweiterung eines Objektes (Einheit)</li>
+                            <li>Synergien: Benachbarte Feuer-Einheiten gewähren +1 Angriff</li>
+                            <li>Temporäre Fähigkeits-Buffs: Feuersturm +3 Angriff für 2 Runden</li>
+                            <li>Status-Effekte: Verlangsamung (-1 Bewegung), Betäubung</li>
+                            <li>Mehrere Effekte gleichzeitig stapelbar</li>
                         </ul>
                     </div>
-                    <p style="font-size: 0.8em; color: #ff6b6b;">Jede Klasse müsste zur Kompilierzeit wissen welche Boni sie theoretisch annehmen könnte</p>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">Jede Klasse müsste alle möglichen Buff-Kombinationen kennen!</p>
                 </section>
             </section>
             <section>
@@ -408,14 +410,16 @@
                 <section>
                     <h3>Das Problem</h3>
                     <div class="why-box">
-                        <p><strong>Schadensberechnung</strong></p>
+                        <p><strong>Schadensberechnung in sequenziellen Schritten</strong></p>
                         <ul style="font-size: 0.85em;">
-                            <li>Schaden wird berechnet durch:</li>
-                            <li>Elementarvorteile (Eis vs. Feuer)</li>
-                            <li>Geländemodifikator</li>
+                            <li>Basisschaden: Angriffswert der Einheit</li>
+                            <li>Elementar-Modifikator: Feuer vs Erde +25%, vs Wasser -25%</li>
+                            <li>Synergien: Benachbarte Einheiten verstärken Angriff</li>
+                            <li>Verteidigung: Verteidigungswert des Ziels subtrahieren</li>
+                            <li>Jeder Schritt muss flexibel erweiterbar sein</li>
                         </ul>
                     </div>
-                    <p style="font-size: 0.8em; color: #ff6b6b;">Erst Hit-Schaden, dann Geländeschaden, dann Heal...</p>
+                    <p style="font-size: 0.8em; color: #ff6b6b;">Monolithische Methode mit allen Modifikatoren? Nicht erweiterbar!</p>
                 </section>
             </section>
             <!-- Q&A -->
