@@ -3,6 +3,13 @@ package org.elementarclash.battlefield;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+/**
+ * Defines five terrain types with their gameplay bonuses and distribution.
+ * Each terrain affects defense, movement cost, and default battlefield distribution.
+ * <p>
+ * Why Enum: Finite set of terrain types with associated data and behavior.
+ * Provides type-safety and prevents invalid terrain instances.
+ */
 @Getter
 @RequiredArgsConstructor
 public enum Terrain {

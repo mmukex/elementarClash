@@ -1,18 +1,21 @@
 package org.elementarclash.units;
 
-import org.elementarclash.faction.Faction;
 import lombok.Getter;
 import lombok.Setter;
+import org.elementarclash.faction.Faction;
 import org.elementarclash.util.Position;
+
+import java.util.List;
 
 /**
  * Abstract base class for all units in ElementarClash.
  * Defines common properties and behavior for all unit types.
  * <p>
  * Design Pattern: Factory Method creates instances of Unit subclasses.
+ * Design Pattern: Composite - Unit is Leaf in UnitComponent hierarchy.
  */
 @Getter
-public abstract class Unit {
+public abstract class Unit implements UnitComponent {
     private final String id;
     private final String name;
     private final Faction faction;
@@ -52,6 +55,16 @@ public abstract class Unit {
 
     public void markAsActed() {
         acted = true;
+    }
+
+    @Override
+    public List<Unit> getAllUnits() {
+        return List.of(this);
+    }
+
+    @Override
+    public int getTotalHealth() {
+        return currentHealth;
     }
 
     // ========== Abstract Methods (Template Method Pattern) ==========

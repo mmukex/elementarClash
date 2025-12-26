@@ -1,25 +1,40 @@
 package org.elementarclash.battlefield;
 
-import lombok.Getter;
 import org.elementarclash.util.Position;
 
 import java.util.*;
 
 /**
- * Represents the 10x10 game board with terrain.
+ * Root composite representing the complete 10x10 battlefield with terrain.
+ * Organized as hierarchy: Battlefield → 10 Rows → 100 Cells.
+ * <p>
+ * Design Pattern: Composite (GoF #3) - Root Composite
+ * Why: Allows operations on entire battlefield while maintaining hierarchical structure.
+ * Supports dynamic region extraction for localized effects.
+ * <p>
  * Design Pattern: Builder (see GameBuilder for construction)
  */
-@Getter
-public class Battlefield {
+public class Battlefield implements BattlefieldComponent {
 
     public static final int GRID_SIZE = 10;
     private static final int TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
     private static final int PERCENTAGE_DIVISOR = 100;
 
-    private final Terrain[][] terrainGrid;
+    private final List<Row> rows;
 
     public Battlefield() {
-        this.terrainGrid = new Terrain[GRID_SIZE][GRID_SIZE];
+        this.rows = new ArrayList<>(GRID_SIZE);
+        initializeEmptyGrid();
+    }
+
+    private void initializeEmptyGrid() {
+        for (int y = 0; y < GRID_SIZE; y++) {
+            List<Cell> cells = new ArrayList<>(GRID_SIZE);
+            for (int x = 0; x < GRID_SIZE; x++) {
+                cells.add(new Cell(new Position(x, y), Terrain.DESERT));
+            }
+            rows.add(new Row(cells));
+        }
     }
 
     public void initializeTerrain(Map<Terrain, Integer> distribution, Long randomSeed) {
@@ -69,16 +84,39 @@ public class Battlefield {
         int index = 0;
         for (int y = 0; y < GRID_SIZE; y++) {
             for (int x = 0; x < GRID_SIZE; x++) {
-                terrainGrid[y][x] = terrainList.get(index++);
+                getCell(x, y).setTerrain(terrainList.get(index++));
             }
         }
     }
 
     public Terrain getTerrainAt(Position position) {
-        return terrainGrid[position.y()][position.x()];
+        return getCell(position.x(), position.y()).getTerrain();
     }
 
     public void setTerrainAt(Position position, Terrain terrain) {
-        terrainGrid[position.y()][position.x()] = terrain;
+        getCell(position.x(), position.y()).setTerrain(terrain);
+    }
+
+    public Cell getCell(int x, int y) {
+        return rows.get(y).getCell(x);
+    }
+
+    public Region getRegion(int x1, int y1, int x2, int y2) {
+        List<Cell> regionCells = new ArrayList<>();
+        for (int y = y1; y <= y2; y++) {
+            for (int x = x1; x <= x2; x++) {
+                if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                    regionCells.add(getCell(x, y));
+                }
+            }
+        }
+        return new Region(regionCells);
+    }
+
+    @Override
+    public List<Cell> cells() {
+        return rows.stream()
+                .flatMap(row -> row.cells().stream())
+                .toList();
     }
 }
