@@ -3,12 +3,16 @@ package org.elementarclash.game;
 import lombok.Getter;
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
+import org.elementarclash.battlefield.visitor.TerrainEffectResult;
+import org.elementarclash.battlefield.visitor.TerrainVisitor;
+import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
 import org.elementarclash.faction.Faction;
 import org.elementarclash.game.command.Command;
-import org.elementarclash.game.command.CommandHistory;
+import org.elementarclash.game.command.CommandExecutor;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.ui.ConsoleGameRenderer;
+import org.elementarclash.ui.GameRenderer;
 import org.elementarclash.units.Unit;
-import org.elementarclash.units.UnitGroup;
 import org.elementarclash.util.Position;
 
 import java.util.*;
@@ -35,15 +39,13 @@ import java.util.*;
 @Getter
 public class Game {
 
-    private static final int INITIAL_ROUND = 0;
-    private static final int STARTING_ROUND = 1;
     private static final int SINGLE_FACTION_REMAINING = 1;
 
     private final Battlefield battlefield;
     private final List<Unit> units;
     private final Map<Position, Unit> positionToUnit;
-    private final CommandHistory commandHistory;
-    private int currentRound;
+    private final CommandExecutor commandExecutor;
+    private final TurnManager turnManager;
     private Faction activeFaction;
     private GameStatus status;
 
@@ -51,10 +53,10 @@ public class Game {
         this.battlefield = battlefield;
         this.units = new ArrayList<>();
         this.positionToUnit = new HashMap<>();
-        this.currentRound = INITIAL_ROUND;
         this.activeFaction = null;
         this.status = GameStatus.SETUP;
-        this.commandHistory = new CommandHistory();
+        this.commandExecutor = new CommandExecutor();
+        this.turnManager = new TurnManager();
     }
 
     public boolean isPositionOccupied(Position position) {
@@ -76,78 +78,36 @@ public class Game {
         positionToUnit.remove(unit.getPosition());
     }
 
-    public boolean moveUnitInternal(Unit unit, Position newPosition) {
+    public void moveUnitInternal(Unit unit, Position newPosition) {
         if (!units.contains(unit) || isPositionOccupied(newPosition)) {
-            return false;
+            return;
         }
 
         positionToUnit.remove(unit.getPosition());
         positionToUnit.put(newPosition, unit);
         unit.setPosition(newPosition);
-
-        return true;
     }
 
     public ValidationResult executeCommand(Command command) {
-        ValidationResult result = command.validate(this);
-        if (!result.isValid()) {
-            return result;
-        }
-
-        try {
-            command.execute(this);
-            commandHistory.push(command);
-            return ValidationResult.success();
-        } catch (Exception e) {
-            return ValidationResult.failure("Execution failed: " + e.getMessage());
-        }
+        return commandExecutor.execute(command, this);
     }
 
     public boolean undoLastCommand() {
-        Command command = commandHistory.popForUndo();
-        if (command == null) {
-            return false;
-        }
-
-        try {
-            command.undo(this);
-            return true;
-        } catch (Exception e) {
-            commandHistory.push(command);
-            throw new IllegalStateException("Undo failed: " + e.getMessage(), e);
-        }
+        return commandExecutor.undo(this);
     }
 
     public boolean redoLastCommand() {
-        Command command = commandHistory.popForRedo();
-        if (command == null) {
-            return false;
-        }
-
-        try {
-            command.execute(this);
-            return true;
-        } catch (Exception e) {
-            commandHistory.pushUndone(command);
-            throw new IllegalStateException("Redo failed: " + e.getMessage(), e);
-        }
+        return commandExecutor.redo(this);
     }
 
     public boolean canUndo() {
-        return commandHistory.canUndo();
+        return commandExecutor.canUndo();
     }
 
     public boolean canRedo() {
-        return commandHistory.canRedo();
+        return commandExecutor.canRedo();
     }
 
-    /**
-     * Handles unit death.
-     * Called by AttackCommand when target health reaches 0.
-     * Does not remove unit from list to preserve undo capability.
-     *
-     * @param unit unit that died
-     */
     public void handleUnitDeath(Unit unit) {
         // Future: trigger death effects, check victory conditions
     }
@@ -166,10 +126,6 @@ public class Game {
         return units.stream()
                 .filter(u -> u.getFaction() != faction)
                 .toList();
-    }
-
-    public UnitGroup getUnitGroupOfFaction(Faction faction) {
-        return new UnitGroup(getUnitsOfFaction(faction));
     }
 
     public List<Unit> getUnitsAdjacentTo(Position position) {
@@ -194,6 +150,14 @@ public class Game {
 
     public boolean isValidMove(Unit unit, Position target) {
         return unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, unit.getBaseStats().movement());
+    }
+
+    public Terrain getTerrainAt(Position position) {
+        return battlefield.getTerrainAt(position);
+    }
+
+    public int getTurnNumber() {
+        return turnManager.getTurnNumber();
     }
 
     public List<Unit> getValidAttackTargets(Unit attacker) {
@@ -222,7 +186,7 @@ public class Game {
     public void startGame() {
         ensureActiveFactionIsSet();
         this.status = GameStatus.IN_PROGRESS;
-        this.currentRound = STARTING_ROUND;
+        turnManager.startGame();
     }
 
     private void ensureActiveFactionIsSet() {
@@ -241,8 +205,31 @@ public class Game {
     public void nextTurn() {
         List<Faction> aliveFactions = getAliveFactions();
         resetCurrentFactionUnits();
+        applyPerTurnTerrainEffects();
         activeFaction = determineNextFaction(aliveFactions);
         updateGameStatus();
+    }
+
+    private void applyPerTurnTerrainEffects() {
+        for (Unit unit : units) {
+            if (!unit.isAlive()) {
+                continue;
+            }
+
+            Terrain terrain = battlefield.getTerrainAt(unit.getPosition());
+            TerrainVisitor visitor =
+                TerrainVisitorFactory.getVisitor(terrain);
+            TerrainEffectResult effect = unit.accept(visitor);
+
+            if (effect.hasPerTurnEffect()) {
+                int hpChange = effect.hpPerTurn();
+                if (hpChange > 0) {
+                    unit.heal(hpChange);
+                } else {
+                    unit.takeDamage(-hpChange); // Convert negative to positive
+                }
+            }
+        }
     }
 
     private List<Faction> getAliveFactions() {
@@ -256,7 +243,7 @@ public class Game {
 
     private void resetCurrentFactionUnits() {
         getUnitsOfFaction(activeFaction).forEach(Unit::resetTurn);
-        commandHistory.clear();
+        commandExecutor.clearHistory();
     }
 
     private Faction determineNextFaction(List<Faction> aliveFactions) {
@@ -264,7 +251,7 @@ public class Game {
         int nextIndex = (currentIndex + 1) % aliveFactions.size();
 
         if (isNewRound(nextIndex)) {
-            currentRound++;
+            turnManager.incrementTurn();
         }
 
         return aliveFactions.get(nextIndex);
@@ -302,57 +289,11 @@ public class Game {
                 .orElse(null);
     }
 
+    private static final GameRenderer RENDERER = new ConsoleGameRenderer();
+
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("################################################################################################").append(System.lineSeparator());
-        sb.append("               ELEMENTARCLASH - Runde ").append(currentRound).append(System.lineSeparator());
-        sb.append("################################################################################################").append(System.lineSeparator());
-
-        if (activeFaction != null) {
-            sb.append("Aktive Fraktion: ").append(activeFaction.getGermanName())
-                    .append(" ").append(activeFaction.getIcon()).append(System.lineSeparator());
-        }
-
-        sb.append("Status: ").append(status).append(System.lineSeparator());
-
-        // Grid header - column numbers centered over emojis
-        sb.append("   ");
-        for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
-            sb.append("  ").append(x).append("  ");
-        }
-        sb.append(System.lineSeparator());
-
-        // Grid rows
-        for (int y = 0; y < Battlefield.GRID_SIZE; y++) {
-            sb.append(y).append(" |");
-            for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
-                Position pos = new Position(x, y);
-                Unit unit = getUnitAt(pos);
-
-                if (unit != null && unit.isAlive()) {
-                    sb.append(" ").append(unit.getFaction().getIcon()).append(" |");
-                } else {
-                    sb.append(" ").append(battlefield.getTerrainAt(pos).getIcon()).append(" |");
-                }
-            }
-            sb.append(System.lineSeparator()).append(System.lineSeparator());
-        }
-
-
-        // Legend
-        sb.append(System.lineSeparator()).append("Legende:");
-        for (Terrain terrain : Terrain.values()) {
-            sb.append("  ").append(terrain.getIcon()).append(" ")
-                    .append(terrain.getGermanName()).append(" | ");
-        }
-        sb.append(System.lineSeparator()).append(System.lineSeparator());
-
-        // Unit summary
-        long livingUnits = units.stream().filter(Unit::isAlive).count();
-        sb.append("Lebende Einheiten: ").append(livingUnits).append("/").append(units.size()).append(System.lineSeparator());
-
-        return sb.toString();
+        return RENDERER.render(this);
     }
 
     public enum GameStatus {

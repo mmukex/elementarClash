@@ -2,6 +2,8 @@ package org.elementarclash.units;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.elementarclash.battlefield.visitor.TerrainEffectResult;
+import org.elementarclash.battlefield.visitor.TerrainVisitor;
 import org.elementarclash.faction.Faction;
 import org.elementarclash.units.strategy.attack.AttackStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
@@ -16,10 +18,9 @@ import java.util.List;
  * Defines common properties and behavior for all unit types.
  * <p>
  * Design Pattern: Factory Method creates instances of Unit subclasses.
- * Design Pattern: Composite - Unit is Leaf in UnitComponent hierarchy.
  */
 @Getter
-public abstract class Unit implements UnitComponent {
+public abstract class Unit {
     private final String id;
     private final String name;
     private final Faction faction;
@@ -120,16 +121,6 @@ public abstract class Unit implements UnitComponent {
         this.attackStrategy = strategy;
     }
 
-    @Override
-    public List<Unit> getAllUnits() {
-        return List.of(this);
-    }
-
-    @Override
-    public int getTotalHealth() {
-        return currentHealth;
-    }
-
     // ========== Abstract Methods (Template Method Pattern) ==========
 
     /**
@@ -138,16 +129,14 @@ public abstract class Unit implements UnitComponent {
      */
     public abstract String getSpecialAbility();
 
-    /**
-     * Hook method for terrain-specific bonuses.
-     * Can be overridden by subclasses (will be used with Visitor pattern later).
-     */
-    public int getTerrainAttackBonus() {
-        return 0;
-    }
 
-    public int getTerrainDefenseBonus() {
-        return 0;
+    public TerrainEffectResult accept(TerrainVisitor visitor) {
+        return switch (faction) {
+            case FIRE -> visitor.visitFireUnit(this);
+            case WATER -> visitor.visitWaterUnit(this);
+            case EARTH -> visitor.visitEarthUnit(this);
+            case AIR -> visitor.visitAirUnit(this);
+        };
     }
 
     @Override

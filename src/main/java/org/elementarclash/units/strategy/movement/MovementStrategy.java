@@ -51,7 +51,7 @@ public interface MovementStrategy {
     default double calculatePathCost(Game game, Position[] path) {
         double totalCost = 0.0;
         for (int i = 1; i < path.length; i++) {
-            Terrain terrain = game.getBattlefield().getTerrainAt(path[i]);
+            Terrain terrain = game.getTerrainAt(path[i]);
             totalCost += calculateMovementCost(terrain);
         }
         return totalCost;

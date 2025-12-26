@@ -17,6 +17,13 @@ import org.elementarclash.units.Unit;
  */
 public interface Command {
 
+    /**
+     * Validates if this command can be executed in the current game state.
+     * Checks preconditions like unit existence, alive status, range, cooldowns, etc.
+     *
+     * @param game current game state
+     * @return validation result with success flag and optional error message
+     */
     ValidationResult validate(Game game);
 
     /**

@@ -2,6 +2,8 @@ package org.elementarclash.game.command;
 
 import lombok.Getter;
 import org.elementarclash.game.Game;
+import org.elementarclash.game.combat.DamageCalculator;
+import org.elementarclash.game.combat.DamageResult;
 import org.elementarclash.units.Unit;
 
 /**
@@ -74,17 +76,11 @@ public class AttackCommand implements Command {
         this.targetPreviousHealth = target.getCurrentHealth();
         this.targetWasAlive = target.isAlive();
 
-        int baseDamage = actor.getAttackStrategy().calculateBaseDamage(actor, target);
+        DamageCalculator calculator = new DamageCalculator();
+        DamageResult result = calculator.calculateDamage(actor, target, game);
 
-        // Terrain bonuses (will be implemented with Visitor pattern)
-        int attackBonus = actor.getTerrainAttackBonus();
-        int defenseBonus = target.getTerrainDefenseBonus();
-
-        int totalAttack = baseDamage + attackBonus;
-        int totalDefense = target.getBaseStats().defense() + defenseBonus;
-        this.damageDealt = Math.max(1, totalAttack - totalDefense);
-
-        target.takeDamage(damageDealt);
+        this.damageDealt = result.totalDamage();
+        target.takeDamage(result.totalDamage());
         actor.markAttackedThisTurn();
 
         if (!target.isAlive()) {

@@ -36,15 +36,7 @@ package "org.elementarclash.battlefield" {
         + setTerrain(terrain: Terrain): void
     }
 
-    ' ===== Composites =====
-    class Row <<Composite>> <<record>> {
-        - cells: List<Cell>
-        __
-        + Row(cells: List<Cell>)
-        __
-        + cells(): List<Cell>
-    }
-
+    ' ===== Composite =====
     class Region <<Composite>> <<record>> {
         - cells: List<Cell>
         __
@@ -57,7 +49,7 @@ package "org.elementarclash.battlefield" {
         + {static} GRID_SIZE: int = 10
         - {static} TOTAL_CELLS: int = 100
         __
-        - rows: List<Row>
+        - rows: List<Region>
         __
         + Battlefield()
         __
@@ -102,58 +94,13 @@ package "org.elementarclash.battlefield.effects" {
     }
 }
 
-package "org.elementarclash.units" {
-
-    ' ===== Component =====
-    INTERFACE UnitComponent <<Component>> {
-        + getAllUnits(): List<Unit>
-        + getTotalHealth(): int
-        + isAlive(): boolean
-    }
-
-    ' ===== Leaf =====
-    ABSTRACT_CLASS Unit <<Leaf>> {
-        - id: String
-        - name: String
-        - faction: Faction
-        - type: UnitType
-        - baseStats: UnitStats
-        - currentHealth: int
-        - position: Position
-        - acted: boolean
-        __
-        + getAllUnits(): List<Unit>
-        + getTotalHealth(): int
-        + isAlive(): boolean
-        + takeDamage(damage: int): void
-        + heal(amount: int): void
-        + resetTurn(): void
-        + {abstract} getSpecialAbility(): String
-    }
-
-    ' ===== Composite =====
-    class UnitGroup <<Composite>> {
-        - units: List<UnitComponent>
-        __
-        + UnitGroup(units: List<? extends UnitComponent>)
-        __
-        + getAllUnits(): List<Unit>
-        + getTotalHealth(): int
-        + isAlive(): boolean
-        + add(unit: UnitComponent): void
-        + remove(unit: UnitComponent): void
-    }
-}
-
 ' ===== Composite Pattern Relationships (Battlefield) =====
 BattlefieldComponent <|.. Cell
-BattlefieldComponent <|.. Row
 BattlefieldComponent <|.. Region
 BattlefieldComponent <|.. Battlefield
 
-Battlefield *-- "10" Row : contains
-Row *-- "10" Cell : contains
-Region o-- "1..*" Cell : subset
+Battlefield *-- "10" Region : contains
+Region *-- "10" Cell : contains
 Cell --> Position
 Cell --> Terrain
 
@@ -162,12 +109,6 @@ TerrainEffect <|.. ForestFireEffect
 TerrainEffect <|.. GeysirEffect
 TerrainEffect <|.. IceMeltEffect
 BattlefieldComponent ..> TerrainEffect : <<uses>>
-
-' ===== Composite Pattern Relationships (Units) =====
-UnitComponent <|.. Unit
-UnitComponent <|.. UnitGroup
-
-UnitGroup o-- "0..*" UnitComponent : manages
 
 ' ===== Notes =====
 note right of BattlefieldComponent
@@ -180,7 +121,7 @@ note right of BattlefieldComponent
   **DRY Principle:**
   applyEffect() and getCell() implemented
   once as default methods, reused by all
-  composites (Row, Region, Battlefield)
+  composites (Region, Battlefield)
 
   **KISS Principle:**
   Simple interface with only essential methods
@@ -196,10 +137,26 @@ note bottom of Cell
   transform terrain (not delegate).
 end note
 
+note bottom of Region
+  **Composite - Dual Purpose**
+
+  Represents both:
+  1. **Fixed Rows:** 10 regions form the grid structure
+     (Battlefield → 10 Regions → 100 Cells)
+
+  2. **Dynamic Areas:** Arbitrary cell subsets for
+     localized effects (forest fires, earthquakes)
+
+  **Example:**
+  Region forestArea = battlefield.getRegion(4, 4, 6, 6);
+  forestArea.applyEffect(new ForestFireEffect());
+  // Applies fire to 3x3 region
+end note
+
 note bottom of Battlefield
   **Root Composite**
 
-  Hierarchy: Battlefield → 10 Rows → 100 Cells
+  Hierarchy: Battlefield → 10 Regions → 100 Cells
 
   **Usage Examples:**
 
@@ -230,39 +187,24 @@ note right of TerrainEffect
   Same effect, different scope!
 end note
 
-note bottom of UnitGroup
-  **Composite for Units**
-
-  Allows grouping units for:
-  - Faction armies
-  - Synergy calculations
-  - Nested hierarchies
-
-  **Example:**
-  UnitGroup fireArmy = game.getUnitGroupOfFaction(FIRE);
-  int totalHP = fireArmy.getTotalHealth();
-
-  UnitGroup allArmies = new UnitGroup(
-      List.of(fireArmy, waterArmy)
-  );  // Nested composite!
-end note
-
 note as N1
-  **Two Composite Hierarchies**
+  **Composite Pattern - Battlefield Hierarchy**
 
-  1. **Battlefield Hierarchy:**
-     BattlefieldComponent
-     ├── Cell (Leaf)
-     ├── Row (Composite: 10 Cells)
-     ├── Region (Composite: Dynamic subset)
-     └── Battlefield (Root: 10 Rows)
+  BattlefieldComponent
+  ├── Cell (Leaf - einzelne Zelle)
+  ├── Region (Composite - fixe Zeilen + dynamische Regionen)
+  └── Battlefield (Root - 10 Regionen à 10 Zellen)
 
-  2. **Unit Hierarchy:**
-     UnitComponent
-     ├── Unit (Leaf)
-     └── UnitGroup (Composite: N Units/Groups)
+  **Ermöglicht einheitliche Operationen auf:**
+  - Einzelnen Zellen (Leaf)
+  - Beliebigen Regionen (Composite)
+  - Gesamtem Battlefield (Root)
 
-  Both follow same pattern, different domains!
+  **Pattern-Qualität:**
+  ✅ Einheitliche Schnittstelle (cells(), applyEffect())
+  ✅ Rekursive Operationen (automatische Propagierung)
+  ✅ DRY durch Default-Methoden
+  ✅ Flexible Gruppierung (Grid + dynamische Areas)
 end note
 
 @enduml

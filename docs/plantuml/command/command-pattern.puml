@@ -96,12 +96,25 @@ package "org.elementarclash.game.command" {
     AttackCommand .up.|> Command : implements
     UseAbilityCommand .up.|> Command : implements
 
+    class CommandExecutor <<Invoker>> {
+        - CommandHistory history
+        --
+        + ValidationResult execute(Command, Game)
+        + boolean undo(Game)
+        + boolean redo(Game)
+        + void clearHistory()
+        + boolean canUndo()
+        + boolean canRedo()
+    }
+
     CommandHistory o-right-> "0..*" Command : manages
+    CommandExecutor *-down-> CommandHistory : contains
+    CommandExecutor ..> Command : validates and executes
 }
 
 package "org.elementarclash.game" {
-    class Game <<Invoker>> {
-        - CommandHistory commandHistory
+    class Game <<Facade>> {
+        - CommandExecutor commandExecutor
         - List<Unit> units
         - Map<Position, Unit> positionToUnit
         --
@@ -117,8 +130,7 @@ package "org.elementarclash.game" {
         + boolean canAttack(Unit, Unit)
     }
 
-    Game *-down-> CommandHistory : contains
-    Game ..> Command : validates and executes
+    Game *-down-> CommandExecutor : delegates to
 }
 
 package "org.elementarclash.units" {
@@ -222,31 +234,57 @@ pushUndone() restores redo stack
 when redo fails
 end note
 
-note bottom of Game
-**Invoker Role**
+note right of CommandExecutor
+**Invoker - Command Execution Manager**
 
-Game executes commands without
-knowing their concrete types:
+CommandExecutor manages command lifecycle:
 
-**executeCommand(Command cmd):**
-1. result = cmd.validate(this)
+**execute(Command cmd, Game game):**
+1. result = cmd.validate(game)
 2. if (!result.isValid()) return result
-3. cmd.execute(this)
-4. commandHistory.push(cmd)
+3. cmd.execute(game)
+4. history.push(cmd)
 5. return success()
 
+**undo(Game game):**
+1. cmd = history.popForUndo()
+2. cmd.undo(game)
+
+**redo(Game game):**
+1. cmd = history.popForRedo()
+2. cmd.execute(game)
+
+**clearHistory():**
+Called at turn end for per-turn undo scope
+
+**Refactoring (Priority 1.2):**
+Extracted from Game.java to enforce
+Single Responsibility Principle
+→ Game is now Facade, CommandExecutor
+  manages execution logic
+end note
+
+note bottom of Game
+**Facade Role**
+
+Game delegates command operations
+to CommandExecutor:
+
+**executeCommand(Command cmd):**
+→ commandExecutor.execute(cmd, this)
+
 **undoLastCommand():**
-1. cmd = commandHistory.popForUndo()
-2. cmd.undo(this)
+→ commandExecutor.undo(this)
 
 **redoLastCommand():**
-1. cmd = commandHistory.popForRedo()
-2. cmd.execute(this)
+→ commandExecutor.redo(this)
 
 Game provides internal methods
 for commands to modify state:
 • moveUnitInternal()
 • handleUnitDeath()
+• isValidMove()
+• canAttack()
 end note
 
 note bottom of MoveCommand
@@ -351,6 +389,28 @@ Called by Game.nextTurn()
 clearMovedThisTurn() and
 clearAttackedThisTurn() restore
 unit state during undo
+end note
+
+note as PatternIntegration
+**Pattern Integration Example: DamageCalculator**
+
+AttackCommand delegates damage calculation to
+DamageCalculator (extracted in Priority 1.3):
+
+**DamageCalculator.calculateDamage():**
+Combines 3 patterns:
+• **Command Pattern:** Called from AttackCommand.execute()
+• **Strategy Pattern:** Uses AttackStrategy.calculateBaseDamage()
+• **Visitor Pattern:** Uses TerrainVisitor for terrain effects
+
+**Benefits:**
+• Law of Demeter (uses Game.getTerrainAt() facade)
+• Single Responsibility (damage logic separate from command)
+• Reusable (can be used by Chain of Responsibility later)
+• Testable (isolated from AttackCommand)
+
+**Result:**
+AttackCommand.execute() reduced from 32 → 16 lines (-50%)
 end note
 
 @enduml

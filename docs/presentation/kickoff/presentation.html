@@ -181,11 +181,11 @@
                     <div class="why-box">
                         <p><strong>Hierarchische Strukturen behandeln:</strong></p>
                         <ul style="font-size: 0.85em;">
-                            <li><strong>Battlefield</strong> → 10 <strong>Rows</strong> → je 10 <strong>Cells</strong></li>
+                            <li><strong>Battlefield</strong> → 10 <strong>Regionen</strong> → je 10 <strong>Cells</strong></li>
                             <li>Operationen auf einzelnen Zellen UND ganzen Regionen</li>
                             <li>Beispiel: Waldbrand breitet sich aus → mehrere Zellen zu Lava</li>
-                            <li><strong>Einheitengruppen:</strong> Armee vs. einzelne Einheit</li>
-                            <li>Synergien: "Alle benachbarten Feuer-Einheiten +1 Angriff"</li>
+                            <li>Einheitliche Schnittstelle für Leaf (Cell) und Composite (Region, Battlefield)</li>
+                            <li>Vereinfacht Geländeeffekte und dynamische Ereignisse</li>
                         </ul>
                     </div>
                     <p style="font-size: 0.8em; color: #ff6b6b;">Separate Logik für Zelle vs. Region? Code-Duplikation!</p>
@@ -282,8 +282,8 @@
                         <p><strong>Gelände-Effekte auf Einheiten:</strong></p>
                         <ul style="font-size: 0.85em;">
                             <li><strong>Lava:</strong> Feuer +2 Angriff, Wasser -5 LP/Runde</li>
-                            <li><strong>Eis:</strong> Wasser +3 Verteidigung + Heilung, Feuer schmilzt zu Wüste</li>
-                            <li><strong>Wald:</strong> +2 Verteidigung, Feuer entzündet → Lava</li>
+                            <li><strong>Eis:</strong> Wasser +2 Verteidigung + Heilung (5 LP/Runde), Feuer schmilzt zu Wüste</li>
+                            <li><strong>Wald:</strong> Alle +2 Verteidigung (blockiert Fernkampf-Sichtlinie)</li>
                             <li><strong>Stein:</strong> Erde +2 Verteidigung</li>
                             <li><strong>Wüste:</strong> Keine Boni</li>
                         </ul>

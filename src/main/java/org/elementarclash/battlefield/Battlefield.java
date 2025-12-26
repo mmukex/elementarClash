@@ -20,7 +20,7 @@ public class Battlefield implements BattlefieldComponent {
     private static final int TOTAL_CELLS = GRID_SIZE * GRID_SIZE;
     private static final int PERCENTAGE_DIVISOR = 100;
 
-    private final List<Row> rows;
+    private final List<Region> rows;
 
     public Battlefield() {
         this.rows = new ArrayList<>(GRID_SIZE);
@@ -33,7 +33,7 @@ public class Battlefield implements BattlefieldComponent {
             for (int x = 0; x < GRID_SIZE; x++) {
                 cells.add(new Cell(new Position(x, y), Terrain.DESERT));
             }
-            rows.add(new Row(cells));
+            rows.add(new Region(cells));
         }
     }
 

@@ -63,7 +63,7 @@ public class RangedAttackStrategy implements AttackStrategy {
                 continue;
             }
 
-            Terrain terrain = game.getBattlefield().getTerrainAt(pos);
+            Terrain terrain = game.getTerrainAt(pos);
             if (terrain == Terrain.FOREST) {
                 return false;
             }

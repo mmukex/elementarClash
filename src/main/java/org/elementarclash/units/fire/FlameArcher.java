@@ -7,10 +7,6 @@ import org.elementarclash.units.UnitType;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
-/**
- * Flame Archer - Fire faction ranged unit.
- * Special: Ignores forest defense bonus (range 3).
- */
 class FlameArcher extends Unit {
 
     public FlameArcher(String id, UnitStats stats) {

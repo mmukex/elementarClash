@@ -7,10 +7,6 @@ import org.elementarclash.units.UnitType;
 import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
-/**
- * Phoenix - Fire faction flying unit.
- * Special: Flying (ignores terrain), one-time resurrection at 50% HP.
- */
 class Phoenix extends Unit {
     private boolean hasResurrected = false;
 
