@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
+import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
  * Sky Guardian - Air faction flying defender.
@@ -14,6 +16,8 @@ class SkyGuardian extends Unit {
 
     public SkyGuardian(String id, UnitStats stats) {
         super(id, "Himmels-Wächter", Faction.AIR, UnitType.SKY_GUARDIAN, stats);
+        setMovementStrategy(new FlyingMovementStrategy());
+        setAttackStrategy(new RangedAttackStrategy(false));
     }
 
     @Override

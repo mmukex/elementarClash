@@ -117,27 +117,30 @@ public class Game {
     }
 
     public boolean canAttack(Unit attacker, Unit target) {
-        if (!attacker.isAlive() || !target.isAlive()) {
-            return false;
-        }
-
-        if (attacker.getFaction() == target.getFaction()) {
-            return false;
-        }
-
-        int attackRange = attacker.getBaseStats().range();
-        return attacker.getPosition().isInRange(target.getPosition(), attackRange);
+        return attacker.getAttackStrategy().canAttack(this, attacker, target);
     }
 
     public boolean isValidMove(Unit unit, Position target) {
-        if (isPositionOccupied(target)) {
-            return false;
-        }
+        return unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, unit.getBaseStats().movement());
+    }
 
+    public List<Unit> getValidAttackTargets(Unit attacker) {
+        return attacker.getAttackStrategy().getValidTargets(this, attacker);
+    }
+
+    public List<Position> getValidMovePositions(Unit unit) {
+        List<Position> validPositions = new ArrayList<>();
         int maxMovement = unit.getBaseStats().movement();
-        int distance = unit.getPosition().manhattanDistanceTo(target);
 
-        return distance <= maxMovement;
+        for (int y = 0; y < Battlefield.GRID_SIZE; y++) {
+            for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
+                Position target = new Position(x, y);
+                if (unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, maxMovement)) {
+                    validPositions.add(target);
+                }
+            }
+        }
+        return validPositions;
     }
 
     void setInitialActiveFaction(Faction faction) {

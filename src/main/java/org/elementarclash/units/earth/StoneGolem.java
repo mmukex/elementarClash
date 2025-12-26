@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
+import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
  * Stone Golem - Earth faction tank unit.
@@ -14,6 +16,8 @@ class StoneGolem extends Unit {
 
     public StoneGolem(String id, UnitStats stats) {
         super(id, "Stein-Golem", Faction.EARTH, UnitType.STONE_GOLEM, stats);
+        setMovementStrategy(new GroundMovementStrategy(Faction.EARTH));
+        setAttackStrategy(new MeleeAttackStrategy());
     }
 
     @Override

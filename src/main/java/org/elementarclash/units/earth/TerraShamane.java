@@ -4,6 +4,8 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitStats;
 import org.elementarclash.units.UnitType;
+import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
+import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
  * Terra Shaman - Earth faction support unit.
@@ -14,6 +16,8 @@ class TerraShamane extends Unit {
 
     public TerraShamane(String id, UnitStats stats) {
         super(id, "Terra-Schamane", Faction.EARTH, UnitType.TERRA_SHAMAN, stats);
+        setMovementStrategy(new GroundMovementStrategy(Faction.EARTH));
+        setAttackStrategy(new RangedAttackStrategy(false));
     }
 
     @Override

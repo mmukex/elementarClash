@@ -1,0 +1,256 @@
+@startuml Strategy Pattern - ElementarClash
+
+!define ABSTRACT_CLASS abstract class
+!define INTERFACE interface
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Strategy>> LightYellow
+    BorderColor<<Strategy>> DarkOrange
+    BackgroundColor<<ConcreteStrategy>> LightBlue
+    BorderColor<<ConcreteStrategy>> DarkBlue
+    BackgroundColor<<Context>> LightGreen
+    BorderColor<<Context>> DarkGreen
+}
+
+package "org.elementarclash.units" {
+    ' ===== Context =====
+    ABSTRACT_CLASS Unit <<Context>> {
+        - movementStrategy: MovementStrategy
+        - attackStrategy: AttackStrategy
+        __
+        + getMovementStrategy(): MovementStrategy
+        + getAttackStrategy(): AttackStrategy
+        # setMovementStrategy(strategy: MovementStrategy): void
+        # setAttackStrategy(strategy: AttackStrategy): void
+    }
+}
+
+package "org.elementarclash.units.strategy.movement" {
+
+    ' ===== Movement Strategy Interface =====
+    INTERFACE MovementStrategy <<Strategy>> {
+        + calculateMovementCost(terrain: Terrain): double
+        + canMoveTo(game: Game, current: Position, target: Position, maxMovement: int): boolean
+        + {default} calculatePathCost(game: Game, path: Position[]): double
+    }
+
+    ' ===== Concrete Movement Strategy =====
+    class GroundMovementStrategy <<ConcreteStrategy>> {
+        - {static} FIRE_LAVA_COST: double = 1.0
+        - {static} FIRE_ICE_COST: double = 2.0
+        - {static} WATER_ICE_COST: double = 1.0
+        - {static} WATER_LAVA_COST: double = 3.0
+        - {static} EARTH_STONE_MULTIPLIER: double = 0.67
+        - faction: Faction
+        __
+        + GroundMovementStrategy(faction: Faction)
+        __
+        + calculateMovementCost(terrain: Terrain): double
+        + canMoveTo(...): boolean
+        - applyFireModifiers(terrain: Terrain, baseCost: double): double
+        - applyWaterModifiers(terrain: Terrain, baseCost: double): double
+        - applyEarthModifiers(terrain: Terrain, baseCost: double): double
+    }
+}
+
+package "org.elementarclash.units.strategy.attack" {
+
+    ' ===== Attack Strategy Interface =====
+    INTERFACE AttackStrategy <<Strategy>> {
+        + canAttack(game: Game, attacker: Unit, target: Unit): boolean
+        + getValidTargets(game: Game, attacker: Unit): List<Unit>
+        + {default} calculateBaseDamage(attacker: Unit, target: Unit): int
+        + getAttackRange(unit: Unit): int
+    }
+
+    ' ===== Concrete Attack Strategy =====
+    class RangedAttackStrategy <<ConcreteStrategy>> {
+        - ignoresForestDefense: boolean
+        __
+        + RangedAttackStrategy()
+        + RangedAttackStrategy(ignoresForestDefense: boolean)
+        __
+        + canAttack(game: Game, attacker: Unit, target: Unit): boolean
+        + getValidTargets(game: Game, attacker: Unit): List<Unit>
+        + getAttackRange(unit: Unit): int
+        - hasLineOfSight(game: Game, from: Position, to: Position): boolean
+        - getPathPositions(from: Position, to: Position): Position[]
+    }
+}
+
+package "org.elementarclash.units.fire" {
+    class FlameArcher {
+        + FlameArcher(id: String, stats: UnitStats)
+    }
+}
+
+package "org.elementarclash.game" {
+    class Game {
+        + isValidMove(unit: Unit, target: Position): boolean
+        + canAttack(attacker: Unit, target: Unit): boolean
+        + getValidAttackTargets(attacker: Unit): List<Unit>
+        + getValidMovePositions(unit: Unit): List<Position>
+    }
+}
+
+' ===== Strategy Pattern Relationships =====
+MovementStrategy <|.. GroundMovementStrategy
+AttackStrategy <|.. RangedAttackStrategy
+
+' ===== Context Uses Strategies =====
+Unit o-- MovementStrategy : uses
+Unit o-- AttackStrategy : uses
+
+' ===== Concrete Unit extends Unit =====
+Unit <|-- FlameArcher
+
+' ===== FlameArcher uses specific strategies =====
+FlameArcher ..> GroundMovementStrategy : <<creates>>
+FlameArcher ..> RangedAttackStrategy : <<creates>>
+
+' ===== Game delegates to strategies =====
+Game ..> Unit : <<uses>>
+
+' ===== Notes =====
+note right of MovementStrategy
+  **Strategy Pattern (GoF #5)**
+
+  **Movement Strategy Interface**
+  - Defines algorithm for movement validation
+  - Calculates terrain-based movement costs
+  - Different factions have different terrain affinities
+
+  **Why Strategy?**
+  - Encapsulates movement algorithms
+  - Easy to add new movement types
+  - No if-else chains in Unit classes
+end note
+
+note bottom of GroundMovementStrategy
+  **Ground Movement**
+
+  Faction-specific terrain modifiers:
+  • Fire: Lava cost 1.0, Ice cost 2.0
+  • Water: Ice cost 1.0, Lava cost 3.0
+  • Earth: Stone cost ×0.67
+
+  **FlameArcher Example:**
+  - Created with Faction.FIRE
+  - Moves fast on LAVA (cost 1.0)
+  - Moves slow on ICE (cost 2.0)
+end note
+
+note right of AttackStrategy
+  **Attack Strategy Interface**
+
+  - Validates attack targets
+  - Returns all valid targets (for AI/UI)
+  - Calculates base damage
+  - Provides attack range
+
+  **Integration:**
+  Separates targeting logic from damage calculation.
+  Damage modifiers handled by Chain of Responsibility
+  (future pattern implementation).
+end note
+
+note bottom of RangedAttackStrategy
+  **Ranged Attack**
+
+  Range = unit.range (3-4 tiles)
+  Line-of-Sight: Forest blocks attacks
+
+  **FlameArcher Example:**
+  - Created with ignoresForestDefense=true
+  - Can shoot through FOREST terrain
+  - Range = 3 (from UnitStats)
+  - hasLineOfSight() returns true immediately
+end note
+
+note bottom of Unit
+  **Context Class**
+
+  Unit holds references to strategies:
+  - movementStrategy
+  - attackStrategy
+
+  Lazy Initialization:
+  - Default: GroundMovement + Melee
+  - Subclasses override in constructor
+
+  Protected setters allow subclasses
+  to configure their strategies.
+end note
+
+note bottom of Game
+  **Game delegates to strategies**
+
+  Old implementation:
+  • isValidMove() had Manhattan distance check
+  • canAttack() had simple range check
+
+  New implementation:
+  • Delegates to unit.getMovementStrategy()
+  • Delegates to unit.getAttackStrategy()
+
+  Benefits:
+  ✓ Faction-specific terrain costs
+  ✓ Flying movement support
+  ✓ Line-of-sight validation
+  ✓ Area-of-effect attacks
+end note
+
+note as N1
+  **Strategy Pattern Benefits**
+
+  **DRY Principle:**
+  Terrain logic once in GroundMovementStrategy,
+  not duplicated across 12 unit classes.
+
+  **KISS Principle:**
+  Simple interfaces, complex logic encapsulated.
+
+  **Open/Closed Principle:**
+  Add new strategies without modifying units.
+
+  **Example: Adding new movement type**
+  1. Create SwimMovementStrategy
+  2. Implement MovementStrategy interface
+  3. Set in unit constructor
+  → No changes to Unit base class!
+
+  **Example: Adding new attack pattern**
+  1. Create PiercingAttackStrategy
+  2. Implement AttackStrategy interface
+  3. Set in unit constructor
+  → No changes to combat system!
+end note
+
+note as N2
+  **FlameArcher Strategy Configuration**
+
+  Constructor code:
+  ```java
+  public FlameArcher(String id, UnitStats stats) {
+      super(id, "Flammen-Bogenschütze",
+            Faction.FIRE,
+            UnitType.FLAME_ARCHER, stats);
+
+      setMovementStrategy(
+          new GroundMovementStrategy(Faction.FIRE)
+      );
+
+      setAttackStrategy(
+          new RangedAttackStrategy(true)
+      );
+  }
+  ```
+
+  **Result:**
+  • Movement: Fast on Lava, slow on Ice
+  • Attack: Ignores forest, range 3
+end note
+
+@enduml
