@@ -31,13 +31,42 @@ import org.elementarclash.units.Unit;
  * 4. Returns TerrainEffectResult with bonuses/effects
  */
 public interface TerrainVisitor {
+    /**
+     * Applies terrain effects to a Fire faction unit.
+     *
+     * @param unit the fire unit visiting this terrain
+     * @return terrain effect result with bonuses/penalties
+     */
     TerrainEffectResult visitFireUnit(Unit unit);
 
+    /**
+     * Applies terrain effects to a Water faction unit.
+     *
+     * @param unit the water unit visiting this terrain
+     * @return terrain effect result with bonuses/penalties
+     */
     TerrainEffectResult visitWaterUnit(Unit unit);
 
+    /**
+     * Applies terrain effects to an Earth faction unit.
+     *
+     * @param unit the earth unit visiting this terrain
+     * @return terrain effect result with bonuses/penalties
+     */
     TerrainEffectResult visitEarthUnit(Unit unit);
 
+    /**
+     * Applies terrain effects to an Air faction unit.
+     *
+     * @param unit the air unit visiting this terrain
+     * @return terrain effect result with bonuses/penalties
+     */
     TerrainEffectResult visitAirUnit(Unit unit);
 
+    /**
+     * Returns the terrain type this visitor represents.
+     *
+     * @return the terrain type
+     */
     Terrain getTerrainType();
 }

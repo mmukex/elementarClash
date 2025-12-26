@@ -7,10 +7,6 @@ import org.elementarclash.units.UnitType;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
-/**
- * Inferno Warrior - Fire faction melee unit.
- * Special: +2 Attack on Lava terrain (will be implemented with Visitor pattern).
- */
 class InfernoWarrior extends Unit {
     private static final int LAVA_ATTACK_BONUS = 2;
 

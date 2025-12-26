@@ -75,7 +75,7 @@ public class GroundMovementStrategy implements MovementStrategy {
             return false;
         }
 
-        Terrain targetTerrain = game.getBattlefield().getTerrainAt(targetPosition);
+        Terrain targetTerrain = game.getTerrainAt(targetPosition);
         int manhattanDistance = currentPosition.manhattanDistanceTo(targetPosition);
         double terrainCost = calculateMovementCost(targetTerrain);
         double totalCost = manhattanDistance * terrainCost;

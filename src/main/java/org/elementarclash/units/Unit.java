@@ -18,10 +18,9 @@ import java.util.List;
  * Defines common properties and behavior for all unit types.
  * <p>
  * Design Pattern: Factory Method creates instances of Unit subclasses.
- * Design Pattern: Composite - Unit is Leaf in UnitComponent hierarchy.
  */
 @Getter
-public abstract class Unit implements UnitComponent {
+public abstract class Unit {
     private final String id;
     private final String name;
     private final Faction faction;
@@ -120,16 +119,6 @@ public abstract class Unit implements UnitComponent {
 
     protected void setAttackStrategy(AttackStrategy strategy) {
         this.attackStrategy = strategy;
-    }
-
-    @Override
-    public List<Unit> getAllUnits() {
-        return List.of(this);
-    }
-
-    @Override
-    public int getTotalHealth() {
-        return currentHealth;
     }
 
     // ========== Abstract Methods (Template Method Pattern) ==========

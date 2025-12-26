@@ -45,7 +45,7 @@ public class SpecialMovementStrategy implements MovementStrategy {
             return false;
         }
 
-        Terrain targetTerrain = game.getBattlefield().getTerrainAt(targetPosition);
+        Terrain targetTerrain = game.getTerrainAt(targetPosition);
         int manhattanDistance = currentPosition.manhattanDistanceTo(targetPosition);
         double totalCost = manhattanDistance * calculateMovementCost(targetTerrain);
 
