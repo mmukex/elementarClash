@@ -42,7 +42,7 @@ public class ConsoleGameRenderer implements GameRenderer {
     private void renderGridHeader(StringBuilder sb) {
         sb.append("   ");
         for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
-            sb.append("  ").append(x).append("  ");
+            sb.append(String.format(" %d  ", x));
         }
         sb.append(System.lineSeparator());
     }
@@ -62,18 +62,21 @@ public class ConsoleGameRenderer implements GameRenderer {
         Unit unit = game.getUnitAt(pos);
 
         if (unit != null && unit.isAlive()) {
-            sb.append(" ").append(unit.getFaction().getIcon()).append(" |");
+            String unitId = unit.getId();
+            sb.append(String.format("%3s |", unitId));
         } else {
             sb.append(" ").append(game.getBattlefield().getTerrainAt(pos).getIcon()).append(" |");
         }
     }
 
     private void renderLegend(StringBuilder sb) {
-        sb.append(System.lineSeparator()).append("Legende:");
+        sb.append(System.lineSeparator()).append("Legende Terrain:");
         for (Terrain terrain : Terrain.values()) {
             sb.append("  ").append(terrain.getIcon()).append(" ")
                     .append(terrain.getGermanName()).append(" | ");
         }
+        sb.append(System.lineSeparator());
+        sb.append("Einheiten: F1-F3 (Feuer), W1-W3 (Wasser), E1-E3 (Erde), A1-A3 (Luft)");
         sb.append(System.lineSeparator()).append(System.lineSeparator());
     }
 

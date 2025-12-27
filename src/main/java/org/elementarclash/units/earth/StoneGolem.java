@@ -8,8 +8,13 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
- * Stone Golem - Earth faction tank unit.
- * Special: Regenerates 5 HP per turn on mountain terrain.
+ * Earth faction's immovable tank with terrain regeneration.
+ * <p>
+ * Faction: Earth | Movement: Ground | Attack: Melee (range: 1)
+ * <p>
+ * Special: Regenerates 5 HP per turn on stone terrain. Immovable (cannot be pushed).
+ * <p>
+ * Tactical: Defensive anchor. Guards key positions. Strongest on stone terrain.
  */
 class StoneGolem extends Unit {
     private static final int MOUNTAIN_REGEN = 5;
@@ -25,10 +30,6 @@ class StoneGolem extends Unit {
         return "Regeneriert 5 LP pro Runde auf Berg-Gelände";
     }
 
-    /**
-     * Returns regeneration amount on mountain terrain.
-     * Will be used by terrain/turn system later.
-     */
     public int getMountainRegeneration() {
         return MOUNTAIN_REGEN;
     }

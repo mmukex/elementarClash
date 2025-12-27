@@ -8,8 +8,13 @@ import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
- * Storm Caller - Air faction ranged damage dealer.
- * Special: Chain lightning (attacks jump to nearby enemies, -2 damage per jump).
+ * Air faction's ranged unit with knockback ability.
+ * <p>
+ * Faction: Air | Movement: Flying | Attack: Ranged (range: 3)
+ * <p>
+ * Special: Push Ability (PushAbility) - Knocks targets back 1 tile.
+ * <p>
+ * Tactical: Crowd control. Repositions enemies. Counters melee rushes.
  */
 class StormCaller extends Unit {
     private static final int CHAIN_DAMAGE_REDUCTION = 2;
@@ -26,10 +31,6 @@ class StormCaller extends Unit {
         return "Kettenblitz (springt auf nahe Gegner, -2 Schaden pro Sprung)";
     }
 
-    /**
-     * Returns true if this unit has chain lightning ability.
-     * Used by combat system (Chain of Responsibility pattern).
-     */
     public boolean hasChainLightning() {
         return true;
     }

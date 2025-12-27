@@ -10,10 +10,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Faction {
-    FIRE("Feuer", "🔥", "Aggressiv"),
-    WATER("Wasser", "💧", "Defensiv"),
-    EARTH("Erde", "🪨", "Kontrollierend"),
-    AIR("Luft", "💨", "Mobil");
+    FIRE("Feuer", "F", "Aggressiv"),
+    WATER("Wasser", "W", "Defensiv"),
+    EARTH("Erde", "E", "Kontrollierend"),
+    AIR("Luft", "A", "Mobil");
 
     private final String germanName;
     private final String icon;

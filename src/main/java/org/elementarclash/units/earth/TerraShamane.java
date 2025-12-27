@@ -8,8 +8,13 @@ import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 
 /**
- * Terra Shaman - Earth faction support unit.
- * Special: Can create earth walls (blocks movement for 2 turns).
+ * Earth faction's support unit that creates defensive terrain.
+ * <p>
+ * Faction: Earth | Movement: Ground | Attack: Ranged (range: 3)
+ * <p>
+ * Special: Create Wall (CreateWallAbility) - Creates stone terrain walls.
+ * <p>
+ * Tactical: Battlefield control specialist. Creates choke points and defensive positions.
  */
 class TerraShamane extends Unit {
     private static final int WALL_DURATION = 2;
@@ -25,10 +30,6 @@ class TerraShamane extends Unit {
         return "Kann Erdwände erschaffen (blockiert 2 Runden)";
     }
 
-    /**
-     * Creates an earth wall at a position.
-     * Will be implemented with Command pattern for abilities.
-     */
     public boolean canCreateWall() {
         return canAct();
     }

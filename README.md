@@ -105,6 +105,16 @@ Diese Patterns ergeben sich aus den Kernmechaniken von ElementarClashs:
 - **Dynamische Ereignisse** → Observer
 - **Fraktionsspezifisches Verhalten** → Strategy, Visitor
 
+### **Unterstützende Patterns**
+
+Zusätzlich zu den 10 Haupt-Patterns nutzt ElementarClash weitere GoF-Patterns zur Strukturierung:
+
+| Pattern | Anwendung | Implementierung |
+|---------|-----------|-----------------|
+| **Template Method** | Ability Lifecycle (validate → execute → undo) | `Ability` Interface definiert den fixen 3-Schritt-Ablauf für aktive Fähigkeiten. Konkrete Abilities (`CreateWallAbility`, `HealAbility`) implementieren die Details. Erzwingt konsistente Validierung und Undo-Fähigkeit. |
+
+**Pattern-Kombination:**
+- **Aktive Abilities**: Command Pattern (#8) + Template Method (z.B. `CreateWallAbility`)
 
 ---
 

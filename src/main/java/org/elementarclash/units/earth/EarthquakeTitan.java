@@ -9,11 +9,16 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
- * Earthquake Titan - Earth faction heavy damage dealer.
- * Special: Area-of-effect attack (damages all adjacent enemies).
+ * Earth faction's massive unit with area-of-effect attack.
+ * <p>
+ * Faction: Earth | Movement: Ground | Attack: Area (range: 1, hits all adjacent enemies at 75% damage)
+ * <p>
+ * Special: Earthquake (AreaDamageAbility) - Damages all adjacent enemies simultaneously.
+ * <p>
+ * Tactical: Anti-cluster unit. Punishes grouped enemies. High value target requiring protection.
  */
 class EarthquakeTitan extends Unit {
-    private static final int AOE_DAMAGE_MULTIPLIER = 75; // 75% of normal damage
+    private static final int AOE_DAMAGE_MULTIPLIER = 75;
 
     public EarthquakeTitan(String id, UnitStats stats) {
         super(id, "Erdbeben-Titan", Faction.EARTH, UnitType.EARTHQUAKE_TITAN, stats);
@@ -29,17 +34,10 @@ class EarthquakeTitan extends Unit {
         return "Flächenangriff (trifft alle angrenzenden Gegner, 75% Schaden)";
     }
 
-    /**
-     * Returns true if this unit can use area-of-effect attacks.
-     * Used by combat system (Chain of Responsibility pattern).
-     */
     public boolean hasAreaOfEffectAttack() {
         return true;
     }
 
-    /**
-     * Returns the damage multiplier for AOE attacks (as percentage).
-     */
     public int getAoeDamagePercent() {
         return AOE_DAMAGE_MULTIPLIER;
     }

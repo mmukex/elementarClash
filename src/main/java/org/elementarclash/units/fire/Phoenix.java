@@ -7,7 +7,25 @@ import org.elementarclash.units.UnitType;
 import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
+/**
+ * Fire faction's mythical flying unit with resurrection ability.
+ * <p>
+ * Faction: Fire
+ * <p>
+ * Movement: Flying (ignores terrain penalties)
+ * Attack: Melee (range: 1)
+ * <p>
+ * Special Ability: Resurrects once at 50% HP when killed.
+ * The phoenix returns from ashes after its first death, but subsequent deaths are permanent.
+ * <p>
+ * Tactical Use: High-risk scout and flanker.
+ * Flying mobility allows bypassing terrain obstacles. Resurrection provides second chance in combat.
+ * Vulnerable to ranged attacks and area damage.
+ */
 class Phoenix extends Unit {
+
+    private static final double RESURRECTION_HEALTH_PERCENT = 0.5;
+
     private boolean hasResurrected = false;
 
     public Phoenix(String id, UnitStats stats) {
@@ -17,29 +35,21 @@ class Phoenix extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
-        return "Fliegend, Wiederbelebung 1× (50% LP)";
-    }
+    public void takeDamage(int damage) {
+        super.takeDamage(damage);
 
-    /**
-     * Special mechanic: Phoenix resurrects once when killed.
-     * This will be triggered by the State pattern (death state).
-     */
-    public boolean canResurrect() {
-        return !hasResurrected && !isAlive();
-    }
-
-    public void resurrect() {
-        if (canResurrect()) {
-            int resurrectionHealth = getBaseStats().maxHealth() / 2;
-            heal(resurrectionHealth);
+        if (!isAlive() && !hasResurrected) {
+            int resurrectionHealth = (int) (getBaseStats().maxHealth() * RESURRECTION_HEALTH_PERCENT);
+            setCurrentHealth(resurrectionHealth);
             hasResurrected = true;
         }
     }
 
-    /**
-     * Flying units ignore terrain movement penalties.
-     */
+    @Override
+    public String getSpecialAbility() {
+        return "Fliegend, Wiederbelebung 1× (50% LP)";
+    }
+
     public boolean isFlying() {
         return true;
     }

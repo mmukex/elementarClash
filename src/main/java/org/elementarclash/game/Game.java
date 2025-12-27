@@ -86,6 +86,18 @@ public class Game {
         positionToUnit.remove(unit.getPosition());
         positionToUnit.put(newPosition, unit);
         unit.setPosition(newPosition);
+
+        applyTerrainTransformation(unit);
+    }
+
+    private void applyTerrainTransformation(Unit unit) {
+        Terrain terrain = getTerrainAt(unit.getPosition());
+        TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
+        TerrainEffectResult effect = unit.accept(visitor);
+
+        if (effect.terrainChange() != null) {
+            battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
+        }
     }
 
     public ValidationResult executeCommand(Command command) {

@@ -11,7 +11,8 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Abstract base class for all units in ElementarClash.
@@ -35,6 +36,7 @@ public abstract class Unit {
 
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
+    private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -52,14 +54,44 @@ public abstract class Unit {
     }
 
     public void takeDamage(int damage) {
-        currentHealth = Math.max(0, currentHealth - Math.max(0, damage));
+        currentHealth -= Math.max(0, damage);
+        if (currentHealth <= 0) {
+            currentHealth = 0;
+        }
     }
 
     public void heal(int amount) {
         currentHealth = Math.min(baseStats.maxHealth(), currentHealth + amount);
     }
 
+    public void setCurrentHealth(int health) {
+        this.currentHealth = Math.max(0, Math.min(baseStats.maxHealth(), health));
+    }
+
+    public boolean isAbilityOnCooldown(Class<?> abilityClass) {
+        return abilityCooldowns.getOrDefault(abilityClass, 0) > 0;
+    }
+
+    public int getAbilityCooldown(Class<?> abilityClass) {
+        return abilityCooldowns.getOrDefault(abilityClass, 0);
+    }
+
+    public void startAbilityCooldown(Class<?> abilityClass, int cooldown) {
+        if (cooldown > 0) {
+            abilityCooldowns.put(abilityClass, cooldown);
+        }
+    }
+
+    public void clearAbilityCooldown(Class<?> abilityClass) {
+        abilityCooldowns.remove(abilityClass);
+    }
+
+    private void tickAbilityCooldowns() {
+        abilityCooldowns.replaceAll((k, v) -> Math.max(0, v - 1));
+    }
+
     public void resetTurn() {
+        tickAbilityCooldowns();
         movedThisTurn = false;
         attackedThisTurn = false;
     }
@@ -106,7 +138,7 @@ public abstract class Unit {
         return movementStrategy;
     }
 
-    protected void setMovementStrategy(MovementStrategy strategy) {
+    public void setMovementStrategy(MovementStrategy strategy) {
         this.movementStrategy = strategy;
     }
 

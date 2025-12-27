@@ -58,6 +58,28 @@ public class GameBuilder {
         return this;
     }
 
+    public GameBuilder withIceWorldScenario() {
+        Map<Terrain, Integer> iceWorld = Map.of(
+            Terrain.ICE, 40,
+            Terrain.DESERT, 30,
+            Terrain.STONE, 20,
+            Terrain.FOREST, 10,
+            Terrain.LAVA, 0
+        );
+        return withCustomTerrain(iceWorld);
+    }
+
+    public GameBuilder withVolcanoArenaScenario() {
+        Map<Terrain, Integer> volcanoArena = Map.of(
+            Terrain.LAVA, 40,
+            Terrain.STONE, 30,
+            Terrain.DESERT, 20,
+            Terrain.FOREST, 10,
+            Terrain.ICE, 0
+        );
+        return withCustomTerrain(volcanoArena);
+    }
+
     public GameBuilder withRandomSeed(long seed) {
         this.randomSeed = seed;
         return this;

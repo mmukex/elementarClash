@@ -8,8 +8,13 @@ import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
- * Wind Dancer - Air faction fast melee unit.
- * Special: Can attack twice per turn if it moves at least 3 tiles.
+ * Air faction's mobile striker with conditional double attack.
+ * <p>
+ * Faction: Air | Movement: Flying | Attack: Melee (range: 1)
+ * <p>
+ * Special: Double attack after moving ≥3 tiles. Avoids opportunity attacks.
+ * <p>
+ * Tactical: Hit-and-run specialist. Uses mobility for repeated strikes.
  */
 class WindDancer extends Unit {
     private static final int DOUBLE_ATTACK_MOVEMENT_THRESHOLD = 3;
@@ -25,10 +30,6 @@ class WindDancer extends Unit {
         return "Kann 2× angreifen nach Bewegung ≥3 Felder";
     }
 
-    /**
-     * Checks if unit qualifies for double attack based on movement.
-     * Will be used by combat system.
-     */
     public boolean canDoubleAttack(int tilesMovedThisTurn) {
         return tilesMovedThisTurn >= DOUBLE_ATTACK_MOVEMENT_THRESHOLD;
     }

@@ -7,6 +7,21 @@ import org.elementarclash.units.UnitType;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
+/**
+ * Fire faction's ranged unit that ignores forest defense bonuses.
+ * <p>
+ * Faction: Fire
+ * <p>
+ * Movement: Ground (Fire faction terrain modifiers: Lava cost 1.0, Ice cost 2.0)
+ * Attack: Ranged (range: 3)
+ * <p>
+ * Special Ability: Ignores forest defense bonus.
+ * Flame Archers' fire arrows burn through forest cover, negating defensive terrain advantages.
+ * <p>
+ * Tactical Use: Anti-forest ranged attacker.
+ * Counters units hiding in forests. Good range but vulnerable to melee rushes.
+ * Positioning critical for maximizing range advantage.
+ */
 class FlameArcher extends Unit {
 
     public FlameArcher(String id, UnitStats stats) {
@@ -20,10 +35,6 @@ class FlameArcher extends Unit {
         return "Ignoriert Wald-Verteidigungsbonus (Reichweite: 3)";
     }
 
-    /**
-     * Returns true if this unit ignores forest defense.
-     * Used by combat system (Chain of Responsibility pattern).
-     */
     public boolean ignoresForestDefense() {
         return true;
     }

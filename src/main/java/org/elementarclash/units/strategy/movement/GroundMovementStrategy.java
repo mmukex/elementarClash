@@ -18,7 +18,7 @@ import org.elementarclash.util.Position;
  * Faction-specific modifiers:
  * - Fire: Lava cost 1.0 (faster), Ice cost 2.0 (slower)
  * - Water: Ice cost 1.0 (faster), Lava cost 3.0 (slower)
- * - Earth: Stone cost ×0.67 (faster on rocky terrain)
+ * - Earth: Stone cost 2.0 (faster on rocky terrain)
  */
 public class GroundMovementStrategy implements MovementStrategy {
 
@@ -26,7 +26,6 @@ public class GroundMovementStrategy implements MovementStrategy {
     private static final double FIRE_ICE_COST = 2.0;
     private static final double WATER_ICE_COST = 1.0;
     private static final double WATER_LAVA_COST = 3.0;
-    private static final double EARTH_STONE_MULTIPLIER = 0.67;
 
     private final Faction faction;
 
@@ -64,7 +63,7 @@ public class GroundMovementStrategy implements MovementStrategy {
 
     private double applyEarthModifiers(Terrain terrain, double baseCost) {
         return switch (terrain) {
-            case STONE -> baseCost * EARTH_STONE_MULTIPLIER;
+            case STONE -> 2.0;
             default -> baseCost;
         };
     }

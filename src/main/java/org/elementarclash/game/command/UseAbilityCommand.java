@@ -60,12 +60,21 @@ public class UseAbilityCommand<T> implements Command {
             return actorCheck;
         }
 
+        if (actor.isAbilityOnCooldown(ability.getClass())) {
+            int remainingCooldown = actor.getAbilityCooldown(ability.getClass());
+            return ValidationResult.failure(
+                String.format("Fähigkeit noch %d Runden auf Abklingzeit", remainingCooldown)
+            );
+        }
+
         return ability.validate(game, actor, targets);
     }
 
     @Override
     public void execute(Game game) {
         this.undoState = ability.execute(game, actor, targets);
+
+        actor.startAbilityCooldown(ability.getClass(), ability.getCooldown());
 
         this.actionWasConsumed = ability.consumesAction();
         if (actionWasConsumed) {
@@ -82,6 +91,8 @@ public class UseAbilityCommand<T> implements Command {
         }
 
         ability.undo(game, actor, undoState);
+
+        actor.clearAbilityCooldown(ability.getClass());
 
         if (actionWasConsumed) {
             actor.clearAttackedThisTurn();

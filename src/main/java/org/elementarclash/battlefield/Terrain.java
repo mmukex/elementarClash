@@ -23,18 +23,11 @@ public enum Terrain {
     private final String icon;
     private final int distributionPercent;
 
-    public int getDefenseBonus() {
-        return switch (this) {
-            case FOREST, STONE -> 2;
-            case DESERT -> 1;
-            default -> 0;
-        };
-    }
-
     public double getMovementCost() {
         return switch (this) {
-            case FOREST, LAVA -> 1.5;
-            case ICE -> 1.2;
+            case FOREST, LAVA -> 2.0;
+            case ICE -> 3.0;
+            case STONE -> 3.0;
             default -> 1.0;
         };
     }

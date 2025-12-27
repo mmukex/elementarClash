@@ -30,10 +30,4 @@ public class Cell implements BattlefieldComponent {
     public List<Cell> cells() {
         return List.of(this);
     }
-
-    @Override
-    public void applyEffect(TerrainEffect effect) {
-        this.terrain = effect.apply(this);
-    }
-
 }

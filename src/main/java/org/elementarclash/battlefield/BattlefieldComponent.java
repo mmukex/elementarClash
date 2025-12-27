@@ -1,6 +1,7 @@
 package org.elementarclash.battlefield;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Component interface for Composite Pattern in battlefield hierarchy.
@@ -20,15 +21,6 @@ public interface BattlefieldComponent {
     List<Cell> cells();
 
     /**
-     * Applies a terrain effect to all cells in this component.
-     *
-     * @param effect effect to apply
-     */
-    default void applyEffect(TerrainEffect effect) {
-        cells().forEach(cell -> cell.applyEffect(effect));
-    }
-
-    /**
      * Retrieves cell at specified index.
      *
      * @param index cell index
@@ -36,5 +28,27 @@ public interface BattlefieldComponent {
      */
     default Cell getCell(int index) {
         return cells().get(index);
+    }
+
+    /**
+     * Applies an effect to all cells in this component.
+     * Used for area-of-effect operations like forest fires, earthquakes, geysers.
+     * <p>
+     * Integration: Enables dynamic events (Observer Pattern #7 @crstmkt).
+     * Events can apply effects to arbitrary regions using this method.
+     * <p>
+     * Example:
+     * <pre>
+     * region.applyEffect(cell -> {
+     *     if (cell.getTerrain() == Terrain.FOREST) {
+     *         cell.setTerrain(Terrain.LAVA);
+     *     }
+     * });
+     * </pre>
+     *
+     * @param effect consumer that modifies each cell
+     */
+    default void applyEffect(Consumer<Cell> effect) {
+        cells().forEach(effect);
     }
 }
