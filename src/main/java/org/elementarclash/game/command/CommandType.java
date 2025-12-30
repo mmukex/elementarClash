@@ -8,6 +8,5 @@ package org.elementarclash.game.command;
  */
 public enum CommandType {
     MOVE,
-    ATTACK,
-    USE_ABILITY
+    ATTACK
 }

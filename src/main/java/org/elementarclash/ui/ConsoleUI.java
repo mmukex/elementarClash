@@ -30,11 +30,11 @@ public class ConsoleUI {
     }
 
     public void showError(String message) {
-        System.out.println("❌ Fehler: " + message);
+        System.out.println("Fehler: " + message);
     }
 
     public void showSuccess(String message) {
-        System.out.println("✅ " + message);
+        System.out.println(message);
     }
 
     public void display(String content) {

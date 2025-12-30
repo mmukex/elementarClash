@@ -38,7 +38,7 @@ public class GameController {
     }
 
     private void displayGameState() {
-        ui.display("\n" + "=".repeat(60));
+        ui.display(System.lineSeparator() + "=".repeat(60));
         ui.display(renderer.render(game));
         ui.display("Runde: " + game.getTurnNumber() + " | Aktive Fraktion: " + game.getActiveFaction());
         ui.display("=".repeat(60));
@@ -143,7 +143,7 @@ public class GameController {
     }
 
     private boolean executeQuit() {
-        ui.display("\nSpiel wird beendet...");
+        ui.display(System.lineSeparator() + "Spiel wird beendet...");
         System.exit(0);
         return true;
     }
@@ -151,9 +151,9 @@ public class GameController {
     private void displayWinner() {
         Faction winner = game.getWinner();
         if (winner != null) {
-            ui.display("\n🏆 " + winner + " hat gewonnen! 🏆");
+            ui.display(System.lineSeparator() + winner + " hat gewonnen!");
         } else {
-            ui.display("\n⚔️ Unentschieden! ⚔️");
+            ui.display(System.lineSeparator() + "Unentschieden!");
         }
     }
 }

@@ -8,13 +8,13 @@ import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
- * Air faction's ranged unit with knockback ability.
+ * Air faction's ranged unit with chain lightning.
  * <p>
  * Faction: Air | Movement: Flying | Attack: Ranged (range: 3)
  * <p>
- * Special: Push Ability (PushAbility) - Knocks targets back 1 tile.
+ * Special: Chain Lightning - Damage chains to nearby enemies with reduced damage per jump.
  * <p>
- * Tactical: Crowd control. Repositions enemies. Counters melee rushes.
+ * Tactical: Multi-target damage. Punishes clustered enemies. Strong against grouped formations.
  */
 class StormCaller extends Unit {
     private static final int CHAIN_DAMAGE_REDUCTION = 2;

@@ -8,18 +8,15 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
- * Water faction's ranged spellcaster with slowing attacks.
+ * Water faction's ranged spellcaster with long range.
  * <p>
  * Faction: Water
  * <p>
  * Movement: Ground (Water faction terrain modifiers: Ice cost 1.0, Lava cost 3.0)
- * Attack: Ranged (range: 3)
+ * Attack: Ranged (range: 4)
  * <p>
- * Special Ability: Slow Ability (SlowAbility).
- * Frost Mage attacks reduce target movement by 1 for 2 turns, limiting enemy mobility.
- * <p>
- * Tactical Use: Crowd control and kiting.
- * Slows enemies to create distance. Strong against melee units. Vulnerable when cornered.
+ * Tactical Use: Long-range damage dealer.
+ * High range allows safe positioning. Strong against melee units. Vulnerable when cornered.
  * Requires careful positioning to maintain range advantage.
  */
 class FrostMage extends Unit {
@@ -31,10 +28,6 @@ class FrostMage extends Unit {
 
     @Override
     public String getSpecialAbility() {
-        return "Angriffe verlangsamen Gegner (-1 Bewegung für 2 Runden)";
-    }
-
-    public boolean appliesSlowEffect() {
-        return true;
+        return "Fernkampf-Magier mit hoher Reichweite (4)";
     }
 }

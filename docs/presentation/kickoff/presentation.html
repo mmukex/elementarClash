@@ -218,7 +218,6 @@
                             <li><strong>Bewegung:</strong> Boden-Einheiten zahlen Geländekosten</li>
                             <li><strong>Angriff:</strong> Nahkampf (Reichweite 1)</li>
                             <li><strong>Angriff:</strong> Fernkampf (Reichweite 3-4, Sichtlinie)</li>
-                            <li><strong>Angriff:</strong> Flächenschaden (Erdbeben-Titan trifft Nachbarn)</li>
                         </ul>
                     </div>
                     <p style="font-size: 0.8em; color: #ff6b6b;">ständiges if-else checken? Unmaintainable!</p>
@@ -282,7 +281,7 @@
                         <p><strong>Gelände-Effekte auf Einheiten:</strong></p>
                         <ul style="font-size: 0.85em;">
                             <li><strong>Lava:</strong> Feuer +2 Angriff, Wasser -5 LP/Runde</li>
-                            <li><strong>Eis:</strong> Wasser +2 Verteidigung + Heilung (5 LP/Runde), Feuer schmilzt zu Wüste</li>
+                            <li><strong>Eis:</strong> Wasser +3 Verteidigung + Heilung (5 LP/Runde), Feuer schmilzt zu Wüste</li>
                             <li><strong>Wald:</strong> Alle +2 Verteidigung (blockiert Fernkampf-Sichtlinie)</li>
                             <li><strong>Stein:</strong> Erde +2 Verteidigung</li>
                             <li><strong>Wüste:</strong> Keine Boni</li>
@@ -356,9 +355,9 @@
                     <div class="why-box">
                         <p><strong>Stapelbare, dynamische Buffs/Debuffs für Einheiten</strong></p>
                         <ul style="font-size: 0.85em;">
+                            <li>Gelände-Boni: Feuer auf Lava +2 Angriff (via Visitor Pattern)</li>
                             <li>Synergien: Benachbarte Feuer-Einheiten gewähren +1 Angriff</li>
-                            <li>Temporäre Fähigkeits-Buffs: Feuersturm +3 Angriff für 2 Runden</li>
-                            <li>Status-Effekte: Verlangsamung (-1 Bewegung), Betäubung</li>
+                            <li>Fraktions-Vorteile: Feuer vs. Erde +25% Schaden</li>
                             <li>Mehrere Effekte gleichzeitig stapelbar</li>
                         </ul>
                     </div>

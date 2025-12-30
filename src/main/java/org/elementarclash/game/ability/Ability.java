@@ -8,21 +8,17 @@ import org.elementarclash.units.Unit;
  * Interface for special unit abilities.
  * Abilities are actions beyond basic move/attack, like healing, area effects, or status changes.
  * <p>
- * Design Pattern: Strategy (for ability execution) + Command (for undo)
- * Why: Different units have different abilities with varying effects.
+ * Design Pattern: Strategy (for ability execution)
+ * Why: Different units have different passive abilities with varying effects.
  * This interface allows abilities to be implemented independently and attached to units.
  * <p>
- * Implementations:
- * - SlowAbility: Reduces target movement for 2 turns (Frost Mage)
- * - ResurrectAbility: Self-resurrection at 50% HP (Phoenix)
- * - PierceAbility: Ignores forest defense bonus (Flame Archer)
- * - WallAbility: Creates earth wall blocking movement (Terra Shaman)
+ * Note: ElementarClash focuses on passive unit abilities and terrain interactions.
+ * Active abilities have been removed to reduce complexity.
  * <p>
- * Integration with Command Pattern:
- * UseAbilityCommand wraps abilities and handles:
- * - Validation delegation to validate()
- * - Execution and state capture via execute()
- * - Rollback via undo()
+ * Passive abilities include:
+ * - Phoenix resurrection (automatic on death)
+ * - Storm Caller chain lightning (built into attack)
+ * - Terrain-based bonuses (via Visitor Pattern)
  * <p>
  * Generic Parameter:
  * - T: Type of undo state (ability-specific)

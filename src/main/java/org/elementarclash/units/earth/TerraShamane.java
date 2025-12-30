@@ -8,17 +8,13 @@ import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 
 /**
- * Earth faction's support unit that creates defensive terrain.
+ * Earth faction's ranged support unit.
  * <p>
  * Faction: Earth | Movement: Ground | Attack: Ranged (range: 3)
  * <p>
- * Special: Create Wall (CreateWallAbility) - Creates stone terrain walls.
- * <p>
- * Tactical: Battlefield control specialist. Creates choke points and defensive positions.
+ * Tactical: Ranged support specialist. Provides backline damage.
  */
 class TerraShamane extends Unit {
-    private static final int WALL_DURATION = 2;
-
     public TerraShamane(String id, UnitStats stats) {
         super(id, "Terra-Schamane", Faction.EARTH, UnitType.TERRA_SHAMAN, stats);
         setMovementStrategy(new GroundMovementStrategy(Faction.EARTH));
@@ -27,14 +23,6 @@ class TerraShamane extends Unit {
 
     @Override
     public String getSpecialAbility() {
-        return "Kann Erdwände erschaffen (blockiert 2 Runden)";
-    }
-
-    public boolean canCreateWall() {
-        return canAct();
-    }
-
-    public int getWallDuration() {
-        return WALL_DURATION;
+        return "Unterstützungseinheit mit Fernkampf";
     }
 }
