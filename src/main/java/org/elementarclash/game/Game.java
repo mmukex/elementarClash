@@ -20,6 +20,7 @@ import org.elementarclash.units.Unit;
 import org.elementarclash.units.decorator.SynergyBonus;
 import org.elementarclash.units.decorator.TerrainBonus;
 import org.elementarclash.util.Position;
+import org.elementarclash.game.event.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -57,6 +58,7 @@ public class Game {
     private GamePhaseState currentPhase;
     @Deprecated
     private GameStatus status;
+    private final List<GameObserver> observers = new ArrayList<>();
 
     Game(Battlefield battlefield) {
         this.battlefield = battlefield;
@@ -89,6 +91,7 @@ public class Game {
         Faction firstFaction = determineFirstFaction();
         transitionToPhase(currentPhase.transitionToPlayerTurn(this, firstFaction));
         this.activeFaction = firstFaction;
+        notifyObservers(new GameStartedEvent());
     }
 
     /**
@@ -103,7 +106,7 @@ public class Game {
         if (checkVictoryCondition()) {
             return; // Game is over
         }
-
+        Faction endingFaction = activeFaction;
         // PlayerTurn → EventPhase
         transitionToPhase(currentPhase.transitionToEventPhase(this));
 
@@ -111,6 +114,7 @@ public class Game {
         Faction nextFaction = getNextFaction();
         transitionToPhase(currentPhase.transitionToPlayerTurn(this, nextFaction));
         this.activeFaction = nextFaction;
+        notifyObservers(new TurnEndedEvent(endingFaction));
     }
 
     /**
@@ -124,9 +128,9 @@ public class Game {
         if (aliveCounts.size() == 1) {
             Faction winner = aliveCounts.keySet().iterator().next();
             transitionToPhase(currentPhase.transitionToGameOver(this, winner));
+            notifyObservers(new GameOverEvent(winner));
             return true;
         }
-
         return false;
     }
 
@@ -153,12 +157,14 @@ public class Game {
         if (!units.contains(unit) || isPositionOccupied(newPosition)) {
             return;
         }
+        Position oldPosition = unit.getPosition();
 
         positionToUnit.remove(unit.getPosition());
         positionToUnit.put(newPosition, unit);
         unit.setPosition(newPosition);
 
         applyTerrainTransformation(unit);
+        notifyObservers(new UnitMovedEvent(unit, oldPosition, newPosition));
     }
 
     private void applyTerrainTransformation(Unit unit) {
@@ -216,6 +222,7 @@ public class Game {
 
     public void handleUnitDeath(Unit unit) {
         removeUnit(unit);
+        notifyObservers(new UnitDeathEvent(unit)); //Notify Observers before victory Check
         checkVictoryCondition();  // Check if game should end
     }
 
@@ -428,5 +435,25 @@ public class Game {
         SETUP,
         IN_PROGRESS,
         GAME_OVER
+    }
+
+    // ===== OBSERVER PATTERN METHODS =====
+
+    public void addObserver(GameObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(GameObserver observer) {
+        observers.remove(observer);
+    }
+
+    public void notifyObservers(GameEvent event) {
+        for (GameObserver observer : observers) {
+            observer.onEvent(event);
+        }
+    }
+
+    public void notifyTerrainChanged(Position position, Terrain oldTerrain, Terrain newTerrain) {
+        notifyObservers(new TerrainChangedEvent(position, oldTerrain, newTerrain));
     }
 }

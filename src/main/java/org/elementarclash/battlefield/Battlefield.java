@@ -1,5 +1,6 @@
 package org.elementarclash.battlefield;
 
+import org.elementarclash.game.Game;
 import org.elementarclash.util.Position;
 
 import java.util.*;
@@ -93,8 +94,25 @@ public class Battlefield implements BattlefieldComponent {
         return getCell(position.x(), position.y()).getTerrain();
     }
 
-    public void setTerrainAt(Position position, Terrain terrain) {
-        getCell(position.x(), position.y()).setTerrain(terrain);
+    /**
+     * Set terrain at position and notify game (for Observer Pattern).
+     *
+     * @author @crstmkt (Observer integration)
+     */
+    public void setTerrainAt(Position position, Terrain newTerrain, Game game) {
+        Cell cell = getCell(position.x(), position.y());
+        Terrain oldTerrain = cell.getTerrain();
+
+        cell.setTerrain(newTerrain);
+
+        if (game != null && oldTerrain != newTerrain) {
+            game.notifyTerrainChanged(position, oldTerrain, newTerrain);
+        }
+    }
+
+    // Keep for compatiblity
+    public void setTerrainAt(Position position, Terrain newTerrain) {
+        setTerrainAt(position, newTerrain, null);
     }
 
     public Cell getCell(int x, int y) {

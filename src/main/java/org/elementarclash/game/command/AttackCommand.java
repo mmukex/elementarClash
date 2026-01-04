@@ -4,6 +4,7 @@ import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.combat.DamageCalculator;
 import org.elementarclash.game.combat.DamageResult;
+import org.elementarclash.game.event.UnitAttackedEvent;
 import org.elementarclash.units.Unit;
 
 /**
@@ -89,6 +90,8 @@ public class AttackCommand implements Command {
         target.takeDamage(result.totalDamage());
         actor.markAttackedThisTurn();
         actor.startAttacking();
+
+        game.notifyObservers(new UnitAttackedEvent(actor, target, result));
 
         if (!target.isAlive()) {
             game.handleUnitDeath(target);
