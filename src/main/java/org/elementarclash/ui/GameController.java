@@ -5,7 +5,6 @@ import org.elementarclash.game.Game;
 import org.elementarclash.game.Game.GameStatus;
 import org.elementarclash.game.command.AttackCommand;
 import org.elementarclash.game.command.MoveCommand;
-import org.elementarclash.game.command.UseAbilityCommand;
 import org.elementarclash.game.command.ValidationResult;
 
 /**
@@ -59,7 +58,6 @@ public class GameController {
         return switch (action) {
             case "B" -> executeMove();
             case "A" -> executeAttack();
-            case "F" -> executeAbility();
             case "U" -> executeUndo();
             case "R" -> executeRedo();
             case "Z" -> true;
@@ -97,23 +95,6 @@ public class GameController {
         ValidationResult result = game.executeCommand(command);
         if (result.isValid()) {
             ui.showSuccess("Angriff ausgeführt");
-            displayGameState();
-        } else {
-            ui.showError(result.errorMessage());
-        }
-
-        return false;
-    }
-
-    private boolean executeAbility() {
-        UseAbilityCommand command = parser.parseAbility(game);
-        if (command == null) {
-            return false;
-        }
-
-        ValidationResult result = game.executeCommand(command);
-        if (result.isValid()) {
-            ui.showSuccess("Fähigkeit eingesetzt");
             displayGameState();
         } else {
             ui.showError(result.errorMessage());
