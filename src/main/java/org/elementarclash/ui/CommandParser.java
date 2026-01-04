@@ -2,12 +2,9 @@ package org.elementarclash.ui;
 
 import org.elementarclash.faction.Faction;
 import org.elementarclash.game.Game;
-import org.elementarclash.game.ability.CreateWallAbility;
 import org.elementarclash.game.command.AttackCommand;
 import org.elementarclash.game.command.MoveCommand;
-import org.elementarclash.game.command.UseAbilityCommand;
 import org.elementarclash.units.Unit;
-import org.elementarclash.units.UnitType;
 import org.elementarclash.util.Position;
 
 import java.util.List;
@@ -79,43 +76,6 @@ public class CommandParser {
             }
 
             return new AttackCommand(attacker, target);
-
-        } catch (Exception e) {
-            ui.showError("Eingabefehler: " + e.getMessage());
-            return null;
-        }
-    }
-
-    public UseAbilityCommand parseAbility(Game game) {
-        try {
-            String unitId = ui.promptUnitSelection("Welche Einheit nutzt Fähigkeit? (z.B. E1): ");
-            Unit actor = findUnitById(game, unitId);
-
-            if (actor == null) {
-                ui.showError("Einheit nicht gefunden: " + unitId);
-                return null;
-            }
-
-            if (actor.getFaction() != game.getActiveFaction()) {
-                ui.showError("Diese Einheit gehört nicht zur aktiven Fraktion");
-                return null;
-            }
-
-            if (actor.getType() == UnitType.TERRA_SHAMAN) {
-                String posInput = ui.promptPosition("Wo soll die Erdmauer erschaffen werden? (z.B. 3,4): ");
-                Position wallPosition = parsePosition(posInput);
-
-                if (wallPosition == null) {
-                    ui.showError("Ungültige Position: " + posInput);
-                    return null;
-                }
-
-                CreateWallAbility ability = new CreateWallAbility();
-                return new UseAbilityCommand<>(actor, ability, wallPosition);
-            }
-
-            ui.showError("Diese Einheit hat keine Fähigkeiten");
-            return null;
 
         } catch (Exception e) {
             ui.showError("Eingabefehler: " + e.getMessage());
