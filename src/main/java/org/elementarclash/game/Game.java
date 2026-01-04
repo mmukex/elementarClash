@@ -17,6 +17,8 @@ import org.elementarclash.game.phase.PlayerTurnPhase;
 import org.elementarclash.ui.ConsoleGameRenderer;
 import org.elementarclash.ui.GameRenderer;
 import org.elementarclash.units.Unit;
+import org.elementarclash.units.decorator.SynergyBonus;
+import org.elementarclash.units.decorator.TerrainBonus;
 import org.elementarclash.util.Position;
 
 import java.util.*;
@@ -167,6 +169,17 @@ public class Game {
         if (effect.terrainChange() != null) {
             battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
         }
+
+        // Apply terrain bonus as Decorator
+        // Remove old terrain bonus, add new one
+        unit.removeDecoratorsOfType(TerrainBonus.class);
+        if (effect.attackBonus() != 0 || effect.defenseBonus() != 0) {
+            unit.addDecorator(new TerrainBonus(effect));
+        }
+
+        // Recalculate synergy bonus (in case unit moved next to allies)
+        unit.removeDecoratorsOfType(SynergyBonus.class);
+        unit.addDecorator(new SynergyBonus(this, unit.getFaction()));
     }
 
     public ValidationResult executeCommand(Command command) {

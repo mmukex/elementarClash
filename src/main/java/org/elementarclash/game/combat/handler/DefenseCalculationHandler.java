@@ -14,9 +14,8 @@ public class DefenseCalculationHandler extends DamageHandler {
         // Total attack = base + terrain + synergies
         int totalAttack = context.getTotalAttack();
 
-        // Total defense = base stats + terrain bonus
-        int baseDefense = context.getTarget().getBaseStats().defense();
-        int totalDefense = baseDefense + context.getTerrainDefenseBonus();
+        // target.getDefense() already includes all decorators (terrain + synergies)
+        int totalDefense = context.getTarget().getDefense();
 
         context.setTotalDefense(totalDefense);
 

@@ -12,7 +12,9 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
-
+import org.elementarclash.units.decorator.UnitDecorator;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,8 +45,8 @@ public abstract class Unit {
     private AttackStrategy attackStrategy;
     private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
 
-    // Getter / Setter über Lombok?
     private UnitState currentState;
+    private final List<UnitDecorator> decorators = new ArrayList<>();
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -238,5 +240,70 @@ public abstract class Unit {
         return String.format("%s [%s] - HP: %d/%d, ATK: %d, DEF: %d",
                 name, faction.getIcon(), currentHealth, baseStats.maxHealth(),
                 baseStats.attack(), baseStats.defense());
+    }
+
+    // ===== DECORATOR PATTERN METHODS =====
+
+    /**
+     * Add a decorator to this unit.
+     */
+    public void addDecorator(UnitDecorator decorator) {
+        decorators.add(decorator);
+    }
+
+    /**
+     * Remove a specific decorator.
+     */
+    public void removeDecorator(UnitDecorator decorator) {
+        decorators.remove(decorator);
+    }
+
+    /**
+     * Remove all decorators of a specific class.
+     */
+    public void removeDecoratorsOfType(Class<? extends UnitDecorator> decoratorClass) {
+        decorators.removeIf(d -> decoratorClass.isInstance(d));
+    }
+
+    /**
+     * Remove all expired decorators (e.g., ability buffs).
+     */
+    public void removeExpiredDecorators() {
+        decorators.removeIf(UnitDecorator::isExpired);
+    }
+
+    /**
+     * Get all decorators (for debugging/UI).
+     */
+    public List<UnitDecorator> getDecorators() {
+        return new ArrayList<>(decorators);
+    }
+
+    /**
+     * Get total attack including all decorator bonuses.
+     * REPLACES: baseStats.attack()
+     */
+    public int getAttack() {
+        int attack = baseStats.attack();
+        for (UnitDecorator decorator : decorators) {
+            if (!decorator.isExpired()) {
+                attack += decorator.getAttackBonus(this);
+            }
+        }
+        return attack;
+    }
+
+    /**
+     * Get total defense including all decorator bonuses.
+     * REPLACES: baseStats.defense()
+     */
+    public int getDefense() {
+        int defense = baseStats.defense();
+        for (UnitDecorator decorator : decorators) {
+            if (!decorator.isExpired()) {
+                defense += decorator.getDefenseBonus(this);
+            }
+        }
+        return defense;
     }
 }

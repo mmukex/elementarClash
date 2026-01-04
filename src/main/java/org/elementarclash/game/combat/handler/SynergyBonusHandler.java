@@ -1,6 +1,8 @@
 package org.elementarclash.game.combat.handler;
 
 import org.elementarclash.game.combat.DamageContext;
+import org.elementarclash.units.decorator.TerrainBonus;
+import org.elementarclash.units.decorator.UnitDecorator;
 
 /**
  * Apply synergy bonuses from adjacent units.
@@ -12,21 +14,21 @@ public class SynergyBonusHandler extends DamageHandler {
 
     @Override
     public void handle(DamageContext context) {
-        // TODO (Week 4): After Decorator Pattern implemented
-        //
-        // int totalBonus = 0;
-        // for (UnitDecorator decorator : context.getAttacker().getDecorators()) {
-        //     totalBonus += decorator.getAttackBonus(context.getAttacker());
-        // }
-        //
-        // if (totalBonus != 0) {
-        //     context.addSynergyBonus(totalBonus);
-        // }
+         int totalBonus = 0;
+         for (UnitDecorator decorator : context.getAttacker().getDecorators()) {
+             totalBonus += decorator.getAttackBonus(context.getAttacker());
+         }
 
-        // For now, calculate simple adjacent unit bonus manually
-        int adjacentBonus = calculateAdjacentBonus(context);
-        if (adjacentBonus != 0) {
-            context.addSynergyBonus(adjacentBonus);
+        // Note: Terrain bonus is already added by TerrainEffectHandler
+        // Only add non-terrain bonuses here (synergies, abilities)
+        int synergyBonus = context.getAttacker().getDecorators().stream()
+                .filter(d -> !(d instanceof TerrainBonus))
+                .filter(d -> !d.isExpired())
+                .mapToInt(d -> d.getAttackBonus(context.getAttacker()))
+                .sum();
+
+        if (synergyBonus != 0) {
+            context.addSynergyBonus(synergyBonus);
         }
 
         // Pass to next handler
