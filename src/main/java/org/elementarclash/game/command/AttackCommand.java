@@ -56,6 +56,12 @@ public class AttackCommand implements Command {
             return targetCheck;
         }
 
+        if (!actor.canAttack()) {
+            return ValidationResult.failure(
+                    actor.getName() + " cannot attack (State: " + actor.getCurrentState().getStateName() + ")"
+            );
+        }
+
         if (actor.hasAttackedThisTurn()) {
             return ValidationResult.failure(
                     String.format("%s has already attacked this turn", actor.getName())
@@ -82,6 +88,7 @@ public class AttackCommand implements Command {
         this.damageDealt = result.totalDamage();
         target.takeDamage(result.totalDamage());
         actor.markAttackedThisTurn();
+        actor.startAttacking();
 
         if (!target.isAlive()) {
             game.handleUnitDeath(target);

@@ -5,6 +5,8 @@ import lombok.Setter;
 import org.elementarclash.battlefield.visitor.TerrainEffectResult;
 import org.elementarclash.battlefield.visitor.TerrainVisitor;
 import org.elementarclash.faction.Faction;
+import org.elementarclash.units.state.IdleState;
+import org.elementarclash.units.state.UnitState;
 import org.elementarclash.units.strategy.attack.AttackStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
@@ -31,12 +33,16 @@ public abstract class Unit {
     private int currentHealth;
     @Setter
     private Position position;
+
+    //Durch STATE Pattern ersetzt
     private boolean movedThisTurn;
     private boolean attackedThisTurn;
 
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
     private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
+
+    private UnitState currentState;
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -47,6 +53,7 @@ public abstract class Unit {
         this.currentHealth = stats.maxHealth();
         this.movedThisTurn = false;
         this.attackedThisTurn = false;
+        this.currentState = IdleState.getInstance();
     }
 
     public boolean isAlive() {
@@ -57,6 +64,7 @@ public abstract class Unit {
         currentHealth -= Math.max(0, damage);
         if (currentHealth <= 0) {
             currentHealth = 0;
+            transitionToDead();
         }
     }
 
@@ -94,13 +102,74 @@ public abstract class Unit {
         tickAbilityCooldowns();
         movedThisTurn = false;
         attackedThisTurn = false;
+
+        //State Pattern
+        currentState = currentState.transitionToIdle(this);
+        currentState.onTurnEnd(this);
     }
 
-    @Deprecated
-    public void markAsActed() {
-        // Deprecated: Use markMovedThisTurn() or markAttackedThisTurn()
-        movedThisTurn = true;
-        attackedThisTurn = true;
+    // Getter / Setter über Lombok?
+    public UnitState getCurrentState() {
+        return currentState;
+    }
+
+    public void setState(UnitState newState) {
+        this.currentState = newState;
+    }
+
+    /**
+     * Check if unit can move based on current state.
+     * Replaces: !movedThisTurn check
+     */
+    public boolean canMove() {
+        return currentState.canMove(this);
+    }
+
+    /**
+     * Check if unit can attack based on current state.
+     * Replaces: !attackedThisTurn check
+     */
+    public boolean canAttack() {
+        return currentState.canAttack(this);
+    }
+
+    /**
+     * Check if unit can use abilities based on current state.
+     */
+    public boolean canUseAbility() {
+        return currentState.canUseAbility(this);
+    }
+
+    /**
+     * Transition to Moving state.
+     * Called by MoveCommand.execute()
+     */
+    public void startMoving() {
+        currentState = currentState.transitionToMoving(this);
+    }
+
+    /**
+     * Transition to Attacking state.
+     * Called by AttackCommand.execute()
+     */
+    public void startAttacking() {
+        currentState = currentState.transitionToAttacking(this);
+    }
+
+    /**
+     * Transition to Stunned state.
+     * Called by Frost Mage ability
+     */
+    public void stun(int rounds) {
+        currentState = currentState.transitionToStunned(this, rounds);
+    }
+
+    /**
+     * Mark unit as dead.
+     * Called when currentHealth reaches 0
+     */
+    private void transitionToDead() {
+        currentState = currentState.transitionToDead(this);
     }
 
     public void markMovedThisTurn() {
@@ -128,7 +197,7 @@ public abstract class Unit {
     }
 
     public boolean canAct() {
-        return !movedThisTurn || !attackedThisTurn;
+        return canMove() || canAttack();
     }
 
     public MovementStrategy getMovementStrategy() {

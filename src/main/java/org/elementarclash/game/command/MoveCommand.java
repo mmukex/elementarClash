@@ -47,11 +47,18 @@ public class MoveCommand implements Command {
             return actorCheck;
         }
 
+        if (!actor.canMove()) {
+            return ValidationResult.failure(
+                    actor.getName() + " cannot move (State: " + actor.getCurrentState().getStateName() + ")"
+            );
+        }
+
         if (actor.hasMovedThisTurn()) {
             return ValidationResult.failure(
                     String.format("%s has already moved this turn", actor.getName())
             );
         }
+
 
         if (!game.isValidMove(actor, targetPosition)) {
             return ValidationResult.failure(
@@ -67,6 +74,7 @@ public class MoveCommand implements Command {
         this.previousPosition = actor.getPosition();
         game.moveUnitInternal(actor, targetPosition);
         actor.markMovedThisTurn();
+        actor.startMoving();
         this.wasExecuted = true;
     }
 
