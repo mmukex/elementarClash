@@ -1,0 +1,73 @@
+package org.elementarclash.game.phase;
+
+import org.elementarclash.game.Game;
+import org.elementarclash.game.command.Command;
+import org.elementarclash.faction.Faction;
+
+/**
+ * Player turn phase: Commands are allowed.
+ * Max 2 actions per unit (move + attack/ability).
+ */
+public class PlayerTurnPhase implements GamePhaseState {
+
+    private final Faction activeFaction;
+    private int actionsThisTurn = 0;
+    private static final int MAX_ACTIONS_PER_UNIT = 2;
+
+    public PlayerTurnPhase(Faction faction) {
+        this.activeFaction = faction;
+    }
+
+    @Override
+    public boolean canExecuteCommand(Game game, Command command) {
+        // Check if command actor belongs to active faction
+        if (command.getActor().getFaction() != activeFaction) {
+            return false;
+        }
+
+        // Check action limit (simplified - could be per-unit)
+        return actionsThisTurn < MAX_ACTIONS_PER_UNIT;
+    }
+
+    @Override
+    public void onEnter(Game game) {
+        // Reset all units of active faction
+        game.getUnitsOfFaction(activeFaction).forEach(unit -> {
+            unit.resetTurn();
+        });
+        actionsThisTurn = 0;
+    }
+
+    @Override
+    public void onExit(Game game) {
+        // Could log turn end, save state, etc.
+    }
+
+    @Override
+    public GamePhaseState transitionToPlayerTurn(Game game, Faction faction) {
+        return new PlayerTurnPhase(faction);
+    }
+
+    @Override
+    public GamePhaseState transitionToEventPhase(Game game) {
+        return EventPhase.getInstance();
+    }
+
+    @Override
+    public GamePhaseState transitionToGameOver(Game game, Faction winner) {
+        return new GameOverPhase(winner);
+    }
+
+    @Override
+    public String getPhaseName() {
+        return "PlayerTurn (" + activeFaction.name() + ")";
+    }
+
+    public Faction getActiveFaction() {
+        return activeFaction;
+    }
+
+    public void incrementActionCount() {
+        actionsThisTurn++;
+    }
+}

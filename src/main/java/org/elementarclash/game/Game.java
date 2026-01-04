@@ -10,12 +10,17 @@ import org.elementarclash.faction.Faction;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.game.command.CommandExecutor;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.game.phase.GameOverPhase;
+import org.elementarclash.game.phase.GamePhaseState;
+import org.elementarclash.game.phase.SetupPhase;
+import org.elementarclash.game.phase.PlayerTurnPhase;
 import org.elementarclash.ui.ConsoleGameRenderer;
 import org.elementarclash.ui.GameRenderer;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Central game manager for ElementarClash.
@@ -47,6 +52,8 @@ public class Game {
     private final CommandExecutor commandExecutor;
     private final TurnManager turnManager;
     private Faction activeFaction;
+    private GamePhaseState currentPhase;
+    @Deprecated
     private GameStatus status;
 
     Game(Battlefield battlefield) {
@@ -54,9 +61,71 @@ public class Game {
         this.units = new ArrayList<>();
         this.positionToUnit = new HashMap<>();
         this.activeFaction = null;
+        this.currentPhase = SetupPhase.getInstance();
         this.status = GameStatus.SETUP;
         this.commandExecutor = new CommandExecutor();
         this.turnManager = new TurnManager();
+    }
+
+    private void transitionToPhase(GamePhaseState newPhase) {
+        currentPhase.onExit(this);
+        this.currentPhase = newPhase;
+        newPhase.onEnter(this);
+
+        // Update deprecated enum for compatibility
+        updateGameStatus();
+    }
+
+    /**
+     * Start the game (Setup → PlayerTurn).
+     */
+    public void startGame() {
+        if (!(currentPhase instanceof SetupPhase)) {
+            throw new IllegalStateException("Can only start game from Setup phase");
+        }
+
+        Faction firstFaction = determineFirstFaction();
+        transitionToPhase(currentPhase.transitionToPlayerTurn(this, firstFaction));
+        this.activeFaction = firstFaction;
+    }
+
+    /**
+     * End current player's turn (PlayerTurn → EventPhase → next PlayerTurn).
+     */
+    public void endTurn() {
+        if (!(currentPhase instanceof PlayerTurnPhase playerTurn)) {
+            throw new IllegalStateException("Can only end turn during PlayerTurn phase");
+        }
+
+        // Check victory condition
+        if (checkVictoryCondition()) {
+            return; // Game is over
+        }
+
+        // PlayerTurn → EventPhase
+        transitionToPhase(currentPhase.transitionToEventPhase(this));
+
+        // EventPhase → next PlayerTurn
+        Faction nextFaction = getNextFaction();
+        transitionToPhase(currentPhase.transitionToPlayerTurn(this, nextFaction));
+        this.activeFaction = nextFaction;
+    }
+
+    /**
+     * Check victory condition and transition to GameOver if met.
+     */
+    private boolean checkVictoryCondition() {
+        Map<Faction, Long> aliveCounts = units.stream()
+                .filter(Unit::isAlive)
+                .collect(Collectors.groupingBy(Unit::getFaction, Collectors.counting()));
+
+        if (aliveCounts.size() == 1) {
+            Faction winner = aliveCounts.keySet().iterator().next();
+            transitionToPhase(currentPhase.transitionToGameOver(this, winner));
+            return true;
+        }
+
+        return false;
     }
 
     public boolean isPositionOccupied(Position position) {
@@ -101,7 +170,19 @@ public class Game {
     }
 
     public ValidationResult executeCommand(Command command) {
-        return commandExecutor.execute(command, this);
+        if (!currentPhase.canExecuteCommand(this, command)) {
+            return ValidationResult.failure(
+                    "Command not allowed in " + currentPhase.getPhaseName()
+            );
+        }
+
+        ValidationResult result = commandExecutor.execute(command, this);
+
+        if (result.isValid() && currentPhase instanceof PlayerTurnPhase playerTurn) {
+            playerTurn.incrementActionCount();
+        }
+
+        return result;
     }
 
     public boolean undoLastCommand() {
@@ -121,7 +202,8 @@ public class Game {
     }
 
     public void handleUnitDeath(Unit unit) {
-        // Future: trigger death effects, check victory conditions
+        removeUnit(unit);
+        checkVictoryCondition();  // Check if game should end
     }
 
     public Unit getUnitAt(Position position) {
@@ -195,23 +277,40 @@ public class Game {
         this.activeFaction = faction;
     }
 
-    public void startGame() {
-        ensureActiveFactionIsSet();
-        this.status = GameStatus.IN_PROGRESS;
-        turnManager.startGame();
-    }
+//    public void startGame() {
+//        ensureActiveFactionIsSet();
+//        this.status = GameStatus.IN_PROGRESS;
+//        turnManager.startGame();
+//    }
 
     private void ensureActiveFactionIsSet() {
         if (activeFaction == null) {
-            activeFaction = findFirstFactionWithUnits();
+            activeFaction = determineFirstFaction();
         }
     }
 
-    private Faction findFirstFactionWithUnits() {
+    private Faction determineFirstFaction() {
         return units.stream()
                 .map(Unit::getFaction)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No units on battlefield"));
+    }
+
+    private Faction getNextFaction() {
+        // Simple round-robin
+        Faction[] allFactions = units.stream()
+                .filter(Unit::isAlive)
+                .map(Unit::getFaction)
+                .distinct()
+                .toArray(Faction[]::new);
+
+        for (int i = 0; i < allFactions.length; i++) {
+            if (allFactions[i] == activeFaction) {
+                return allFactions[(i + 1) % allFactions.length];
+            }
+        }
+
+        return allFactions[0];
     }
 
     public void nextTurn() {
@@ -274,8 +373,12 @@ public class Game {
     }
 
     private void updateGameStatus() {
-        if (isGameOver()) {
+        if (currentPhase instanceof SetupPhase) {
+            status = GameStatus.SETUP;
+        } else if (currentPhase instanceof GameOverPhase) {
             status = GameStatus.GAME_OVER;
+        } else {
+            status = GameStatus.IN_PROGRESS;
         }
     }
 

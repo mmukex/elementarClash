@@ -113,6 +113,20 @@ public class Battlefield implements BattlefieldComponent {
         return new Region(regionCells);
     }
 
+    /**
+     * Get a random region for dynamic events.
+     * Used by EventPhase for forest fires, geysers, etc.
+     *
+     * @author @crstmkt (integration helper for State Pattern)
+     */
+    public Region getRandomRegion() {
+        if (rows.isEmpty()) {
+            throw new IllegalStateException("No regions in battlefield");
+        }
+        int randomIndex = new Random().nextInt(rows.size());
+        return rows.get(randomIndex);
+    }
+
     @Override
     public List<Cell> cells() {
         return rows.stream()
