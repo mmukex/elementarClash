@@ -38,10 +38,12 @@ public abstract class Unit {
     private boolean movedThisTurn;
     private boolean attackedThisTurn;
 
+    @Setter
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
     private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
 
+    // Getter / Setter über Lombok?
     private UnitState currentState;
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
@@ -106,11 +108,6 @@ public abstract class Unit {
         //State Pattern
         currentState = currentState.transitionToIdle(this);
         currentState.onTurnEnd(this);
-    }
-
-    // Getter / Setter über Lombok?
-    public UnitState getCurrentState() {
-        return currentState;
     }
 
     public void setState(UnitState newState) {
@@ -205,10 +202,6 @@ public abstract class Unit {
             movementStrategy = new GroundMovementStrategy(faction);
         }
         return movementStrategy;
-    }
-
-    public void setMovementStrategy(MovementStrategy strategy) {
-        this.movementStrategy = strategy;
     }
 
     public AttackStrategy getAttackStrategy() {
