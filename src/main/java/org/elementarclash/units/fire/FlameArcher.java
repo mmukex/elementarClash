@@ -31,7 +31,7 @@ class FlameArcher extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "Ignoriert Wald-Verteidigungsbonus (Reichweite: 3)";
     }
 

@@ -34,6 +34,7 @@ public abstract class Unit {
     private boolean movedThisTurn;
     private boolean attackedThisTurn;
 
+    @Setter
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
     private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
@@ -138,10 +139,6 @@ public abstract class Unit {
         return movementStrategy;
     }
 
-    public void setMovementStrategy(MovementStrategy strategy) {
-        this.movementStrategy = strategy;
-    }
-
     public AttackStrategy getAttackStrategy() {
         if (attackStrategy == null) {
             attackStrategy = new MeleeAttackStrategy();
@@ -156,10 +153,10 @@ public abstract class Unit {
     // ========== Abstract Methods (Template Method Pattern) ==========
 
     /**
-     * Returns the unit's special ability description.
+     * Returns the unit's description.
      * Implemented by each concrete unit type.
      */
-    public abstract String getSpecialAbility();
+    public abstract String getDescription();
 
 
     public TerrainEffectResult accept(TerrainVisitor visitor) {

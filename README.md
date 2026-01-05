@@ -26,40 +26,40 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 
 ### **Feuer-Fraktion** (Aggressiv)
 
-| **Einheit**              | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Spezial**                                                  |
+| **Einheit**              | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Beschreibung**                                                  |
 | ------------------------ | ------ | ----------- | ---------------- | ------------ | -------------- | ------------------------------------------------------------ |
-| **Inferno Krieger**      | 100    | 15          | 5                | 3            | 1              | +2 Angriff auf Lava-Gelände<br>                              |
-| **Flammen-Bogenschütze** | 70     | 12          | 3                | 4            | 3              | Ignoriert Wald-Verteidigungsbonus                            |
-| **Phönix**               | 80     | 10          | 4                | 5            | 1              | **F**liegend (ignoriert Gelände), Wiederbelebung 1× (50% LP) |
+| **Inferno Krieger**      | 100    | 15          | 5                | 3            | 1              | +2 Angriff auf Lava-Gelände                                  |
+| **Flammen-Bogenschütze** | 70     | 12          | 3                | 4            | 3              | Ignoriert Wald-Verteidigungsbonus (Fernkampf)                |
+| **Phönix**               | 80     | 10          | 4                | 5            | 1              | Fliegend (ignoriert Gelände), Wiederbelebung 1× (50% LP)     |
 
-**Passiver Fraktions-Bonus:** Feuer-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Wasser. Benachbarte Feuer-Einheiten gewähren einander +1 Angriff.
+**Passiver Fraktions-Bonus:** Feuer-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Wasser. Benachbarte Verbündete gewähren einander +1 Angriff (Synergy-Bonus).
 ### **Wasser-Fraktion** (Defensiv)
 
-| **Einheit**          | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Spezial**                                             |
+| **Einheit**          | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Beschreibung**                                             |
 | -------------------- | ------ | ----------- | ---------------- | ------------ | -------------- | ------------------------------------------------------- |
-| **Gezeiten-Wächter** | 120    | 10          | 8                | 2            | 1              | +3 Verteidigung auf Eis-Gelände<br>                     |
-| **Frost-Magier**     | 60     | 13          | 4                | 3            | 4              | Fernkampf-Magier mit hoher Reichweite |
-| **Wellen-Reiter**    | 90     | 11          | 6                | 4            | 1              | Kann durch Wasser/Eis mit Kosten 1 ziehen               |
+| **Gezeiten-Wächter** | 120    | 10          | 8                | 2            | 1              | +3 Verteidigung auf Eis, +5 LP/Runde Heilung            |
+| **Frost-Magier**     | 60     | 13          | 4                | 3            | 4              | Fernkampf-Magier (höchste Reichweite: 4)                |
+| **Wellen-Reiter**    | 90     | 11          | 6                | 4            | 1              | Schnelle Bewegung auf Eis (Kosten: 1)                   |
 
 **Passiver Fraktions-Bonus:** Wasser-Einheiten verursachen +25% Schaden gegen Feuer, -25% gegen Erde. Heilt 5 LP pro Runde auf Eis-Gelände.
 
 ### **Erde-Fraktion** (Kontrollierend)
 
-| **Einheit**         | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Spezial**                                     |
+| **Einheit**         | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Beschreibung**                                     |
 | ------------------- | ------ | ----------- | ---------------- | ------------ | -------------- | ----------------------------------------------- |
-| **Stein-Golem**     | 140    | 8           | 10               | 2            | 1              | Unbeweglich (kann nicht verschoben werden)<br>  |
-| **Terra-Schamane** | 70     | 9           | 5                | 3            | 3              | Unterstützungseinheit mit Fernkampf |
-| **Erdbeben-Titan**  | 110    | 14          | 7                | 2            | 1              | Mächtiger Nahkämpfer mit hoher Gesundheit        |
+| **Stein-Golem**     | 150    | 8           | 10               | 2            | 1              | Massiver Tank (höchste LP & Verteidigung)       |
+| **Terra-Schamane**  | 75     | 11          | 5                | 3            | 2              | Fernkampf-Unterstützung (Reichweite: 2)         |
+| **Erdbeben-Titan**  | 130    | 14          | 7                | 2            | 1              | Starker Nahkämpfer (höchster Angriff)           |
 
-**Passiver Fraktions-Bonus:** Erde-Einheiten verursachen +25% Schaden gegen Wasser, -25% gegen Luft. +2 Verteidigung auf Stein-Gelände.
+**Passiver Fraktions-Bonus:** Erde-Einheiten verursachen +25% Schaden gegen Wasser, -25% gegen Luft. +5 Verteidigung auf Stein-Gelände (+3 Basis, +2 Erde-Bonus).
 
 ### **Luft-Fraktion** (Mobil)
 
-| **Einheit**         | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Spezial**                                             |
-| ------------------- | ------ | ----------- | ---------------- | ------------ | -------------- | ------------------------------------------------------- |
-| **Wind-Tänzer**     | 65     | 13          | 3                | 6            | 1              | Fliegend, kann ohne Gelegenheitsangriffe ausweichen<br> |
-| **Sturm-Rufer**     | 75     | 14          | 4                | 5            | 4              | Kettenblitz (springt auf nahe Gegner, -2 Schaden/Sprung)                    |
-| **Himmels-Wächter** | 85     | 11          | 5                | 5            | 2              | Fliegt, gewährt Sicht                                   |
+| **Einheit**         | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Beschreibung**                         |
+| ------------------- | ------ | ----------- | ---------------- | ------------ | -------------- |------------------------------------------|
+| **Wind-Tänzer**     | 70     | 12          | 3                | 6            | 1              | Fliegend, höchste Mobilität (6 Bewegung) |
+| **Sturm-Rufer**     | 65     | 14          | 2                | 4            | 3              | Fliegend, Fernkampf (Reichweite: 3)      |
+| **Himmels-Wächter** | 85     | 10          | 5                | 5            | 2              | Fliegend, ausgewogener Verteidiger       |
 
 **Passiver Fraktions-Bonus:** Luft-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Feuer. Alle Einheiten haben Fliegend (ignorieren Gelände-Bewegungsstrafen).
 
@@ -104,17 +104,6 @@ Diese Patterns ergeben sich aus den Kernmechaniken von ElementarClashs:
 - **Rundenbasierter Ablauf** → State, Command
 - **Dynamische Ereignisse** → Observer
 - **Fraktionsspezifisches Verhalten** → Strategy, Visitor
-
-### **Unterstützende Patterns**
-
-Zusätzlich zu den 10 Haupt-Patterns nutzt ElementarClash weitere GoF-Patterns zur Strukturierung:
-
-| Pattern | Anwendung | Implementierung |
-|---------|-----------|-----------------|
-| **Template Method** | Ability Lifecycle (validate → execute → undo) | `Ability` Interface definiert den fixen 3-Schritt-Ablauf für aktive Fähigkeiten. Konkrete Abilities (`CreateWallAbility`, `HealAbility`) implementieren die Details. Erzwingt konsistente Validierung und Undo-Fähigkeit. |
-
-**Pattern-Kombination:**
-- **Aktive Abilities**: Command Pattern (#8) + Template Method (z.B. `CreateWallAbility`)
 
 ---
 

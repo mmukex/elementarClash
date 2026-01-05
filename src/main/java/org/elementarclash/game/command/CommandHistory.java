@@ -67,12 +67,4 @@ public class CommandHistory {
     public boolean canRedo() {
         return !undoneCommands.isEmpty();
     }
-
-    public int getUndoCount() {
-        return executedCommands.size();
-    }
-
-    public int getRedoCount() {
-        return undoneCommands.size();
-    }
 }

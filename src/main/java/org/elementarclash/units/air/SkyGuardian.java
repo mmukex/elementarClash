@@ -8,17 +8,16 @@ import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
- * Air faction's flying defender with vision bonus.
+ * Air faction's balanced flying defender.
  * <p>
- * Faction: Air | Movement: Flying | Attack: Ranged (range: 3)
+ * Faction: Air | Movement: Flying | Attack: Ranged (range: 2)
  * <p>
- * Special: Provides vision for allies. Flying movement ignores terrain.
+ * Special: Flying + Ranged with moderate range. Balanced stats.
  * <p>
- * Tactical: Scout and support. Reveals fog of war. Mobile defensive anchor.
+ * Tactical: Versatile air unit. Good HP (85) and defense (5) for a flying unit.
+ * Can engage at range while maintaining defensive position.
  */
 class SkyGuardian extends Unit {
-    private static final int HIGH_GROUND_DEFENSE_BONUS = 2;
-
     public SkyGuardian(String id, UnitStats stats) {
         super(id, "Himmels-Wächter", Faction.AIR, UnitType.SKY_GUARDIAN, stats);
         setMovementStrategy(new FlyingMovementStrategy());
@@ -26,15 +25,11 @@ class SkyGuardian extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
-        return "Fliegend, +2 Verteidigung auf erhöhtem Gelände";
+    public String getDescription() {
+        return "Fliegend, ausgewogener Verteidiger";
     }
 
     public boolean isFlying() {
         return true;
-    }
-
-    public int getHighGroundDefenseBonus() {
-        return HIGH_GROUND_DEFENSE_BONUS;
     }
 }

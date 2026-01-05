@@ -24,7 +24,7 @@ class WaveRider extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "Kann durch Wasser/Eis mit Kosten 1 ziehen";
     }
 }

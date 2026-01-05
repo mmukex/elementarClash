@@ -22,7 +22,7 @@ class TerraShamane extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "Unterstützungseinheit mit Fernkampf";
     }
 }

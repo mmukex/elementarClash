@@ -62,11 +62,4 @@ public interface TerrainVisitor {
      * @return terrain effect result with bonuses/penalties
      */
     TerrainEffectResult visitAirUnit(Unit unit);
-
-    /**
-     * Returns the terrain type this visitor represents.
-     *
-     * @return the terrain type
-     */
-    Terrain getTerrainType();
 }

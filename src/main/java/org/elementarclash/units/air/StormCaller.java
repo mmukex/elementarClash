@@ -8,18 +8,16 @@ import org.elementarclash.units.strategy.movement.FlyingMovementStrategy;
 import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
 
 /**
- * Air faction's ranged unit with chain lightning.
+ * Air faction's flying ranged attacker.
  * <p>
- * Faction: Air | Movement: Flying | Attack: Ranged (range: 3)
+ * Faction: Air | Movement: Flying | Attack: Ranged (range: 4)
  * <p>
- * Special: Chain Lightning - Damage chains to nearby enemies with reduced damage per jump.
+ * Special: Flying + Ranged combination. Can attack from safe positions.
  * <p>
- * Tactical: Multi-target damage. Punishes clustered enemies. Strong against grouped formations.
+ * Tactical: Air superiority unit. Flying movement + long range allows attacking
+ * while staying out of melee range. Strong against ground units.
  */
 class StormCaller extends Unit {
-    private static final int CHAIN_DAMAGE_REDUCTION = 2;
-    private static final int MAX_CHAIN_TARGETS = 3;
-
     public StormCaller(String id, UnitStats stats) {
         super(id, "Sturm-Rufer", Faction.AIR, UnitType.STORM_CALLER, stats);
         setMovementStrategy(new FlyingMovementStrategy());
@@ -27,19 +25,7 @@ class StormCaller extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
-        return "Kettenblitz (springt auf nahe Gegner, -2 Schaden pro Sprung)";
-    }
-
-    public boolean hasChainLightning() {
-        return true;
-    }
-
-    public int getChainDamageReduction() {
-        return CHAIN_DAMAGE_REDUCTION;
-    }
-
-    public int getMaxChainTargets() {
-        return MAX_CHAIN_TARGETS;
+    public String getDescription() {
+        return "Fliegend, Fernkampf (Reichweite: 4)";
     }
 }

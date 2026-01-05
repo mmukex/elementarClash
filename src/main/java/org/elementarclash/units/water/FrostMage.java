@@ -27,7 +27,7 @@ class FrostMage extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "Fernkampf-Magier mit hoher Reichweite (4)";
     }
 }

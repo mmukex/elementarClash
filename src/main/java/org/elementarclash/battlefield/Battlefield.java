@@ -101,18 +101,6 @@ public class Battlefield implements BattlefieldComponent {
         return rows.get(y).getCell(x);
     }
 
-    public Region getRegion(int x1, int y1, int x2, int y2) {
-        List<Cell> regionCells = new ArrayList<>();
-        for (int y = y1; y <= y2; y++) {
-            for (int x = x1; x <= x2; x++) {
-                if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
-                    regionCells.add(getCell(x, y));
-                }
-            }
-        }
-        return new Region(regionCells);
-    }
-
     @Override
     public List<Cell> cells() {
         return rows.stream()

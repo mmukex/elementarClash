@@ -46,7 +46,7 @@ class Phoenix extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "Fliegend, Wiederbelebung 1× (50% LP)";
     }
 

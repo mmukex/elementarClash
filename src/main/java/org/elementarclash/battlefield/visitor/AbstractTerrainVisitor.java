@@ -23,11 +23,6 @@ public abstract class AbstractTerrainVisitor implements TerrainVisitor {
         this.terrainType = terrainType;
     }
 
-    @Override
-    public Terrain getTerrainType() {
-        return terrainType;
-    }
-
     // Default implementations - return NEUTRAL for all factions
     @Override
     public TerrainEffectResult visitFireUnit(Unit unit) {
@@ -63,10 +58,6 @@ public abstract class AbstractTerrainVisitor implements TerrainVisitor {
 
     protected TerrainEffectResult createPerTurnEffect(int hpPerTurn, String description) {
         return new TerrainEffectResult(0, 0, hpPerTurn, null, description);
-    }
-
-    protected TerrainEffectResult createTerrainChange(Terrain newTerrain, String description) {
-        return new TerrainEffectResult(0, 0, 0, newTerrain, description);
     }
 
     protected String getTerrainName() {

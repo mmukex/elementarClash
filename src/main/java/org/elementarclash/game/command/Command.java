@@ -45,14 +45,6 @@ public interface Command {
     void undo(Game game);
 
     /**
-     * Returns the unit performing this action.
-     * Used for action limit tracking.
-     *
-     * @return the unit actor
-     */
-    Unit getActor();
-
-    /**
      * Returns the command type for logging/debugging.
      *
      * @return the command type
