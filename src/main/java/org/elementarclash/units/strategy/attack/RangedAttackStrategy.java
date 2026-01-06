@@ -41,7 +41,7 @@ public class RangedAttackStrategy implements AttackStrategy {
             return false;
         }
 
-        int attackRange = attacker.getBaseStats().range();
+        int attackRange = getAttackRange(attacker);
         if (!attacker.getPosition().isInRange(target.getPosition(), attackRange)) {
             return false;
         }
