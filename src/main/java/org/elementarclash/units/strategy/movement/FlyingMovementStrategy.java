@@ -18,6 +18,8 @@ import org.elementarclash.util.Position;
  * - No terrain penalties (forest, ice, lava all cost 1.0)
  * - Can traverse difficult terrain without slowdown
  * - Effective movement range equals base movement stat
+ *
+ * @author mmukex
  */
 public class FlyingMovementStrategy implements MovementStrategy {
 

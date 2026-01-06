@@ -14,6 +14,8 @@ import org.elementarclash.battlefield.Terrain;
  * - Combat bonuses (attack/defense modifiers for battle calculations)
  * - Per-turn effects (HP drain/healing applied each turn)
  * - Terrain transformations (e.g., Ice → Desert when Fire unit moves)
+ *
+ * @author mmukex
  */
 public record TerrainEffectResult(
         int attackBonus,

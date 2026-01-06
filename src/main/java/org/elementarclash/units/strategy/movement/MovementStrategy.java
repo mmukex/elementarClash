@@ -15,7 +15,8 @@ import org.elementarclash.util.Position;
  * Implementations:
  * - GroundMovementStrategy: Pays terrain costs with faction-specific modifiers
  * - FlyingMovementStrategy: Ignores terrain (used by Air faction and Phoenix)
- * - SpecialMovementStrategy: Hybrid with special terrain affinity (Wave Rider on ice)
+ *
+ * @author mmukex
  */
 public interface MovementStrategy {
 

@@ -13,6 +13,8 @@ import java.util.List;
  * Design Pattern: Composite (GoF #3) - Leaf
  * Why: Represents the smallest unit in battlefield hierarchy.
  * Cannot contain other components but implements same interface as composites.
+ *
+ * @author mmukex
  */
 @Getter
 public class Cell implements BattlefieldComponent {

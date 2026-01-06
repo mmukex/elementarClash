@@ -12,6 +12,8 @@ import org.elementarclash.units.Unit;
  * - Earth/Air: No effect (inherited from AbstractTerrainVisitor)
  * <p>
  * Design Pattern: Visitor (GoF #10) - Concrete Visitor
+ *
+ * @author mmukex
  */
 public class LavaTerrainVisitor extends AbstractTerrainVisitor {
 
@@ -25,18 +27,18 @@ public class LavaTerrainVisitor extends AbstractTerrainVisitor {
     @Override
     public TerrainEffectResult visitFireUnit(Unit unit) {
         return createAttackBonus(
-            FIRE_ATTACK_BONUS,
-            String.format("%s: +%d Angriff auf %s",
-                unit.getName(), FIRE_ATTACK_BONUS, getTerrainName())
+                FIRE_ATTACK_BONUS,
+                String.format("%s: +%d Angriff auf %s",
+                        unit.getName(), FIRE_ATTACK_BONUS, getTerrainName())
         );
     }
 
     @Override
     public TerrainEffectResult visitWaterUnit(Unit unit) {
         return createPerTurnEffect(
-            WATER_HP_DRAIN,
-            String.format("%s: %d LP pro Runde auf %s",
-                unit.getName(), WATER_HP_DRAIN, getTerrainName())
+                WATER_HP_DRAIN,
+                String.format("%s: %d LP pro Runde auf %s",
+                        unit.getName(), WATER_HP_DRAIN, getTerrainName())
         );
     }
 

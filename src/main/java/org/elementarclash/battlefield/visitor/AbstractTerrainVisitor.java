@@ -14,6 +14,8 @@ import org.elementarclash.units.Unit;
  * Default Behavior:
  * - All visit methods return NEUTRAL by default
  * - Concrete visitors only override methods for non-neutral effects
+ *
+ * @author mmukex
  */
 public abstract class AbstractTerrainVisitor implements TerrainVisitor {
 

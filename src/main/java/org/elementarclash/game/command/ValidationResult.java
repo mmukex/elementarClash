@@ -6,6 +6,8 @@ package org.elementarclash.game.command;
  * <p>
  * This is a value object that encapsulates validation results
  * from Command.validate() methods.
+ *
+ * @author mmukex
  */
 public record ValidationResult(boolean isValid, String errorMessage) {
 

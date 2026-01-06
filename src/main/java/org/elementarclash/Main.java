@@ -19,38 +19,21 @@ import java.util.Map;
 public class Main {
 
     public static void main(String[] args) {
-        displayWelcome();
-
         Game game = createDefaultGame();
         GameController controller = new GameController(game);
         controller.start();
     }
 
-    private static void displayWelcome() {
-        System.out.println("""
-            ╔════════════════════════════════════════╗
-            ║     ELEMENTARCLASH                     ║
-            ║  Taktisches Elementar-Strategiespiel   ║
-            ╚════════════════════════════════════════╝
-
-            Steuerung:
-            - Einheiten: F1, F2, F3 (Fire), W1, W2, W3 (Water)
-            - Position: x,y (z.B. 3,4)
-
-            Viel Erfolg!
-            """);
-    }
-
     private static Game createDefaultGame() {
         GameBuilder builder = new GameBuilder()
-            .withFactions(Faction.FIRE, Faction.WATER)
-            .withCustomTerrain(Map.of(
-                Terrain.LAVA, 20,
-                Terrain.ICE, 20,
-                Terrain.FOREST, 20,
-                Terrain.DESERT, 20,
-                Terrain.STONE, 20
-            ));
+                .withFactions(Faction.FIRE, Faction.WATER)
+                .withCustomTerrain(Map.of(
+                        Terrain.LAVA, 20,
+                        Terrain.ICE, 20,
+                        Terrain.FOREST, 20,
+                        Terrain.DESERT, 20,
+                        Terrain.STONE, 20
+                ));
 
         addFireUnits(builder);
         addWaterUnits(builder);

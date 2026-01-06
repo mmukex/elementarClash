@@ -28,6 +28,8 @@ import java.util.EnumMap;
  * TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
  * TerrainEffectResult effect = unit.accept(visitor);
  * </pre>
+ *
+ * @author mmukex
  */
 public final class TerrainVisitorFactory {
 

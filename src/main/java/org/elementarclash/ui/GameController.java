@@ -39,7 +39,6 @@ public class GameController {
     private void displayGameState() {
         ui.display(System.lineSeparator() + "=".repeat(60));
         ui.display(renderer.render(game));
-        ui.display("Runde: " + game.getTurnNumber() + " | Aktive Fraktion: " + game.getActiveFaction());
         ui.display("=".repeat(60));
     }
 

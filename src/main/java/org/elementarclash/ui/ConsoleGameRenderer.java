@@ -2,6 +2,9 @@ package org.elementarclash.ui;
 
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
+import org.elementarclash.battlefield.visitor.TerrainEffectResult;
+import org.elementarclash.battlefield.visitor.TerrainVisitor;
+import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
 import org.elementarclash.game.Game;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
@@ -17,6 +20,7 @@ public class ConsoleGameRenderer implements GameRenderer {
         renderHeader(sb, game);
         renderGrid(sb, game);
         renderLegend(sb);
+        renderUnitDetails(sb, game);
         renderUnitSummary(sb, game);
         return sb.toString();
     }
@@ -24,14 +28,13 @@ public class ConsoleGameRenderer implements GameRenderer {
     private void renderHeader(StringBuilder sb, Game game) {
         sb.append("################################################################################################").append(System.lineSeparator());
         sb.append("               ELEMENTARCLASH - Runde ").append(game.getTurnNumber()).append(System.lineSeparator());
-        sb.append("################################################################################################").append(System.lineSeparator());
+        sb.append("################################################################################################").append(System.lineSeparator()).append(System.lineSeparator());
 
         if (game.getActiveFaction() != null) {
-            sb.append("Aktive Fraktion: ").append(game.getActiveFaction().getGermanName())
-                    .append(" ").append(game.getActiveFaction().getIcon()).append(System.lineSeparator());
+            sb.append("Aktive Fraktion: ").append(game.getActiveFaction().getGermanName()).append(System.lineSeparator());
         }
 
-        sb.append("Status: ").append(game.getStatus()).append(System.lineSeparator());
+        sb.append("Status: ").append(game.getStatus()).append(System.lineSeparator()).append(System.lineSeparator());
     }
 
     private void renderGrid(StringBuilder sb, Game game) {
@@ -42,7 +45,7 @@ public class ConsoleGameRenderer implements GameRenderer {
     private void renderGridHeader(StringBuilder sb) {
         sb.append("   ");
         for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
-            sb.append(String.format(" %d  ", x));
+            sb.append(String.format("  %d  ", x));
         }
         sb.append(System.lineSeparator());
     }
@@ -75,9 +78,80 @@ public class ConsoleGameRenderer implements GameRenderer {
             sb.append("  ").append(terrain.getIcon()).append(" ")
                     .append(terrain.getGermanName()).append(" | ");
         }
-        sb.append(System.lineSeparator());
-        sb.append("Einheiten: F1-F3 (Feuer), W1-W3 (Wasser), E1-E3 (Erde), A1-A3 (Luft)");
         sb.append(System.lineSeparator()).append(System.lineSeparator());
+    }
+
+    private void renderUnitDetails(StringBuilder sb, Game game) {
+        sb.append("### Einheiten ###").append(System.lineSeparator());
+
+        game.getUnits().stream()
+                .filter(Unit::isAlive)
+                .sorted((u1, u2) -> {
+                    int factionCompare = u1.getFaction().compareTo(u2.getFaction());
+                    return factionCompare != 0 ? factionCompare : u1.getId().compareTo(u2.getId());
+                })
+                .forEach(unit -> {
+                    boolean isActiveFaction = unit.getFaction() == game.getActiveFaction();
+
+                    Terrain terrain = game.getBattlefield().getTerrainAt(unit.getPosition());
+                    TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
+                    TerrainEffectResult effect = unit.accept(visitor);
+
+                    if (isActiveFaction) {
+                        sb.append(String.format("%s = %-20s (%s) | HP: %3d/%3d | ATK: %2d | DEF: %2d | MOV: %d | RNG: %d | Pos: %s",
+                                unit.getId(),
+                                unit.getName(),
+                                unit.getFaction().getIcon(),
+                                unit.getCurrentHealth(),
+                                unit.getBaseStats().maxHealth(),
+                                unit.getBaseStats().attack(),
+                                unit.getBaseStats().defense(),
+                                unit.getBaseStats().movement(),
+                                unit.getBaseStats().range(),
+                                unit.getPosition()
+                        ));
+
+                        if (effect.attackBonus() != 0 || effect.defenseBonus() != 0 || effect.hpPerTurn() != 0) {
+                            sb.append(" [");
+                            boolean first = true;
+                            if (effect.attackBonus() != 0) {
+                                sb.append("ATK").append(effect.attackBonus() > 0 ? "+" : "").append(effect.attackBonus());
+                                first = false;
+                            }
+                            if (effect.defenseBonus() != 0) {
+                                if (!first) sb.append(", ");
+                                sb.append("DEF").append(effect.defenseBonus() > 0 ? "+" : "").append(effect.defenseBonus());
+                                first = false;
+                            }
+                            if (effect.hpPerTurn() != 0) {
+                                if (!first) sb.append(", ");
+                                sb.append("HP").append(effect.hpPerTurn() > 0 ? "+" : "").append(effect.hpPerTurn()).append("/turn");
+                            }
+                            sb.append("]");
+                        }
+
+                        if (unit.hasMovedThisTurn() || unit.hasAttackedThisTurn()) {
+                            sb.append(" [");
+                            if (unit.hasMovedThisTurn()) sb.append("Bewegt");
+                            if (unit.hasMovedThisTurn() && unit.hasAttackedThisTurn()) sb.append(", ");
+                            if (unit.hasAttackedThisTurn()) sb.append("Angegriffen");
+                            sb.append("]");
+                        }
+                    } else {
+                        sb.append(String.format("%s = %-20s (%s) | HP: %3d/%3d | Pos: %s",
+                                unit.getId(),
+                                unit.getName(),
+                                unit.getFaction().getIcon(),
+                                unit.getCurrentHealth(),
+                                unit.getBaseStats().maxHealth(),
+                                unit.getPosition()
+                        ));
+                    }
+
+                    sb.append(System.lineSeparator());
+                });
+
+        sb.append(System.lineSeparator());
     }
 
     private void renderUnitSummary(StringBuilder sb, Game game) {

@@ -11,9 +11,6 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Abstract base class for all units in ElementarClash.
  * Defines common properties and behavior for all unit types.
@@ -37,7 +34,6 @@ public abstract class Unit {
     @Setter
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
-    private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -69,30 +65,7 @@ public abstract class Unit {
         this.currentHealth = Math.max(0, Math.min(baseStats.maxHealth(), health));
     }
 
-    public boolean isAbilityOnCooldown(Class<?> abilityClass) {
-        return abilityCooldowns.getOrDefault(abilityClass, 0) > 0;
-    }
-
-    public int getAbilityCooldown(Class<?> abilityClass) {
-        return abilityCooldowns.getOrDefault(abilityClass, 0);
-    }
-
-    public void startAbilityCooldown(Class<?> abilityClass, int cooldown) {
-        if (cooldown > 0) {
-            abilityCooldowns.put(abilityClass, cooldown);
-        }
-    }
-
-    public void clearAbilityCooldown(Class<?> abilityClass) {
-        abilityCooldowns.remove(abilityClass);
-    }
-
-    private void tickAbilityCooldowns() {
-        abilityCooldowns.replaceAll((k, v) -> Math.max(0, v - 1));
-    }
-
     public void resetTurn() {
-        tickAbilityCooldowns();
         movedThisTurn = false;
         attackedThisTurn = false;
     }

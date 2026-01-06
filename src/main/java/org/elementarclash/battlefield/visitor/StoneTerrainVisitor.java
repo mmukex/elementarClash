@@ -11,6 +11,8 @@ import org.elementarclash.units.Unit;
  * - Fire/Water/Air: No effect (inherited from AbstractTerrainVisitor)
  * <p>
  * Design Pattern: Visitor (GoF #10) - Concrete Visitor
+ *
+ * @author mmukex
  */
 public class StoneTerrainVisitor extends AbstractTerrainVisitor {
 
@@ -23,9 +25,9 @@ public class StoneTerrainVisitor extends AbstractTerrainVisitor {
     @Override
     public TerrainEffectResult visitEarthUnit(Unit unit) {
         return createDefenseBonus(
-            EARTH_DEFENSE_BONUS,
-            String.format("%s: +%d Verteidigung auf %s",
-                unit.getName(), EARTH_DEFENSE_BONUS, getTerrainName())
+                EARTH_DEFENSE_BONUS,
+                String.format("%s: +%d Verteidigung auf %s",
+                        unit.getName(), EARTH_DEFENSE_BONUS, getTerrainName())
         );
     }
 

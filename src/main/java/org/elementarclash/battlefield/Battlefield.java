@@ -13,6 +13,8 @@ import java.util.*;
  * Supports dynamic region extraction for localized effects.
  * <p>
  * Design Pattern: Builder (see GameBuilder for construction)
+ *
+ * @author mmukex
  */
 public class Battlefield implements BattlefieldComponent {
 

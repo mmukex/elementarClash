@@ -20,6 +20,8 @@ import java.util.List;
  * - Frost Mage (range 4, affected by forest)
  * - Storm Caller (range 4, affected by forest)
  * - Sky Guardian (range 2, affected by forest)
+ *
+ * @author mmukex
  */
 public class RangedAttackStrategy implements AttackStrategy {
 

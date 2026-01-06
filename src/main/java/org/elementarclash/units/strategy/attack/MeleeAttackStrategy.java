@@ -16,6 +16,8 @@ import java.util.List;
  * <p>
  * Melee units must be adjacent to their target to attack.
  * This creates tactical positioning requirements and vulnerability to ranged units.
+ *
+ * @author mmukex
  */
 public class MeleeAttackStrategy implements AttackStrategy {
 

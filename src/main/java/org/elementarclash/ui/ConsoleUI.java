@@ -14,8 +14,8 @@ public class ConsoleUI {
     }
 
     public String promptAction() {
-        System.out.print("\nAktion [B]ewegen | [A]ngreifen | " +
-                         "[U]ndo | [R]edo | [Z]ug beenden | [Q] Beenden: ");
+        System.out.print(System.lineSeparator() + "Aktion [B]ewegen | [A]ngreifen | " +
+                "[U]ndo | [R]edo | [Z]ug beenden | [Q] Beenden: ");
         return scanner.nextLine().trim().toUpperCase();
     }
 

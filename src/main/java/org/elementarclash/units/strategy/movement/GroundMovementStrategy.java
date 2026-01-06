@@ -19,6 +19,8 @@ import org.elementarclash.util.Position;
  * - Fire: Lava cost 1.0 (faster), Ice cost 2.0 (slower)
  * - Water: Ice cost 1.0 (faster), Lava cost 3.0 (slower)
  * - Earth: Stone cost 2.0 (faster on rocky terrain)
+ *
+ * @author mmukex
  */
 public class GroundMovementStrategy implements MovementStrategy {
 

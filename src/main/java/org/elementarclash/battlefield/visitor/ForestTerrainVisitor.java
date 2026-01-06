@@ -14,6 +14,8 @@ import org.elementarclash.units.Unit;
  * Design Pattern: Visitor (GoF #10) - Concrete Visitor
  * Why: Forest provides uniform bonus to all factions, making visitor logic simple.
  * Line-of-sight blocking is handled separately by RangedAttackStrategy.
+ *
+ * @author mmukex
  */
 public class ForestTerrainVisitor extends AbstractTerrainVisitor {
 
@@ -45,9 +47,9 @@ public class ForestTerrainVisitor extends AbstractTerrainVisitor {
 
     private TerrainEffectResult createForestBonus(Unit unit) {
         return createDefenseBonus(
-            DEFENSE_BONUS,
-            String.format("%s: +%d Verteidigung auf %s (blockiert Fernkampf-Sichtlinie)",
-                unit.getName(), DEFENSE_BONUS, getTerrainName())
+                DEFENSE_BONUS,
+                String.format("%s: +%d Verteidigung auf %s",
+                        unit.getName(), DEFENSE_BONUS, getTerrainName())
         );
     }
 }

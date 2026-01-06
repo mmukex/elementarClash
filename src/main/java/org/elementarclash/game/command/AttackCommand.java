@@ -22,6 +22,8 @@ import org.elementarclash.units.Unit;
  * 5. Attack is valid (delegates to Strategy)
  * <p>
  * Undo: Restores target health, clears attacked flag, resurrects target if needed
+ *
+ * @author mmukex
  */
 @Getter
 public class AttackCommand implements Command {

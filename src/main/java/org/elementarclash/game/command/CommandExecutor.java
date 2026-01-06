@@ -4,6 +4,13 @@ import org.elementarclash.game.Game;
 
 /**
  * Executes and manages game commands with undo/redo capability.
+ * Maintains command history and coordinates with CommandHistory for undo/redo operations.
+ * <p>
+ * Design Pattern: Command (GoF #4) - Invoker
+ * Why: Centralizes command execution and history management.
+ * Separates command invocation from command implementation.
+ *
+ * @author mmukex
  */
 public class CommandExecutor {
     private final CommandHistory history;
@@ -12,9 +19,6 @@ public class CommandExecutor {
         this.history = new CommandHistory();
     }
 
-    /**
-     * Executes a command if valid and adds it to history.
-     */
     public ValidationResult execute(Command command, Game game) {
         ValidationResult result = command.validate(game);
         if (!result.isValid()) {
@@ -30,9 +34,6 @@ public class CommandExecutor {
         }
     }
 
-    /**
-     * Undoes the last command.
-     */
     public boolean undo(Game game) {
         Command command = history.popForUndo();
         if (command == null) {
@@ -48,9 +49,6 @@ public class CommandExecutor {
         }
     }
 
-    /**
-     * Redoes the last undone command.
-     */
     public boolean redo(Game game) {
         Command command = history.popForRedo();
         if (command == null) {
@@ -66,9 +64,6 @@ public class CommandExecutor {
         }
     }
 
-    /**
-     * Clears command history (called at turn end).
-     */
     public void clearHistory() {
         history.clear();
     }
