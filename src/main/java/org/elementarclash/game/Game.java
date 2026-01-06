@@ -131,9 +131,6 @@ public class Game {
 
     public void handleUnitDeath(Unit unit) {
         // TODO: crstmkt - Observer Pattern - Dispatch unit death event here
-        // Add: eventDispatcher.dispatchEvent(new UnitDeathEvent(unit));
-        // Listeners: VictoryCheckListener, UIUpdateListener, BuffCleanupListener
-        // Future: trigger death effects, check victory conditions
     }
 
     public Unit getUnitAt(Position position) {
@@ -325,11 +322,6 @@ public class Game {
     }
 
     // TODO: crstmkt - State Pattern - Convert GameStatus enum to State Pattern
-    // Replace enum with GameState interface and concrete states (SetupGameState, InProgressGameState, GameOverGameState)
-    // Add field: private GameState currentState = new SetupGameState();
-    // Each state defines: canExecuteCommand(), onStateEnter(), onStateExit(), getNextState()
-    // Refactor startGame() (line 198), nextTurn() (line 217), and game over check (lines 276-279) to use state transitions
-    // Update status field (line 50) to be GameState instead of GameStatus enum
     public enum GameStatus {
         SETUP,
         IN_PROGRESS,

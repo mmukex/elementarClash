@@ -74,13 +74,6 @@ public abstract class Unit {
         attackedThisTurn = false;
     }
 
-    @Deprecated
-    public void markAsActed() {
-        // Deprecated: Use markMovedThisTurn() or markAttackedThisTurn()
-        movedThisTurn = true;
-        attackedThisTurn = true;
-    }
-
     public void markMovedThisTurn() {
         movedThisTurn = true;
     }
