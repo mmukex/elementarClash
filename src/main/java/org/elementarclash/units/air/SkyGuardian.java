@@ -28,8 +28,4 @@ class SkyGuardian extends Unit {
     public String getDescription() {
         return "Fliegend, ausgewogener Verteidiger";
     }
-
-    public boolean isFlying() {
-        return true;
-    }
 }

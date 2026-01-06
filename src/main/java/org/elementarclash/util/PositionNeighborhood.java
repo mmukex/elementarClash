@@ -22,32 +22,6 @@ public final class PositionNeighborhood {
         };
     }
 
-    /**
-     * Checks if two positions are adjacent (horizontally or vertically).
-     * Does not include diagonal positions.
-     */
-    public static boolean areAdjacent(Position p1, Position p2) {
-        return PositionDistance.manhattan(p1, p2) == 1;
-    }
-
-    /**
-     * Returns all positions within given range (Euclidean distance).
-     */
-    public static Position[] getInRange(Position center, int range) {
-        var positions = new java.util.ArrayList<Position>();
-
-        for (int dx = -range; dx <= range; dx++) {
-            for (int dy = -range; dy <= range; dy++) {
-                Position pos = moveIfValid(center, dx, dy);
-                if (pos != null && PositionDistance.euclidean(center, pos) <= range) {
-                    positions.add(pos);
-                }
-            }
-        }
-
-        return positions.toArray(new Position[0]);
-    }
-
     private static Position moveIfValid(Position pos, int dx, int dy) {
         int newX = pos.x() + dx;
         int newY = pos.y() + dy;

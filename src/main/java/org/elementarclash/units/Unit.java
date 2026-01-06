@@ -98,10 +98,6 @@ public abstract class Unit {
         return attackedThisTurn;
     }
 
-    public boolean canAct() {
-        return !movedThisTurn || !attackedThisTurn;
-    }
-
     public MovementStrategy getMovementStrategy() {
         if (movementStrategy == null) {
             movementStrategy = new GroundMovementStrategy(faction);
@@ -120,7 +116,6 @@ public abstract class Unit {
         this.attackStrategy = strategy;
     }
 
-    // ========== Abstract Methods (Template Method Pattern) ==========
 
     /**
      * Returns the unit's description.

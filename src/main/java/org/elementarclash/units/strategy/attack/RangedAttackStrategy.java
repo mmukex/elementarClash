@@ -27,10 +27,6 @@ public class RangedAttackStrategy implements AttackStrategy {
 
     private final boolean ignoresForestDefense;
 
-    public RangedAttackStrategy() {
-        this(false);
-    }
-
     public RangedAttackStrategy(boolean ignoresForestDefense) {
         this.ignoresForestDefense = ignoresForestDefense;
     }

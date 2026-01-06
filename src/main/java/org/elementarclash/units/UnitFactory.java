@@ -1,5 +1,6 @@
 package org.elementarclash.units;
 
+import lombok.Getter;
 import org.elementarclash.faction.Faction;
 
 /**
@@ -13,6 +14,7 @@ import org.elementarclash.faction.Faction;
  * @author @crstmkt
  */
 public abstract class UnitFactory {
+    @Getter
     private final Faction faction;
     private int unitCounter = 0;
 
@@ -55,9 +57,5 @@ public abstract class UnitFactory {
     private String generateUnitId(UnitType type) {
         unitCounter++;
         return faction.name().substring(0, 1) + unitCounter;
-    }
-
-    public Faction getFaction() {
-        return faction;
     }
 }

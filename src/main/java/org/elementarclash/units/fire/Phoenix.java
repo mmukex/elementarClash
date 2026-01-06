@@ -49,8 +49,4 @@ class Phoenix extends Unit {
     public String getDescription() {
         return "Fliegend, Wiederbelebung 1× (50% LP)";
     }
-
-    public boolean isFlying() {
-        return true;
-    }
 }
