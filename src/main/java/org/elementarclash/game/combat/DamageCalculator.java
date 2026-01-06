@@ -10,6 +10,8 @@ import org.elementarclash.units.Unit;
 /**
  * Calculates combat damage considering base attack, terrain effects, and defense.
  * Uses Strategy Pattern (attack calculation) and Visitor Pattern (terrain effects).
+ *
+ * TODO: crstmkt - Chain of Responsibility - Refactor to use damage modifier chain
  */
 public class DamageCalculator {
 
@@ -22,6 +24,7 @@ public class DamageCalculator {
      * @return damage calculation result with breakdown
      */
     public DamageResult calculateDamage(Unit attacker, Unit target, Game game) {
+        // TODO: crstmkt - Decorator Pattern
         int baseDamage = attacker.getAttackStrategy().calculateBaseDamage(attacker, target);
 
         TerrainEffectResult attackerEffect = getTerrainEffect(attacker, game);

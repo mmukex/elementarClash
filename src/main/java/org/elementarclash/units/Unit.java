@@ -28,12 +28,16 @@ public abstract class Unit {
     private int currentHealth;
     @Setter
     private Position position;
+
+    // TODO: crstmkt - State Pattern - Replace boolean flags with UnitTurnState
     private boolean movedThisTurn;
     private boolean attackedThisTurn;
 
     @Setter
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
+
+    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;

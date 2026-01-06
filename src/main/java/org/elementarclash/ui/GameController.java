@@ -22,6 +22,8 @@ public class GameController {
         this.ui = new ConsoleUI();
         this.parser = new CommandParser(ui);
         this.renderer = new ConsoleGameRenderer();
+
+        // TODO: crstmkt - Observer Pattern - Register renderer as event listener
     }
 
     public void start() {

@@ -2,6 +2,8 @@ package org.elementarclash.game;
 
 /**
  * Manages turn and round counting for the game.
+ *
+ * TODO: crstmkt - State Pattern - Add turn phase management
  */
 public class TurnManager {
     private static final int INITIAL_ROUND = 0;
