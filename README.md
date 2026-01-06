@@ -12,10 +12,10 @@
 | **Feature**                 | **Details**                                                                                                 |
 | --------------------------- | ----------------------------------------------------------------------------------------------------------- |
 | **Dynamisches Terrain**     | Geländearten beeinflussen Bewegung, Angriff und Verteidigung.                                               |
-| **Einheiten & Fähigkeiten** | 3 Einheitentypen pro Fraktion mit **aktiven Fähigkeiten** und **passiven Boni**.                            |
-| **Synergien & Konter**      | Einheitenkombinationen und elementare Interaktionen (Feuer schmilzt Eis).                                   |
-| **Rundenbasierte Logik**    | 2 Aktionen pro Runde: **Bewegen** (geländeabhängig), **Angreifen**.              |
-| **Dynamische Ereignisse**   | Zufällige Ereignisse wie **Geysire**, **Waldbrände** oder **Erdrutsche** können das Schlachtfeld verändern. |
+| **Einheiten & Fähigkeiten** | 3 Einheitentypen pro Fraktion mit **passiven Fähigkeiten** und elementaren Boni.                            |
+| **Elementare Interaktionen**      | Terrain-Fraktions-Synergien (Feuer auf Lava: +2 Angriff, Feuer schmilzt Eis zu Wüste).                                   |
+| **Rundenbasierte Logik**    | Jede Einheit kann pro Runde: **1× Bewegen** (geländeabhängig), **1× Angreifen**.              |
+| **Undo/Redo System**   | Per-Turn Rollback-Fähigkeit für alle Aktionen über Command Pattern. |
 | **Siegbedingungen**         | Alle Gegner müssen besiegt werden                                                                           |
 | **Modular & Erweiterbar**   | Neue Fraktionen, Geländearten oder Fähigkeiten können **ohne Änderungen am Core-Code** hinzugefügt werden.  |
 
@@ -32,7 +32,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Flammen-Bogenschütze** | 70     | 12          | 3                | 4            | 3              | Ignoriert Wald-Verteidigungsbonus (Fernkampf)                |
 | **Phönix**               | 80     | 10          | 4                | 5            | 1              | Fliegend (ignoriert Gelände), Wiederbelebung 1× (50% LP)     |
 
-**Passiver Fraktions-Bonus:** Feuer-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Wasser. Benachbarte Verbündete gewähren einander +1 Angriff (Synergy-Bonus).
+**Passiver Fraktions-Bonus:** Feuer-Einheiten erhalten +2 Angriff auf Lava-Gelände. Feuer-Einheiten schmelzen Eis-Gelände zu Wüste beim Betreten.
 ### **Wasser-Fraktion** (Defensiv)
 
 | **Einheit**          | **LP** | **Angriff** | **Verteidigung** | **Bewegung** | **Reichweite** | **Beschreibung**                                             |
@@ -41,7 +41,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Frost-Magier**     | 60     | 13          | 4                | 3            | 4              | Fernkampf-Magier (höchste Reichweite: 4)                |
 | **Wellen-Reiter**    | 90     | 11          | 6                | 4            | 1              | Schnelle Bewegung auf Eis (Kosten: 1)                   |
 
-**Passiver Fraktions-Bonus:** Wasser-Einheiten verursachen +25% Schaden gegen Feuer, -25% gegen Erde. Heilt 5 LP pro Runde auf Eis-Gelände.
+**Passiver Fraktions-Bonus:** Wasser-Einheiten erhalten +3 Verteidigung und +5 LP/Runde Heilung auf Eis-Gelände. Wasser-Einheiten erleiden -5 LP/Runde Schaden auf Lava-Gelände.
 
 ### **Erde-Fraktion** (Kontrollierend)
 
@@ -51,7 +51,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Terra-Schamane**  | 75     | 11          | 5                | 3            | 2              | Fernkampf-Unterstützung (Reichweite: 2)         |
 | **Erdbeben-Titan**  | 130    | 14          | 7                | 2            | 1              | Starker Nahkämpfer (höchster Angriff)           |
 
-**Passiver Fraktions-Bonus:** Erde-Einheiten verursachen +25% Schaden gegen Wasser, -25% gegen Luft. +5 Verteidigung auf Stein-Gelände (+3 Basis, +2 Erde-Bonus).
+**Passiver Fraktions-Bonus:** Erde-Einheiten erhalten +2 Verteidigung auf Stein-Gelände. Erde-Einheiten haben reduzierte Bewegungskosten auf Stein (2 statt 3).
 
 ### **Luft-Fraktion** (Mobil)
 
@@ -61,7 +61,7 @@ Jede Fraktion verfügt über **3 einzigartige Einheitentypen** mit unterschiedli
 | **Sturm-Rufer**     | 65     | 14          | 2                | 4            | 3              | Fliegend, Fernkampf (Reichweite: 3)      |
 | **Himmels-Wächter** | 85     | 10          | 5                | 5            | 2              | Fliegend, ausgewogener Verteidiger       |
 
-**Passiver Fraktions-Bonus:** Luft-Einheiten verursachen +25% Schaden gegen Erde, -25% gegen Feuer. Alle Einheiten haben Fliegend (ignorieren Gelände-Bewegungsstrafen).
+**Passiver Fraktions-Bonus:** Alle Luft-Einheiten haben die Fliegend-Fähigkeit (ignorieren Gelände-Bewegungskosten, können über Units fliegen). Luft-Einheiten erhalten +1 Verteidigung auf Wald-Gelände.
 
 ---    
 ## **Geländearten**
@@ -74,7 +74,7 @@ Das 10×10-Schlachtfeld enthält **5 Geländearten**, die jeweils Bewegung, Kamp
 | **Eis**   | Normal: 3, Wasser: 1, Feuer: 2 | +1 Verteidigung    | **Wasser:** +3 Verteidigung, Heilt 5 LP/Runde / **Feuer:** Schmilzt zu Wüste nach Bewegung |
 | **Wald**  | Normal: 2, Luft: 1 (fliegend)  | +2 Verteidigung    | Blockiert Fernkampf-Sichtlinie                                                             |
 | **Wüste** | Normal: 1                      | 0                  | Neutrales Gelände, keine Boni                                                              |
-| **Stein** | Normal: 3, Erde: 2             | +3 Verteidigung    | **Erde:** +2 Verteidigung                                                                  |
+| **Stein** | Normal: 3, Erde: 2             | 0                  | **Erde:** +2 Verteidigung                                                                  |
 
 **Gelände-Verteilung:** Das Schlachtfeld startet mit zufälligem Gelände (30% Wüste, 20% Wald, 20% Stein, 15% Lava, 15% Eis).
     
@@ -83,18 +83,18 @@ Das 10×10-Schlachtfeld enthält **5 Geländearten**, die jeweils Bewegung, Kamp
 
 ElementarClash implementiert **10 GoF Design Patterns**, um Modularität, Erweiterbarkeit und saubere Architektur sicherzustellen. Jedes Pattern adressiert direkt spezifische Spielmechaniken:
 
-| #  | **Pattern**                 | **Kategorie** | **Anwendungsfall in ElementarClash**                                                                                       | **Warum dieses Pattern?**                                                                                                                                                                                                                                                                                                                                                                    | **Wer?** |  
-|----|-----------------------------|---------------|----------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|  
-| 1  | **Factory Method**          | Erzeugung     | Erstellung fraktionsspezifischer Einheiten (FeuerKrieger, WasserHeiler, etc.)                                              | Jede der 4 Fraktionen hat 3 einzigartige Einheitentypen. Factory Method kapselt Erstellungslogik und ermöglicht das Hinzufügen neuer Fraktionen ohne Core-Code-Änderungen.                                                                                                                                                                                                                   | @crstmkt |  
-| 2  | **Builder**                 | Erzeugung     | Schrittweise Erstellung des Spielfelds (10×10 Raster mit Geländeverteilung, Einheiten-Platzierung, Validierung)            | Das Battlefield ist komplex: 100 Zellen, zufällige Geländeverteilung (5 Typen mit Prozent-Vorgaben), faire Startpositionen für 2-4 Fraktionen, benutzerdefinierte Terrain-Konfigurationen. Builder ermöglicht flexible Konfiguration und wiederverwendbare Setup-Logik.                                                                                                       | @mmukex  |  
-| 3  | **Composite**               | Struktur      | Raster-Hierarchie (Battlefield → Regionen → Zellen) für flexible Operationen auf Teilbereichen des Schlachtfelds           | Das 10×10-Raster enthält 100 Zellen organisiert in Regionen. Composite ermöglicht einheitliche Operationen auf einzelnen Zellen UND ganzen Regionen (z.B. "applyForestFire()"). Vereinfacht Geländeeffekte und dynamische Ereignisse durch gemeinsame Schnittstelle für Leaf (Cell) und Composite (Region, Battlefield).                                                                    | @mmukex  |  
-| 4  | **Decorator**               | Struktur      | Stapeln temporärer Buffs/Debuffs auf Einheiten                                                                             | Einheiten erhalten dynamische Boni: Gelände-Bonus (Feuer auf Lava: +2 Angriff), Synergien (benachbarte Feuer-Einheiten: +1 Angriff), Fähigkeits-Buffs (Feuersturm: +3 Angriff für 2 Runden). Decorator ermöglicht Stapeln ohne Änderung der Unit-Klasse.                                                                                                                                     | @crstmkt |  
-| 5  | **Strategy**                | Verhalten     | Bewegungsstrategien (Boden, Fliegend für Luft-Einheiten) und Angriffsstrategien (Nahkampf, Fernkampf)              | Jede Fraktion hat einzigartige Spielstile: Luft ist "mobil" (fliegende Bewegung), verschiedene Angriffstypen (Nahkampf vs. Fernkampf). Strategy kapselt diese Verhaltensweisen als austauschbare Algorithmen.                                                                                                                                                                               | @mmukex  |  
-| 6  | **State**                   | Verhalten     | Einheiten-Zustände (Idle, Moving, Attacking, Stunned, Dead) und Spielphasen (Setup, PlayerTurn, EventPhase, GameOver)      | Einheiten können nur bestimmte Aktionen in bestimmten Zuständen ausführen (kein Angriff wenn betäubt). Das Spiel hat klare Phasen (3 Aktionen → dynamische Ereignisse → nächster Spieler). State Pattern verwaltet Übergänge sauber.                                                                                                                                                         | @crstmkt |  
-| 7  | **Observer**                | Verhalten     | Event-System für UI-Updates, Synergien und dynamische Ereignisse                                                           | Wenn eine Einheit stirbt → UI-Updates, Achievements triggern, Synergien neu berechnen. "Dynamische Ereignisse" wie Waldbrände betreffen mehrere Einheiten. Observer entkoppelt Komponenten (Spiellogik ↔ UI ↔ Events).                                                                                                                                                                       | @crstmkt |  
+| #  | **Pattern**                 | **Kategorie** | **Anwendungsfall in ElementarClash**                                                                                      | **Warum dieses Pattern?**                                                                                                                                                                                                                                                                                                                                                                    | **Wer?** |  
+|----|-----------------------------|---------------|---------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|  
+| 1  | **Factory Method**          | Erzeugung     | Erstellung fraktionsspezifischer Einheiten (FeuerKrieger, WasserHeiler, etc.)                                             | Jede der 4 Fraktionen hat 3 einzigartige Einheitentypen. Factory Method kapselt Erstellungslogik und ermöglicht das Hinzufügen neuer Fraktionen ohne Core-Code-Änderungen.                                                                                                                                                                                                                   | @crstmkt |  
+| 2  | **Builder**                 | Erzeugung     | Schrittweise Erstellung des Spielfelds (10×10 Raster mit Geländeverteilung, Einheiten-Platzierung, Validierung)           | Das Battlefield ist komplex: 100 Zellen, zufällige Geländeverteilung (5 Typen mit Prozent-Vorgaben), faire Startpositionen für 2-4 Fraktionen, benutzerdefinierte Terrain-Konfigurationen. Builder ermöglicht flexible Konfiguration und wiederverwendbare Setup-Logik.                                                                                                       | @mmukex  |  
+| 3  | **Composite**               | Struktur      | Raster-Hierarchie (Battlefield → Regionen → Zellen) für flexible Operationen auf Teilbereichen des Schlachtfelds          | Das 10×10-Raster enthält 100 Zellen organisiert in Regionen. Composite ermöglicht einheitliche Operationen auf einzelnen Zellen UND ganzen Regionen (z.B. "applyForestFire()"). Vereinfacht Geländeeffekte und dynamische Ereignisse durch gemeinsame Schnittstelle für Leaf (Cell) und Composite (Region, Battlefield).                                                                    | @mmukex  |  
+| 4  | **Decorator**               | Struktur      | (Stapeln temporärer Buffs/Debuffs)                                                                            | Gelände-Effekte werden aktuell direkt über Visitor Pattern berechnet. Decorator würde zusätzliches Stapeln von temporären Buffs/Debuffs ermöglichen. **Status:** Nicht in aktueller Version implementiert.                                                                                                                                     | @crstmkt |  
+| 5  | **Strategy**                | Verhalten     | Bewegungsstrategien (Boden, Fliegend für Luft-Einheiten) und Angriffsstrategien (Nahkampf, Fernkampf)             | Jede Fraktion hat einzigartige Spielstile: Luft ist "mobil" (fliegende Bewegung), verschiedene Angriffstypen (Nahkampf vs. Fernkampf). Strategy kapselt diese Verhaltensweisen als austauschbare Algorithmen.                                                                                                                                                                               | @mmukex  |  
+| 6  | **State**                   | Verhalten     | Spielphasen (GameStatus Enum: Setup, InProgress, GameOver)      | Grundlegende Spielzustände über Enum implementiert. Unit-Zustände (Idle, Moving, Attacking, Stunned) und EventPhase sind **nicht implementiert** - stattdessen werden Boolean-Flags verwendet (hasMovedThisTurn, hasAttackedThisTurn).                                                                                                                                                         | @crstmkt |  
+| 7  | **Observer**                | Verhalten     | (Event-System, Entkopplung)                                                           | UI wird aktuell direkt durch den GameController aufgerufen. Observer würde UI-Updates, Achievements und dynamische Ereignisse entkoppeln. **Status:** Nicht in aktueller Version implementiert - direkte Methodenaufrufe statt Event-System.                                                                                                                                                                                       | @crstmkt |  
 | 8  | **Command**                 | Verhalten     | Spieler-Aktionssystem (MoveCommand, AttackCommand) mit eingebetteter Validierungs- und Ausführungslogik | Kapselt alle Spielzüge als Objekte. "2 Aktionen pro Runde" = 2 Commands in Queue. Jedes Command enthält eigene Validierung (Reichweite, Gelände, Position), Ausführungslogik und Rollback-Fähigkeit. CommandExecutor verwaltet CommandHistory für Undo/Redo (per-turn rollback). DamageCalculator zeigt Pattern-Integration: kombiniert Command mit Strategy (AttackStrategy) und Visitor (TerrainEffects). | @mmukex  |  
-| 9  | **Chain of Responsibility** | Verhalten     | Schadensberechnung-Pipeline (Basisschaden → Elementar-Modifikator → Gelände → Synergien → Verteidigung)                    | Schaden wird beeinflusst durch: Einheiten-Angriff, elementare Vorteile (Feuer vs Eis: +25%), Gelände-Effekte (Verteidiger auf Stein: +3 Verteidigung), Synergien, Ziel-Verteidigung. Jeder Handler fügt seine Modifikation in Sequenz hinzu. Chain ermöglicht flexible Erweiterung um neue Modifikatoren.                                                                                    | @crstmkt |  
-| 10 | **Visitor**                 | Verhalten     | Gelände-Effekte auf verschiedene Einheitentypen                                                                            | Lava-Gelände hat unterschiedliche Effekte pro Fraktion: Feuer-Einheiten erhalten +2 Angriff, Wasser-Einheiten nehmen -5 LP/Runde Schaden, Erde/Luft haben keinen Bonus. Visitor vermeidet verschachtelte if-Statements (5 Gelände × 4 Fraktionen = 20 Kombinationen) und macht neue Geländetypen leicht erweiterbar durch Double Dispatch.                                                   | @mmukex  |  
+| 9  | **Chain of Responsibility** | Verhalten     | (Schadensberechnung-Pipeline)                   | Schadensberechnung ist aktuell in einer einzelnen Methode (DamageCalculator) implementiert. Chain würde modulare Erweiterung um Fraktions-Boni (+25%/-25%), Synergien und weitere Modifikatoren ermöglichen. **Status:** Nicht implementiert - aktuell direkte Berechnung statt Handler-Kette.                                                                                    | @crstmkt |  
+| 10 | **Visitor**                 | Verhalten     | Gelände-Effekte auf verschiedene Einheitentypen                                                                           | Lava-Gelände hat unterschiedliche Effekte pro Fraktion: Feuer-Einheiten erhalten +2 Angriff, Wasser-Einheiten nehmen -5 LP/Runde Schaden, Erde/Luft haben keinen Bonus. Visitor vermeidet verschachtelte if-Statements (5 Gelände × 4 Fraktionen = 20 Kombinationen) und macht neue Geländetypen leicht erweiterbar durch Double Dispatch.                                                   | @mmukex  |  
 
 Diese Patterns ergeben sich aus den Kernmechaniken von ElementarClashs:
 - **4 Fraktionen × 3 Einheitentypen** → Factory Method
@@ -113,49 +113,65 @@ ElementarClash bietet eine **textbasierte Konsolen-Schnittstelle** mit ASCII-Gra
 
 ### **Console View Example**
 ```
-═══════════════════════════════════════════════════════════════
-                   ELEMENTARCLASH - Runde 5
-═══════════════════════════════════════════════════════════════
-Spieler: FEUER (3 Einheiten)               Gegner: WASSER (3 Einheiten)
-Verbleibende Aktionen: 2/3                 Gesamt-LP: 270/270
-═══════════════════════════════════════════════════════════════
-  
-    0    1    2    3    4    5    6    7    8    9  
-0 | 🔥 | ⛰️ | 🌵 | ❄️ | 🌵 | ⛰️ | 🌵 | 💧 | 🌵 | 🌵 |
+============================================================
+################################################################################################
+               ELEMENTARCLASH - Runde 1
+################################################################################################
 
-1 | 🌋 | 🔥 | 🌵 | ⛰️ | ⛰️ | 🌲 | ⛰️ | 🌲 | 🌋 | 💧 |
+Aktive Fraktion: Feuer
+Status: IN_PROGRESS
 
-2 | ⛰️ | 🌋 | ⛰️ | 🌵 | 🌵 | 🌋 | ⛰️ | 🌲 | ❄️ | 🌲 |
+     0    1    2    3    4    5    6    7    8    9  
+0 | F1 | ❄️ | 🌋 | 🌵 | 🌋 | 🌵 | 🌋 | W1 | 🌲 | 🌋 |
 
-3 | ❄️ | ❄️ | 🌲 | 🌋 | ⛰️ | 🌋 | 🌵 | 🌵 | 🌵 | 🌲 |
+1 | F2 | 🌵 | 🌵 | 🌋 | 🌵 | ❄️ | ❄️ | W2 | ❄️ | 🌲 |
 
-4 | ❄️ | 🌵 | 🌋 | 🌵 | 🌵 | 🌲 | ❄️ | 🌵 | ❄️ | ⛰️ |
+2 | F3 | 🌲 | ⛰️ | 🌋 | ❄️ | 🌲 | ⛰️ | W3 | 🌋 | 🌵 |
 
-5 | ⛰️ | 🌵 | 🌵 | ❄️ | ❄️ | 🌲 | 🌵 | 🌋 | ❄️ | ⛰️ |
+3 | 🌵 | 🌵 | ⛰️ | ❄️ | 🌲 | 🌋 | ⛰️ | 🌲 | ❄️ | ⛰️ |
 
-6 | 🌋 | 🌲 | ⛰️ | 🌵 | 🌵 | ❄️ | 🌋 | 🌵 | ❄️ | 🌋 |
+4 | 🌋 | 🌵 | 🌋 | 🌲 | 🌲 | ❄️ | ❄️ | ⛰️ | 🌵 | 🌵 |
 
-7 | ❄️ | 🌲 | 🌵 | 🌲 | 🌲 | 🌲 | ⛰️ | 🌋 | 🌲 | 🌵 |
+5 | ⛰️ | 🌋 | 🌋 | 🌵 | 🌵 | 🌋 | 🌵 | ⛰️ | 🌲 | 🌵 |
 
-8 | 🌵 | 🔥 | 🌲 | 🌵 | 🌲 | 🌋 | ⛰️ | ⛰️ | 🌋 | 💧 |
+6 | ⛰️ | 🌋 | ⛰️ | 🌵 | 🌋 | 🌋 | 🌲 | ⛰️ | ⛰️ | 🌲 |
 
-9 | 🌵 | 🌵 | 🌵 | ⛰️ | ⛰️ | 🌵 | ⛰️ | 🌲 | ❄️ | 🌲 |
+7 | ❄️ | 🌋 | ⛰️ | 🌲 | ⛰️ | ❄️ | ❄️ | ❄️ | ❄️ | 🌋 |
 
-Legende:
-  🔥 Lava  | ❄️  Eis  | 🌲 Wald | 🌵 Wüste | ⛰️  Stein | 💧 Wasser
+8 | 🌵 | ⛰️ | 🌋 | ⛰️ | 🌲 | ⛰️ | 🌵 | ⛰️ | 🌲 | ❄️ |
 
-Einheiten:
-  F1 = Inferno-Krieger   (LP: 100/100, ANG: 17, VTD: 5)  [+2 ANG auf Lava]
-  F2 = Flammen-Bogenschütze (LP: 70/70, ANG: 12, VTD: 3)  [Reichweite: 3]
-  F3 = Phönix            (LP: 100/100, ANG: 10, VTD: 4)  [Fliegend, Wiederbelebung]
+9 | 🌲 | ❄️ | 🌲 | ⛰️ | 🌲 | ❄️ | ❄️ | 🌲 | 🌲 | 🌋 |
 
-  W1 = Gezeiten-Wächter (LP: 120/120, ANG: 10, VTD: 11) [+3 VTD auf Eis]
-  W2 = Frost-Magier     (LP: 60/60,   ANG: 13, VTD: 4)  [Reichweite: 4, Verlangsamung]
-  W3 = Wellen-Reiter    (LP: 90/90,   ANG: 11, VTD: 6)  [Schnell auf Eis]
 
-Aktionen: [B]ewegen | [A]ngreifen | [F]ähigkeit | [Z]ug beenden | [Q] Beenden
-> Einheit auswählen (z.B. F1): _
+Legende Terrain:  🌋 Lava |   ❄️ Eis |   🌲 Wald |   🌵 Wüste |   ⛰️ Stein | 
+
+### Einheiten ###
+F1 = Inferno-Krieger      (F) | HP: 100/100 | ATK: 15 | DEF:  5 | MOV: 3 | RNG: 1 | Pos: (0, 0) [DEF+1]
+F2 = Flammen-Bogenschütze (F) | HP:  70/ 70 | ATK: 12 | DEF:  3 | MOV: 4 | RNG: 3 | Pos: (0, 1) [DEF+1]
+F3 = Phönix               (F) | HP:  80/ 80 | ATK: 10 | DEF:  4 | MOV: 5 | RNG: 1 | Pos: (0, 2)
+W1 = Gezeiten-Wächter     (W) | HP: 120/120 | Pos: (7, 0)
+W2 = Frost-Magier         (W) | HP:  60/ 60 | Pos: (7, 1)
+W3 = Wellen-Reiter        (W) | HP:  90/ 90 | Pos: (7, 2)
+
+Lebende Einheiten: 6/6
+
+============================================================
+
+Aktion [B]ewegen | [A]ngreifen | [U]ndo | [R]edo | [Z]ug beenden | [Q] Beenden:
 ```
+---
+
+## **Zusätzliche Features**
+
+### **Undo/Redo System**
+Vollständiges **Undo/Redo System** für alle Aktionen innerhalb einer Runde:
+
+- **`[U]ndo`:** Macht die letzte Aktion rückgängig (Bewegung oder Angriff)
+- **`[R]edo`:** Wiederholt eine rückgängig gemachte Aktion
+- **Per-Turn Rollback:** Historie wird bei Rundenwechsel geleert
+- **Pattern-Integration:** Implementiert über **Command Pattern** - `CommandHistory` verwaltet zwei Stacks (Undo/Redo), jedes `Command` kennt seine eigene Rollback-Logik
+
+**Gameplay-Vorteil:** Experimentieren mit verschiedenen Strategien ohne Commit, Fehlerkorrektur, bessere Lernkurve für neue Spieler.
 
 ---
 
