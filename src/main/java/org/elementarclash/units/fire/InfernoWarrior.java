@@ -16,14 +16,12 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * Attack: Melee (range: 1)
  * <p>
  * Special Ability: +2 attack on Lava terrain.
- * Inferno Warriors gain combat advantage when fighting on volcanic ground.
+ * Implemented via Visitor Pattern: LavaTerrainVisitor applies +2 ATK bonus automatically.
  * <p>
  * Tactical Use: Tanky frontline fighter.
  * High health and defense. Strongest on lava terrain. Weak against ranged units and air.
  */
 class InfernoWarrior extends Unit {
-    private static final int LAVA_ATTACK_BONUS = 2;
-
     public InfernoWarrior(String id, UnitStats stats) {
         super(id, "Inferno-Krieger", Faction.FIRE, UnitType.INFERNO_WARRIOR, stats);
         setMovementStrategy(new GroundMovementStrategy(Faction.FIRE));
@@ -31,7 +29,7 @@ class InfernoWarrior extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "+2 Angriff auf Lava-Gelände";
     }
 }

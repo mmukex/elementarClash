@@ -14,6 +14,8 @@ import org.elementarclash.units.Unit;
  * Default Behavior:
  * - All visit methods return NEUTRAL by default
  * - Concrete visitors only override methods for non-neutral effects
+ *
+ * @author mmukex
  */
 public abstract class AbstractTerrainVisitor implements TerrainVisitor {
 
@@ -21,11 +23,6 @@ public abstract class AbstractTerrainVisitor implements TerrainVisitor {
 
     protected AbstractTerrainVisitor(Terrain terrainType) {
         this.terrainType = terrainType;
-    }
-
-    @Override
-    public Terrain getTerrainType() {
-        return terrainType;
     }
 
     // Default implementations - return NEUTRAL for all factions
@@ -63,10 +60,6 @@ public abstract class AbstractTerrainVisitor implements TerrainVisitor {
 
     protected TerrainEffectResult createPerTurnEffect(int hpPerTurn, String description) {
         return new TerrainEffectResult(0, 0, hpPerTurn, null, description);
-    }
-
-    protected TerrainEffectResult createTerrainChange(Terrain newTerrain, String description) {
-        return new TerrainEffectResult(0, 0, 0, newTerrain, description);
     }
 
     protected String getTerrainName() {

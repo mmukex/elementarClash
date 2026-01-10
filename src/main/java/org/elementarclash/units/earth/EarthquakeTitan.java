@@ -23,7 +23,7 @@ class EarthquakeTitan extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "Mächtiger Nahkämpfer mit hoher Gesundheit";
     }
 }

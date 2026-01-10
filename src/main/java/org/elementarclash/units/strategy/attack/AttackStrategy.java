@@ -16,7 +16,8 @@ import java.util.List;
  * Implementations:
  * - MeleeAttackStrategy: Range 1, adjacent cells only
  * - RangedAttackStrategy: Range 3-4, line of sight check
- * - AreaAttackStrategy: Decorator wrapping base strategy, hits multiple targets
+ *
+ * @author mmukex
  */
 public interface AttackStrategy {
 

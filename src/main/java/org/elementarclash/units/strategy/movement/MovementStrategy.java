@@ -15,7 +15,8 @@ import org.elementarclash.util.Position;
  * Implementations:
  * - GroundMovementStrategy: Pays terrain costs with faction-specific modifiers
  * - FlyingMovementStrategy: Ignores terrain (used by Air faction and Phoenix)
- * - SpecialMovementStrategy: Hybrid with special terrain affinity (Wave Rider on ice)
+ *
+ * @author mmukex
  */
 public interface MovementStrategy {
 
@@ -39,21 +40,4 @@ public interface MovementStrategy {
      * @return true if move is valid
      */
     boolean canMoveTo(Game game, Position currentPosition, Position targetPosition, int maxMovement);
-
-    /**
-     * Calculates total movement cost for entire path.
-     * Sums terrain costs from start to end.
-     *
-     * @param game game instance for terrain lookup
-     * @param path array of positions from start to end
-     * @return total movement cost
-     */
-    default double calculatePathCost(Game game, Position[] path) {
-        double totalCost = 0.0;
-        for (int i = 1; i < path.length; i++) {
-            Terrain terrain = game.getTerrainAt(path[i]);
-            totalCost += calculateMovementCost(terrain);
-        }
-        return totalCost;
-    }
 }

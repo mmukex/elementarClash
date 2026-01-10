@@ -24,7 +24,7 @@ class TideGuardian extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
+    public String getDescription() {
         return "+3 Verteidigung auf Eis-Gelände";
     }
 }

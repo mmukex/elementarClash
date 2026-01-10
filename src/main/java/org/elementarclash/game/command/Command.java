@@ -13,7 +13,8 @@ import org.elementarclash.units.Unit;
  * Implementations:
  * - MoveCommand: Unit movement with position rollback
  * - AttackCommand: Unit attack with health rollback
- * - UseAbilityCommand: Special abilities (slow, resurrect, pierce)
+ *
+ * @author mmukex
  */
 public interface Command {
 
@@ -43,14 +44,6 @@ public interface Command {
      * @param game Current game state
      */
     void undo(Game game);
-
-    /**
-     * Returns the unit performing this action.
-     * Used for action limit tracking.
-     *
-     * @return the unit actor
-     */
-    Unit getActor();
 
     /**
      * Returns the command type for logging/debugging.
@@ -90,7 +83,7 @@ public interface Command {
 
     /**
      * Common validation: Check if target exists in game and is alive.
-     * Reduces code duplication in attack/ability commands.
+     * Reduces code duplication in attack commands.
      *
      * @param game   Current game state
      * @param target Target unit to validate

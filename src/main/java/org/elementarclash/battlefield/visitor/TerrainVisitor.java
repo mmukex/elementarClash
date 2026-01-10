@@ -1,6 +1,5 @@
 package org.elementarclash.battlefield.visitor;
 
-import org.elementarclash.battlefield.Terrain;
 import org.elementarclash.units.Unit;
 
 /**
@@ -29,6 +28,8 @@ import org.elementarclash.units.Unit;
  * 2. Unit dispatches by faction: visitor.visitFireUnit(this)
  * 3. Visitor applies terrain-specific logic
  * 4. Returns TerrainEffectResult with bonuses/effects
+ *
+ * @author mmukex
  */
 public interface TerrainVisitor {
     /**
@@ -62,11 +63,4 @@ public interface TerrainVisitor {
      * @return terrain effect result with bonuses/penalties
      */
     TerrainEffectResult visitAirUnit(Unit unit);
-
-    /**
-     * Returns the terrain type this visitor represents.
-     *
-     * @return the terrain type
-     */
-    Terrain getTerrainType();
 }

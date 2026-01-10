@@ -23,6 +23,8 @@ import org.elementarclash.units.Unit;
  * 5. Attack is valid (delegates to Strategy)
  * <p>
  * Undo: Restores target health, clears attacked flag, resurrects target if needed
+ *
+ * @author mmukex
  */
 @Getter
 public class AttackCommand implements Command {
@@ -83,6 +85,7 @@ public class AttackCommand implements Command {
         this.targetPreviousHealth = target.getCurrentHealth();
         this.targetWasAlive = target.isAlive();
 
+        // TODO: crstmkt - Chain of Responsibility - Configure damage modifier chain here
         DamageCalculator calculator = new DamageCalculator();
         DamageResult result = calculator.calculateDamage(actor, target, game);
 

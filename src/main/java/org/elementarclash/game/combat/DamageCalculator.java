@@ -5,6 +5,7 @@ import org.elementarclash.game.combat.handler.*;
 import org.elementarclash.units.Unit;
 
 /**
+<<<<<<< HEAD
  * Calculates combat damage using Chain of Responsibility Pattern.
  *
  * Chain: Base → Faction → Terrain → Synergy → Defense
@@ -15,6 +16,12 @@ import org.elementarclash.units.Unit;
  * - @crstmkt Decorator Pattern: SynergyBonusHandler uses Unit decorators (Week 4)
  *
  * @author @crstmkt (refactored for Chain of Responsibility)
+=======
+ * Calculates combat damage considering base attack, terrain effects, and defense.
+ * Uses Strategy Pattern (attack calculation) and Visitor Pattern (terrain effects).
+ *
+ * TODO: crstmkt - Chain of Responsibility - Refactor to use damage modifier chain
+>>>>>>> master
  */
 public class DamageCalculator {
 
@@ -40,6 +47,7 @@ public class DamageCalculator {
      */
     public DamageResult calculateDamage(Unit attacker, Unit target, Game game) {
         DamageContext context = new DamageContext(attacker, target, game);
+        // TODO: crstmkt - Decorator Pattern
 
         // Execute the chain
         handlerChain.handle(context);

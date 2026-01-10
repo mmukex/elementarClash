@@ -60,6 +60,8 @@ public class Game {
     private GameStatus status;
     private final List<GameObserver> observers = new ArrayList<>();
 
+    // TODO: crstmkt - Observer Pattern - Add event system for game events
+
     Game(Battlefield battlefield) {
         this.battlefield = battlefield;
         this.units = new ArrayList<>();
@@ -172,6 +174,13 @@ public class Game {
         TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
         TerrainEffectResult effect = unit.accept(visitor);
 
+        // TODO: crstmkt - Observer Pattern - Dispatch terrain change event
+        // Add: if (effect.terrainChange() != null) {
+        //          Terrain oldTerrain = terrain;
+        //          battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
+        //          eventDispatcher.dispatchEvent(new TerrainChangedEvent(unit.getPosition(), oldTerrain, effect.terrainChange()));
+        //      }
+        // Listeners: TerrainVisualRenderer, UnitStatRecalculator
         if (effect.terrainChange() != null) {
             battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
         }
@@ -224,6 +233,7 @@ public class Game {
         removeUnit(unit);
         notifyObservers(new UnitDeathEvent(unit)); //Notify Observers before victory Check
         checkVictoryCondition();  // Check if game should end
+        // TODO: crstmkt - Observer Pattern - Dispatch unit death event here
     }
 
     public Unit getUnitAt(Position position) {
@@ -334,6 +344,10 @@ public class Game {
     }
 
     public void nextTurn() {
+        // TODO: crstmkt - Observer Pattern - Dispatch turn transition events
+        // Before faction change: eventDispatcher.dispatchEvent(new TurnEndingEvent(activeFaction));
+        // After faction change: eventDispatcher.dispatchEvent(new TurnStartingEvent(activeFaction));
+        // Listeners: UIRenderer (update faction display), UnitManager (reset flags), TerrainEffectApplier, AbilityCooldownReducer
         List<Faction> aliveFactions = getAliveFactions();
         resetCurrentFactionUnits();
         applyPerTurnTerrainEffects();
@@ -431,6 +445,7 @@ public class Game {
         return RENDERER.render(this);
     }
 
+    // TODO: crstmkt - State Pattern - Convert GameStatus enum to State Pattern
     public enum GameStatus {
         SETUP,
         IN_PROGRESS,

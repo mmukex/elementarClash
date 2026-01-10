@@ -22,6 +22,8 @@ public class GameController {
         this.ui = new ConsoleUI();
         this.parser = new CommandParser(ui);
         this.renderer = new ConsoleGameRenderer();
+
+        // TODO: crstmkt - Observer Pattern - Register renderer as event listener
     }
 
     public void start() {
@@ -39,7 +41,6 @@ public class GameController {
     private void displayGameState() {
         ui.display(System.lineSeparator() + "=".repeat(60));
         ui.display(renderer.render(game));
-        ui.display("Runde: " + game.getTurnNumber() + " | Aktive Fraktion: " + game.getActiveFaction());
         ui.display("=".repeat(60));
     }
 

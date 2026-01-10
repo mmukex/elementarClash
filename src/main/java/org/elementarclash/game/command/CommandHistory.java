@@ -16,6 +16,8 @@ import java.util.Deque;
  * - executedCommands: Stack of commands that have been executed (for undo)
  * - undoneCommands: Stack of commands that have been undone (for redo)
  * - New command execution clears redo stack (timeline branch)
+ *
+ * @author mmukex
  */
 public class CommandHistory {
 
@@ -66,13 +68,5 @@ public class CommandHistory {
 
     public boolean canRedo() {
         return !undoneCommands.isEmpty();
-    }
-
-    public int getUndoCount() {
-        return executedCommands.size();
-    }
-
-    public int getRedoCount() {
-        return undoneCommands.size();
     }
 }

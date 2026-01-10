@@ -6,7 +6,7 @@ import org.elementarclash.units.Unit;
 import java.util.List;
 
 /**
- * Melee attack strategy for close-range combat (range 1, adjacent cells only).
+ * Melee attack strategy for close-range combat (typically range 1).
  * <p>
  * Design Pattern: Strategy (GoF #5)
  * Why: Different unit types have different attack patterns (melee vs ranged).
@@ -16,10 +16,10 @@ import java.util.List;
  * <p>
  * Melee units must be adjacent to their target to attack.
  * This creates tactical positioning requirements and vulnerability to ranged units.
+ *
+ * @author mmukex
  */
 public class MeleeAttackStrategy implements AttackStrategy {
-
-    private static final int MELEE_RANGE = 1;
 
     @Override
     public boolean canAttack(Game game, Unit attacker, Unit target) {
@@ -31,7 +31,7 @@ public class MeleeAttackStrategy implements AttackStrategy {
             return false;
         }
 
-        return attacker.getPosition().manhattanDistanceTo(target.getPosition()) <= MELEE_RANGE;
+        return attacker.getPosition().manhattanDistanceTo(target.getPosition()) <= getAttackRange(attacker);
     }
 
     @Override
@@ -43,6 +43,6 @@ public class MeleeAttackStrategy implements AttackStrategy {
 
     @Override
     public int getAttackRange(Unit unit) {
-        return MELEE_RANGE;
+        return unit.getBaseStats().range();
     }
 }

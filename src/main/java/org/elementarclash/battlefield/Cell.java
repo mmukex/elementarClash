@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.elementarclash.util.Position;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Leaf in the Composite Pattern representing a single battlefield cell.
@@ -13,6 +14,8 @@ import java.util.List;
  * Design Pattern: Composite (GoF #3) - Leaf
  * Why: Represents the smallest unit in battlefield hierarchy.
  * Cannot contain other components but implements same interface as composites.
+ *
+ * @author mmukex
  */
 @Getter
 public class Cell implements BattlefieldComponent {

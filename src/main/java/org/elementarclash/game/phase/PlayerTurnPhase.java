@@ -3,6 +3,7 @@ package org.elementarclash.game.phase;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.faction.Faction;
+import org.elementarclash.game.command.ValidationResult;
 
 /**
  * Player turn phase: Commands are allowed.
@@ -21,7 +22,8 @@ public class PlayerTurnPhase implements GamePhaseState {
     @Override
     public boolean canExecuteCommand(Game game, Command command) {
         // Check if command actor belongs to active faction
-        if (command.getActor().getFaction() != activeFaction) {
+        ValidationResult result = command.validate(game);
+        if (!result.isValid()) {
             return false;
         }
 

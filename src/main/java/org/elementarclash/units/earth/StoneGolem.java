@@ -8,17 +8,16 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 
 /**
- * Earth faction's immovable tank with terrain regeneration.
+ * Earth faction's massive defensive tank.
  * <p>
  * Faction: Earth | Movement: Ground | Attack: Melee (range: 1)
  * <p>
- * Special: Regenerates 5 HP per turn on stone terrain. Immovable (cannot be pushed).
+ * Special: Highest HP (140) and Defense (10) in the game. +5 Defense on Stone terrain.
+ * Stone defense bonus implemented via Visitor Pattern: StoneTerrainVisitor.
  * <p>
- * Tactical: Defensive anchor. Guards key positions. Strongest on stone terrain.
+ * Tactical: Defensive anchor. Guards key positions. Extremely hard to kill.
  */
 class StoneGolem extends Unit {
-    private static final int MOUNTAIN_REGEN = 5;
-
     public StoneGolem(String id, UnitStats stats) {
         super(id, "Stein-Golem", Faction.EARTH, UnitType.STONE_GOLEM, stats);
         setMovementStrategy(new GroundMovementStrategy(Faction.EARTH));
@@ -26,11 +25,7 @@ class StoneGolem extends Unit {
     }
 
     @Override
-    public String getSpecialAbility() {
-        return "Regeneriert 5 LP pro Runde auf Berg-Gelände";
-    }
-
-    public int getMountainRegeneration() {
-        return MOUNTAIN_REGEN;
+    public String getDescription() {
+        return "Massiver Tank (höchste LP & Verteidigung)";
     }
 }

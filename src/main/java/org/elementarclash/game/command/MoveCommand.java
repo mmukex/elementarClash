@@ -20,6 +20,8 @@ import org.elementarclash.util.Position;
  * 4. Movement is valid (delegates to Strategy)
  * <p>
  * Undo: Restores previous position and clears moved flag
+ *
+ * @author mmukex
  */
 @Getter
 public class MoveCommand implements Command {

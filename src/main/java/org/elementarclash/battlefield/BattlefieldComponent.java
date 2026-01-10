@@ -11,6 +11,8 @@ import java.util.function.Consumer;
  * Why: Enables operations on both single cells (Leaf) and regions/entire battlefield (Composite).
  * Example: Apply forest fire effect to single cell, 3x3 region, or entire battlefield
  * with the same interface.
+ *
+ * @author mmukex
  */
 public interface BattlefieldComponent {
     /**

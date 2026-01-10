@@ -27,6 +27,8 @@ import java.util.stream.Collectors;
  *     .addUnit(waterGuardian, Faction.WATER)
  *     .build();
  * </pre>
+ *
+ * @author mmukex
  */
 public class GameBuilder {
 
@@ -115,7 +117,7 @@ public class GameBuilder {
         List<Position> availableSpawns = spawnZones.get(faction);
 
         return availableSpawns.stream().filter(pos ->
-                !game.isPositionOccupied(pos))
+                        !game.isPositionOccupied(pos))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No spawn position available for faction " + faction));
     }

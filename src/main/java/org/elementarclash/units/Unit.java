@@ -15,8 +15,7 @@ import org.elementarclash.util.Position;
 import org.elementarclash.units.decorator.UnitDecorator;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * Abstract base class for all units in ElementarClash.
@@ -37,13 +36,15 @@ public abstract class Unit {
     private Position position;
 
     //Durch STATE Pattern ersetzt
+    // TODO: crstmkt - State Pattern - Replace boolean flags with UnitTurnState
     private boolean movedThisTurn;
     private boolean attackedThisTurn;
 
     @Setter
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
-    private final Map<Class<?>, Integer> abilityCooldowns = new HashMap<>();
+
+    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here
 
     private UnitState currentState;
     private final List<UnitDecorator> decorators = new ArrayList<>();
@@ -80,30 +81,7 @@ public abstract class Unit {
         this.currentHealth = Math.max(0, Math.min(baseStats.maxHealth(), health));
     }
 
-    public boolean isAbilityOnCooldown(Class<?> abilityClass) {
-        return abilityCooldowns.getOrDefault(abilityClass, 0) > 0;
-    }
-
-    public int getAbilityCooldown(Class<?> abilityClass) {
-        return abilityCooldowns.getOrDefault(abilityClass, 0);
-    }
-
-    public void startAbilityCooldown(Class<?> abilityClass, int cooldown) {
-        if (cooldown > 0) {
-            abilityCooldowns.put(abilityClass, cooldown);
-        }
-    }
-
-    public void clearAbilityCooldown(Class<?> abilityClass) {
-        abilityCooldowns.remove(abilityClass);
-    }
-
-    private void tickAbilityCooldowns() {
-        abilityCooldowns.replaceAll((k, v) -> Math.max(0, v - 1));
-    }
-
     public void resetTurn() {
-        tickAbilityCooldowns();
         movedThisTurn = false;
         attackedThisTurn = false;
 
@@ -195,10 +173,6 @@ public abstract class Unit {
         return attackedThisTurn;
     }
 
-    public boolean canAct() {
-        return canMove() || canAttack();
-    }
-
     public MovementStrategy getMovementStrategy() {
         if (movementStrategy == null) {
             movementStrategy = new GroundMovementStrategy(faction);
@@ -217,13 +191,12 @@ public abstract class Unit {
         this.attackStrategy = strategy;
     }
 
-    // ========== Abstract Methods (Template Method Pattern) ==========
 
     /**
-     * Returns the unit's special ability description.
+     * Returns the unit's description.
      * Implemented by each concrete unit type.
      */
-    public abstract String getSpecialAbility();
+    public abstract String getDescription();
 
 
     public TerrainEffectResult accept(TerrainVisitor visitor) {

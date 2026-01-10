@@ -12,6 +12,8 @@ import org.elementarclash.battlefield.Terrain;
  * Design Pattern: Visitor (GoF #10) - Concrete Visitor
  * Why: Maintains pattern consistency even for neutral terrain.
  * Desert acts as the "default" terrain after ice melting.
+ *
+ * @author mmukex
  */
 public class DesertTerrainVisitor extends AbstractTerrainVisitor {
 
