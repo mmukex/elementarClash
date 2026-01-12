@@ -56,8 +56,6 @@ public class Game {
     private final TurnManager turnManager;
     private Faction activeFaction;
     private GamePhaseState currentPhase;
-    @Deprecated
-    private GameStatus status;
     private final List<GameObserver> observers = new ArrayList<>();
 
     // TODO: crstmkt - Observer Pattern - Add event system for game events
@@ -68,7 +66,6 @@ public class Game {
         this.positionToUnit = new HashMap<>();
         this.activeFaction = null;
         this.currentPhase = SetupPhase.getInstance();
-        this.status = GameStatus.SETUP;
         this.commandExecutor = new CommandExecutor();
         this.turnManager = new TurnManager();
     }
@@ -77,9 +74,6 @@ public class Game {
         currentPhase.onExit(this);
         this.currentPhase = newPhase;
         newPhase.onEnter(this);
-
-        // Update deprecated enum for compatibility
-        updateGameStatus();
     }
 
     /**
@@ -351,8 +345,8 @@ public class Game {
         List<Faction> aliveFactions = getAliveFactions();
         resetCurrentFactionUnits();
         applyPerTurnTerrainEffects();
-        activeFaction = determineNextFaction(aliveFactions);
-        updateGameStatus();
+
+        endTurn();
     }
 
     private void applyPerTurnTerrainEffects() {
@@ -406,16 +400,6 @@ public class Game {
         return nextIndex == 0;
     }
 
-    private void updateGameStatus() {
-        if (currentPhase instanceof SetupPhase) {
-            status = GameStatus.SETUP;
-        } else if (currentPhase instanceof GameOverPhase) {
-            status = GameStatus.GAME_OVER;
-        } else {
-            status = GameStatus.IN_PROGRESS;
-        }
-    }
-
     private boolean isGameOver() {
         return getAliveFactions().size() <= SINGLE_FACTION_REMAINING;
     }
@@ -429,7 +413,8 @@ public class Game {
     }
 
     private boolean isGameFinished() {
-        return status == GameStatus.GAME_OVER;
+        // return status == GameStatus.GAME_OVER;
+        return currentPhase instanceof GameOverPhase;
     }
 
     private Faction findRemainingFaction() {
@@ -445,12 +430,6 @@ public class Game {
         return RENDERER.render(this);
     }
 
-    // TODO: crstmkt - State Pattern - Convert GameStatus enum to State Pattern
-    public enum GameStatus {
-        SETUP,
-        IN_PROGRESS,
-        GAME_OVER
-    }
 
     // ===== OBSERVER PATTERN METHODS =====
 

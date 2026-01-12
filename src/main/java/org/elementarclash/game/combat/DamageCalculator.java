@@ -33,7 +33,7 @@ public class DamageCalculator {
         handlerChain
                 .setNext(new FactionAdvantageHandler())
                 .setNext(new TerrainEffectHandler())      // Integration with @mmukex Visitor!
-                .setNext(new SynergyBonusHandler())       // Integration with @crstmkt Decorator (Week 4)
+                .setNext(new SynergyBonusHandler())       // Integration with @crstmkt Decorator
                 .setNext(new DefenseCalculationHandler());
     }
 

@@ -36,7 +36,7 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
             sb.append("Aktive Fraktion: ").append(game.getActiveFaction().getGermanName()).append(System.lineSeparator());
         }
 
-        sb.append("Status: ").append(game.getStatus()).append(System.lineSeparator()).append(System.lineSeparator());
+        sb.append("Status: ").append(game.getCurrentPhase().getPhaseName()).append(System.lineSeparator()).append(System.lineSeparator());
     }
 
     private void renderGrid(StringBuilder sb, Game game) {

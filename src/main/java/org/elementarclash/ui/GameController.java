@@ -2,10 +2,11 @@ package org.elementarclash.ui;
 
 import org.elementarclash.faction.Faction;
 import org.elementarclash.game.Game;
-import org.elementarclash.game.Game.GameStatus;
+// import org.elementarclash.game.Game.GameStatus;
 import org.elementarclash.game.command.AttackCommand;
 import org.elementarclash.game.command.MoveCommand;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.game.phase.GameOverPhase;
 
 /**
  * Controls the main game loop.
@@ -29,7 +30,7 @@ public class GameController {
     public void start() {
         game.startGame();
 
-        while (game.getStatus() == GameStatus.IN_PROGRESS) {
+        while (!(game.getCurrentPhase() instanceof GameOverPhase)) {
             displayGameState();
             processTurn();
         }
@@ -47,7 +48,8 @@ public class GameController {
     private void processTurn() {
         boolean turnEnded = false;
 
-        while (!turnEnded && game.getStatus() == GameStatus.IN_PROGRESS) {
+        //while (!turnEnded && game.getStatus() == GameStatus.IN_PROGRESS) {
+          while (!turnEnded && !(game.getCurrentPhase() instanceof GameOverPhase)){
             String action = ui.promptAction();
             turnEnded = handleAction(action);
         }
