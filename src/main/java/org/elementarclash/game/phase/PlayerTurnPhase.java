@@ -12,8 +12,8 @@ import org.elementarclash.game.command.ValidationResult;
 public class PlayerTurnPhase implements GamePhaseState {
 
     private final Faction activeFaction;
-    private int actionsThisTurn = 0;
-    private static final int MAX_ACTIONS_PER_UNIT = 2;
+    // private int actionsThisTurn = 0;
+    // private static final int MAX_ACTIONS_PER_UNIT = 2;
 
     public PlayerTurnPhase(Faction faction) {
         this.activeFaction = faction;
@@ -21,14 +21,18 @@ public class PlayerTurnPhase implements GamePhaseState {
 
     @Override
     public boolean canExecuteCommand(Game game, Command command) {
+
         // Check if command actor belongs to active faction
+        // Kann das vereinfacht werden zu return command.validate(game).isValid()?
         ValidationResult result = command.validate(game);
         if (!result.isValid()) {
             return false;
         }
+        return true;
 
-        // Check action limit (simplified - could be per-unit)
-        return actionsThisTurn < MAX_ACTIONS_PER_UNIT;
+//
+//        // Check action limit (simplified - could be per-unit)
+//        return actionsThisTurn < MAX_ACTIONS_PER_UNIT;
     }
 
     @Override
@@ -37,7 +41,6 @@ public class PlayerTurnPhase implements GamePhaseState {
         game.getUnitsOfFaction(activeFaction).forEach(unit -> {
             unit.resetTurn();
         });
-        actionsThisTurn = 0;
     }
 
     @Override
@@ -69,7 +72,11 @@ public class PlayerTurnPhase implements GamePhaseState {
         return activeFaction;
     }
 
-    public void incrementActionCount() {
-        actionsThisTurn++;
-    }
+//    public void incrementActionCount() {
+//        actionsThisTurn++;
+//    }
+//
+//    public void decrementActionCount(){
+//        actionsThisTurn--;
+//    }
 }

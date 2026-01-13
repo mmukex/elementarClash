@@ -132,13 +132,13 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
                             sb.append("]");
                         }
 
-                        if (unit.hasMovedThisTurn() || unit.hasAttackedThisTurn()) {
-                            sb.append(" [");
-                            if (unit.hasMovedThisTurn()) sb.append("Bewegt");
-                            if (unit.hasMovedThisTurn() && unit.hasAttackedThisTurn()) sb.append(", ");
-                            if (unit.hasAttackedThisTurn()) sb.append("Angegriffen");
-                            sb.append("]");
-                        }
+//                        if (unit.hasMovedThisTurn() || unit.hasAttackedThisTurn()) {
+//                            sb.append(" [");
+//                            if (unit.hasMovedThisTurn()) sb.append("Bewegt");
+//                            if (unit.hasMovedThisTurn() && unit.hasAttackedThisTurn()) sb.append(", ");
+//                            if (unit.hasAttackedThisTurn()) sb.append("Angegriffen");
+//                            sb.append("]");
+//                        }
                     } else {
                         sb.append(String.format("%s = %-20s (%s) | HP: %3d/%3d | Pos: %s",
                                 unit.getId(),

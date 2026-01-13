@@ -16,15 +16,20 @@ public class DeadState implements UnitState {
 
     private DeadState() {}
 
-    @Override
-    public boolean canMove(Unit unit) {
+    public boolean hasActionsLeft(Unit unit){
+        // always false because dead unit is dead
         return false;
     }
 
-    @Override
-    public boolean canAttack(Unit unit) {
-        return false;
-    }
+//    @Override
+//    public boolean canMove(Unit unit) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean canAttack(Unit unit) {
+//        return false;
+//    }
 
     @Override
     public boolean canUseAbility(Unit unit) {

@@ -17,14 +17,19 @@ import org.elementarclash.units.Unit;
 public interface UnitState {
 
     /**
-     * Can this unit move in the current state?
+     * Has unit actions left?
      */
-    boolean canMove(Unit unit);
+    boolean hasActionsLeft(Unit unit);
 
-    /**
-     * Can this unit attack in the current state?
-     */
-    boolean canAttack(Unit unit);
+//    /**
+//     * Can this unit move in the current state?
+//     */
+//    boolean canMove(Unit unit);
+//
+//    /**
+//     * Can this unit attack in the current state?
+//     */
+//    boolean canAttack(Unit unit);
 
     /**
      * Can this unit use abilities in the current state?

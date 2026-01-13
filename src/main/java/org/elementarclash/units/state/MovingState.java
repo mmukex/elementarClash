@@ -16,15 +16,19 @@ public class MovingState implements UnitState {
 
     private MovingState() {}
 
-    @Override
-    public boolean canMove(Unit unit) {
-        return false; // Already moved this turn
+    public boolean hasActionsLeft(Unit unit){
+        return unit.getActionsThisTurn() < unit.getMaxActionsPerTurn();
     }
 
-    @Override
-    public boolean canAttack(Unit unit) {
-        return !unit.hasAttackedThisTurn();
-    }
+//    @Override
+//    public boolean canMove(Unit unit) {
+//        return unit.hasActionLeft(); // Already moved this turn
+//    }
+//
+//    @Override
+//    public boolean canAttack(Unit unit) {
+//        return unit.hasActionLeft();
+//    }
 
     @Override
     public boolean canUseAbility(Unit unit) {
@@ -38,7 +42,7 @@ public class MovingState implements UnitState {
 
     @Override
     public UnitState transitionToAttacking(Unit unit) {
-        if (canAttack(unit)) {
+        if (hasActionsLeft(unit)) {
             return AttackingState.getInstance();
         }
         return this;

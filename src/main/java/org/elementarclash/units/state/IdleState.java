@@ -16,15 +16,18 @@ public class IdleState implements UnitState {
 
     private IdleState() {}
 
-    @Override
-    public boolean canMove(Unit unit) {
-        return !unit.hasMovedThisTurn();
+    public boolean hasActionsLeft(Unit unit){
+        return unit.getActionsThisTurn() < unit.getMaxActionsPerTurn();
     }
-
-    @Override
-    public boolean canAttack(Unit unit) {
-        return !unit.hasAttackedThisTurn();
-    }
+//    @Override
+//    public boolean canMove(Unit unit) {
+//        return !unit.hasMovedThisTurn();
+//    }
+//
+//    @Override
+//    public boolean canAttack(Unit unit) {
+//        return !unit.hasAttackedThisTurn();
+//    }
 
     @Override
     public boolean canUseAbility(Unit unit) {
@@ -33,7 +36,7 @@ public class IdleState implements UnitState {
 
     @Override
     public UnitState transitionToMoving(Unit unit) {
-        if (canMove(unit)) {
+        if (hasActionsLeft(unit)) {
             return MovingState.getInstance();
         }
         return this;
@@ -41,7 +44,7 @@ public class IdleState implements UnitState {
 
     @Override
     public UnitState transitionToAttacking(Unit unit) {
-        if (canAttack(unit)) {
+        if (hasActionsLeft(unit)) {
             return AttackingState.getInstance();
         }
         return this;

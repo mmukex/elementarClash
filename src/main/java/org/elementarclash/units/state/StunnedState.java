@@ -14,15 +14,19 @@ public class StunnedState implements UnitState {
         this.remainingRounds = rounds;
     }
 
-    @Override
-    public boolean canMove(Unit unit) {
+    public boolean hasActionsLeft(Unit unit){
+        // always false because stunned unit can not move or attack independently from actions left
         return false;
     }
-
-    @Override
-    public boolean canAttack(Unit unit) {
-        return false;
-    }
+//    @Override
+//    public boolean canMove(Unit unit) {
+//        return false;
+//    }
+//
+//    @Override
+//    public boolean canAttack(Unit unit) {
+//        return false;
+//    }
 
     @Override
     public boolean canUseAbility(Unit unit) {

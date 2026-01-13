@@ -6,6 +6,9 @@ import org.elementarclash.game.combat.DamageCalculator;
 import org.elementarclash.game.combat.DamageResult;
 import org.elementarclash.game.event.UnitAttackedEvent;
 import org.elementarclash.units.Unit;
+import org.elementarclash.units.state.DeadState;
+import org.elementarclash.units.state.StunnedState;
+import org.elementarclash.units.state.UnitState;
 
 /**
  * Command for attacking a target unit.
@@ -59,13 +62,13 @@ public class AttackCommand implements Command {
             return targetCheck;
         }
 
-        if (!actor.canAttack()) {
+        if (actor.getCurrentState() instanceof StunnedState || actor.getCurrentState() instanceof DeadState) {
             return ValidationResult.failure(
                     actor.getName() + " cannot attack (State: " + actor.getCurrentState().getStateName() + ")"
             );
         }
 
-        if (actor.hasAttackedThisTurn()) {
+        if (!actor.hasActionsLeft()) {
             return ValidationResult.failure(
                     String.format("%s has already attacked this turn", actor.getName())
             );
@@ -91,7 +94,8 @@ public class AttackCommand implements Command {
 
         this.damageDealt = result.totalDamage();
         target.takeDamage(result.totalDamage());
-        actor.markAttackedThisTurn();
+        actor.incrementActionsThisTurn();
+        //actor.markAttackedThisTurn();
         actor.startAttacking();
 
         game.notifyObservers(new UnitAttackedEvent(actor, target, result));
@@ -114,7 +118,7 @@ public class AttackCommand implements Command {
             target.heal(healthToRestore);
         }
 
-        actor.clearAttackedThisTurn();
+        actor.decrementActionsThisTurn();
 
         // Future: Undo death effects when implemented
     }

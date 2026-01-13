@@ -8,7 +8,7 @@ import org.elementarclash.units.decorator.UnitDecorator;
  * Apply synergy bonuses from adjacent units.
  *
  * Integration Point: Will use @crstmkt Decorator Pattern (Pattern #4)
- * TODO: Implement after Decorator Pattern is done (Week 4)
+ * TODO: Implement after Decorator Pattern is done
  */
 public class SynergyBonusHandler extends DamageHandler {
 

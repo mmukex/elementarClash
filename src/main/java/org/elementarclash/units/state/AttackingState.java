@@ -16,15 +16,18 @@ public class AttackingState implements UnitState {
 
     private AttackingState() {}
 
-    @Override
-    public boolean canMove(Unit unit) {
-        return false; // Cannot move after attacking
+    public boolean hasActionsLeft(Unit unit){
+        return unit.getActionsThisTurn() < unit.getMaxActionsPerTurn();
     }
-
-    @Override
-    public boolean canAttack(Unit unit) {
-        return false; // Already attacked
-    }
+//    @Override
+//    public boolean canMove(Unit unit) {
+//        return false; // Cannot move after attacking
+//    }
+//
+//    @Override
+//    public boolean canAttack(Unit unit) {
+//        return false; // Already attacked
+//    }
 
     @Override
     public boolean canUseAbility(Unit unit) {

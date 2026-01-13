@@ -87,6 +87,7 @@ public class Game {
         Faction firstFaction = determineFirstFaction();
         transitionToPhase(currentPhase.transitionToPlayerTurn(this, firstFaction));
         this.activeFaction = firstFaction;
+        this.turnManager.startGame();
         notifyObservers(new GameStartedEvent());
     }
 
@@ -200,9 +201,10 @@ public class Game {
 
         ValidationResult result = commandExecutor.execute(command, this);
 
-        if (result.isValid() && currentPhase instanceof PlayerTurnPhase playerTurn) {
-            playerTurn.incrementActionCount();
-        }
+        // Brauchen wir das noch wenn die Actions auf per Unit Ebene sind?
+//        if (result.isValid() && currentPhase instanceof PlayerTurnPhase playerTurn) {
+//            playerTurn.incrementActionCount();
+//        }
 
         return result;
     }
@@ -430,6 +432,7 @@ public class Game {
         return RENDERER.render(this);
     }
 
+    // TODO: crstmkt - State Pattern - Convert GameStatus enum to State Pattern - DONE
 
     // ===== OBSERVER PATTERN METHODS =====
 
