@@ -1,8 +1,9 @@
 package org.elementarclash.game.combat.handler;
 
 import org.elementarclash.game.combat.DamageContext;
-import org.elementarclash.units.decorator.TerrainBonus;
-import org.elementarclash.units.decorator.UnitDecorator;
+import org.elementarclash.units.Faction;
+import org.elementarclash.units.bonus.TerrainBonus;
+import org.elementarclash.units.bonus.UnitDecorator;
 
 /**
  * Apply synergy bonuses from adjacent units.
@@ -47,7 +48,7 @@ public class SynergyBonusHandler extends DamageHandler {
                 .count();
 
         // Fire faction: +1 attack per adjacent ally
-        if (context.getAttacker().getFaction() == org.elementarclash.faction.Faction.FIRE) {
+        if (context.getAttacker().getFaction() == Faction.FIRE) {
             return (int) adjacentAllies;
         }
 

@@ -1,7 +1,7 @@
 package org.elementarclash.units.strategy.movement;
 
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.game.Game;
 import org.elementarclash.util.Position;
 

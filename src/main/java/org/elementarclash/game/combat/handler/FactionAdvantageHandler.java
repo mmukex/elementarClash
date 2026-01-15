@@ -1,6 +1,6 @@
 package org.elementarclash.game.combat.handler;
 
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.game.combat.DamageContext;
 
 import java.util.Map;

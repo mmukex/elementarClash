@@ -2,9 +2,8 @@ package org.elementarclash.units;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
-import org.elementarclash.battlefield.visitor.TerrainVisitor;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
 import org.elementarclash.units.state.IdleState;
 import org.elementarclash.units.state.UnitState;
 import org.elementarclash.units.strategy.attack.AttackStrategy;
@@ -12,7 +11,7 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
-import org.elementarclash.units.decorator.UnitDecorator;
+import org.elementarclash.units.bonus.UnitDecorator;
 import java.util.ArrayList;
 import java.util.List;
 

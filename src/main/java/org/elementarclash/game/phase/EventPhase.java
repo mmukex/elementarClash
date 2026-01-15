@@ -2,10 +2,9 @@ package org.elementarclash.game.phase;
 
 import org.elementarclash.battlefield.Region;
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.battlefield.Cell;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.units.Unit;
 
 import java.util.Random;

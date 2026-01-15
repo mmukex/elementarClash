@@ -3,7 +3,7 @@ package org.elementarclash.game.phase;
 import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.game.command.ValidationResult;
 
 /**

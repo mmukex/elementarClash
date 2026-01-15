@@ -2,7 +2,7 @@ package org.elementarclash.game;
 
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
 

@@ -2,7 +2,7 @@ package org.elementarclash.game.phase;
 
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 
 /**
  * Setup phase: Game is being constructed via GameBuilder.

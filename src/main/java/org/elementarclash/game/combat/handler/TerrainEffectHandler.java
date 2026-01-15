@@ -1,9 +1,9 @@
 package org.elementarclash.game.combat.handler;
 
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
-import org.elementarclash.battlefield.visitor.TerrainVisitor;
-import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
+import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitorFactory;
 import org.elementarclash.game.combat.DamageContext;
 
 /**

@@ -2,9 +2,9 @@ package org.elementarclash.ui;
 
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
-import org.elementarclash.battlefield.visitor.TerrainVisitor;
-import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
+import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitorFactory;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.combat.DamageResult;
 import org.elementarclash.units.Unit;

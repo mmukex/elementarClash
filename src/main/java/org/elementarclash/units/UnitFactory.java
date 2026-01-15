@@ -1,7 +1,6 @@
 package org.elementarclash.units;
 
 import lombok.Getter;
-import org.elementarclash.faction.Faction;
 
 /**
  * Abstract Factory for creating faction-specific units.

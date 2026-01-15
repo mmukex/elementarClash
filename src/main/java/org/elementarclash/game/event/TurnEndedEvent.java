@@ -1,7 +1,7 @@
 package org.elementarclash.game.event;
 
 import lombok.Getter;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 
 @Getter
 public class TurnEndedEvent extends GameEvent {

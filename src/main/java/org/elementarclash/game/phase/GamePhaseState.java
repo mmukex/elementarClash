@@ -2,7 +2,7 @@ package org.elementarclash.game.phase;
 
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 
 /**
  * State Pattern (GoF #8) - Game Phase State Machine

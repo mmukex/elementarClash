@@ -1,6 +1,6 @@
 package org.elementarclash.ui;
 
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.AttackCommand;
 import org.elementarclash.game.command.MoveCommand;
