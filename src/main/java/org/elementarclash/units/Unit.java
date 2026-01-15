@@ -37,7 +37,7 @@ public abstract class Unit {
     private Position position;
 
     //Durch STATE Pattern ersetzt
-    // TODO: crstmkt - State Pattern - Replace boolean flags with UnitTurnState
+    // TODO: crstmkt - State Pattern - Replace boolean flags with UnitTurnState - DONE
     // private boolean movedThisTurn;
     // private boolean attackedThisTurn;
     @Setter
@@ -48,7 +48,7 @@ public abstract class Unit {
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
 
-    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here
+    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here - DONE
 
     private UnitState currentState;
     private final List<UnitDecorator> decorators = new ArrayList<>();

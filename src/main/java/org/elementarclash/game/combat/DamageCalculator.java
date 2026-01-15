@@ -20,7 +20,7 @@ import org.elementarclash.units.Unit;
  * Calculates combat damage considering base attack, terrain effects, and defense.
  * Uses Strategy Pattern (attack calculation) and Visitor Pattern (terrain effects).
  *
- * TODO: crstmkt - Chain of Responsibility - Refactor to use damage modifier chain
+ * TODO: crstmkt - Chain of Responsibility - Refactor to use damage modifier chain -> Sollte so sein.
 >>>>>>> master
  */
 public class DamageCalculator {
@@ -47,7 +47,7 @@ public class DamageCalculator {
      */
     public DamageResult calculateDamage(Unit attacker, Unit target, Game game) {
         DamageContext context = new DamageContext(attacker, target, game);
-        // TODO: crstmkt - Decorator Pattern
+        // TODO: crstmkt - Decorator Pattern -> Warum? Alle Decorators sollten hier vergeben sein und werden durch die Chain doch berücksichtigt?
 
         // Execute the chain
         handlerChain.handle(context);

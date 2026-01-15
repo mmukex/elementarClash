@@ -88,7 +88,7 @@ public class AttackCommand implements Command {
         this.targetPreviousHealth = target.getCurrentHealth();
         this.targetWasAlive = target.isAlive();
 
-        // TODO: crstmkt - Chain of Responsibility - Configure damage modifier chain here
+        // TODO: crstmkt - Chain of Responsibility - Configure damage modifier chain here -> Wird doch im DamageCalculator gemacht?
         DamageCalculator calculator = new DamageCalculator();
         DamageResult result = calculator.calculateDamage(actor, target, game);
 
