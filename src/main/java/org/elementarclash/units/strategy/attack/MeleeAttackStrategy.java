@@ -35,13 +35,6 @@ public class MeleeAttackStrategy implements AttackStrategy {
     }
 
     @Override
-    public List<Unit> getValidTargets(Game game, Unit attacker) {
-        return game.getEnemiesOf(attacker.getFaction()).stream()
-                .filter(target -> canAttack(game, attacker, target))
-                .toList();
-    }
-
-    @Override
     public int getAttackRange(Unit unit) {
         return unit.getBaseStats().range();
     }

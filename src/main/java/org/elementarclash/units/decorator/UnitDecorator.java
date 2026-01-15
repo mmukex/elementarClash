@@ -17,6 +17,8 @@ import org.elementarclash.units.Unit;
  * - Clean separation: Unit = base stats, Decorators = modifiers
  *
  * @author @crstmkt
+ *
+ * ToDo: Buff wie Tod auf einem Feld oder Fee für tempörere Buffs oder Debuffs in Kombi mit Observer kann das gut klappen
  */
 public abstract class UnitDecorator {
 

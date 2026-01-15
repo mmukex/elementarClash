@@ -1,7 +1,9 @@
 package org.elementarclash.game.event;
 
+import lombok.Getter;
 import org.elementarclash.faction.Faction;
 
+@Getter
 public class GameOverEvent extends GameEvent {
 
     private final Faction winner;
@@ -21,7 +23,4 @@ public class GameOverEvent extends GameEvent {
         return "Game Over - " + winner.name() + " wins!";
     }
 
-    public Faction getWinner() {
-        return winner;
-    }
 }

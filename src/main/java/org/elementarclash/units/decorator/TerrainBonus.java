@@ -7,6 +7,8 @@ import org.elementarclash.units.Unit;
  * Terrain-based bonus from @mmukex Visitor Pattern.
  *
  * Integration Point: Converts TerrainEffectResult to Decorator
+ *
+ * // ToDo: Müll
  */
 public class TerrainBonus extends UnitDecorator {
 

@@ -177,7 +177,7 @@ public class Game {
         //      }
         // Listeners: TerrainVisualRenderer, UnitStatRecalculator
         if (effect.terrainChange() != null) {
-            battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
+            battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange(), this);
         }
 
         // Apply terrain bonus as Decorator
@@ -199,14 +199,7 @@ public class Game {
             );
         }
 
-        ValidationResult result = commandExecutor.execute(command, this);
-
-        // Brauchen wir das noch wenn die Actions auf per Unit Ebene sind?
-//        if (result.isValid() && currentPhase instanceof PlayerTurnPhase playerTurn) {
-//            playerTurn.incrementActionCount();
-//        }
-
-        return result;
+        return commandExecutor.execute(command, this);
     }
 
     public boolean undoLastCommand() {
@@ -215,14 +208,6 @@ public class Game {
 
     public boolean redoLastCommand() {
         return commandExecutor.redo(this);
-    }
-
-    public boolean canUndo() {
-        return commandExecutor.canUndo();
-    }
-
-    public boolean canRedo() {
-        return commandExecutor.canRedo();
     }
 
     public void handleUnitDeath(Unit unit) {
@@ -258,12 +243,6 @@ public class Game {
                 .toList();
     }
 
-    public List<Unit> getUnitsInRange(Position position, int range) {
-        return units.stream()
-                .filter(u -> u.isAlive() && u.getPosition().isInRange(position, range))
-                .toList();
-    }
-
     public boolean canAttack(Unit attacker, Unit target) {
         return attacker.getAttackStrategy().canAttack(this, attacker, target);
     }
@@ -278,25 +257,6 @@ public class Game {
 
     public int getTurnNumber() {
         return turnManager.getTurnNumber();
-    }
-
-    public List<Unit> getValidAttackTargets(Unit attacker) {
-        return attacker.getAttackStrategy().getValidTargets(this, attacker);
-    }
-
-    public List<Position> getValidMovePositions(Unit unit) {
-        List<Position> validPositions = new ArrayList<>();
-        int maxMovement = unit.getBaseStats().movement();
-
-        for (int y = 0; y < Battlefield.GRID_SIZE; y++) {
-            for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
-                Position target = new Position(x, y);
-                if (unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, maxMovement)) {
-                    validPositions.add(target);
-                }
-            }
-        }
-        return validPositions;
     }
 
     void setInitialActiveFaction(Faction faction) {
@@ -387,25 +347,6 @@ public class Game {
         commandExecutor.clearHistory();
     }
 
-    private Faction determineNextFaction(List<Faction> aliveFactions) {
-        int currentIndex = aliveFactions.indexOf(activeFaction);
-        int nextIndex = (currentIndex + 1) % aliveFactions.size();
-
-        if (isNewRound(nextIndex)) {
-            turnManager.incrementTurn();
-        }
-
-        return aliveFactions.get(nextIndex);
-    }
-
-    private boolean isNewRound(int nextIndex) {
-        return nextIndex == 0;
-    }
-
-    private boolean isGameOver() {
-        return getAliveFactions().size() <= SINGLE_FACTION_REMAINING;
-    }
-
     public Faction getWinner() {
         if (!isGameFinished()) {
             return null;
@@ -415,7 +356,6 @@ public class Game {
     }
 
     private boolean isGameFinished() {
-        // return status == GameStatus.GAME_OVER;
         return currentPhase instanceof GameOverPhase;
     }
 
@@ -431,8 +371,6 @@ public class Game {
     public String toString() {
         return RENDERER.render(this);
     }
-
-    // TODO: crstmkt - State Pattern - Convert GameStatus enum to State Pattern - DONE
 
     // ===== OBSERVER PATTERN METHODS =====
 

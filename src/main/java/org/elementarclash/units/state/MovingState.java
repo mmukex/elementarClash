@@ -20,21 +20,6 @@ public class MovingState implements UnitState {
         return unit.getActionsThisTurn() < unit.getMaxActionsPerTurn();
     }
 
-//    @Override
-//    public boolean canMove(Unit unit) {
-//        return unit.hasActionLeft(); // Already moved this turn
-//    }
-//
-//    @Override
-//    public boolean canAttack(Unit unit) {
-//        return unit.hasActionLeft();
-//    }
-
-    @Override
-    public boolean canUseAbility(Unit unit) {
-        return true;
-    }
-
     @Override
     public UnitState transitionToMoving(Unit unit) {
         return this; // Already moving

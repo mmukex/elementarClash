@@ -20,9 +20,4 @@ public class BaseDamageHandler extends DamageHandler {
         // Pass to next handler
         super.handle(context);
     }
-
-    @Override
-    public String getHandlerName() {
-        return "BaseDamageHandler";
-    }
 }

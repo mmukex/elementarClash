@@ -88,14 +88,12 @@ public class AttackCommand implements Command {
         this.targetPreviousHealth = target.getCurrentHealth();
         this.targetWasAlive = target.isAlive();
 
-        // TODO: crstmkt - Chain of Responsibility - Configure damage modifier chain here -> Wird doch im DamageCalculator gemacht?
         DamageCalculator calculator = new DamageCalculator();
         DamageResult result = calculator.calculateDamage(actor, target, game);
 
         this.damageDealt = result.totalDamage();
         target.takeDamage(result.totalDamage());
         actor.incrementActionsThisTurn();
-        //actor.markAttackedThisTurn();
         actor.startAttacking();
 
         game.notifyObservers(new UnitAttackedEvent(actor, target, result));
@@ -119,8 +117,6 @@ public class AttackCommand implements Command {
         }
 
         actor.decrementActionsThisTurn();
-
-        // Future: Undo death effects when implemented
     }
 
     @Override

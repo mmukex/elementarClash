@@ -112,11 +112,6 @@ public class Battlefield implements BattlefieldComponent {
         }
     }
 
-    // Keep for compatiblity
-    public void setTerrainAt(Position position, Terrain newTerrain) {
-        setTerrainAt(position, newTerrain, null);
-    }
-
     public Cell getCell(int x, int y) {
         return rows.get(y).getCell(x);
     }

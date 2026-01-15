@@ -1,11 +1,13 @@
 package org.elementarclash.units.state;
 
+import lombok.Getter;
 import org.elementarclash.units.Unit;
 
 /**
  * Unit is stunned (e.g., by Frost Mage ability).
  * Cannot perform any actions for a number of rounds.
  */
+@Getter
 public class StunnedState implements UnitState {
 
     private int remainingRounds;
@@ -16,20 +18,6 @@ public class StunnedState implements UnitState {
 
     public boolean hasActionsLeft(Unit unit){
         // always false because stunned unit can not move or attack independently from actions left
-        return false;
-    }
-//    @Override
-//    public boolean canMove(Unit unit) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean canAttack(Unit unit) {
-//        return false;
-//    }
-
-    @Override
-    public boolean canUseAbility(Unit unit) {
         return false;
     }
 
@@ -76,7 +64,4 @@ public class StunnedState implements UnitState {
         return "Stunned (" + remainingRounds + " rounds)";
     }
 
-    public int getRemainingRounds() {
-        return remainingRounds;
-    }
 }

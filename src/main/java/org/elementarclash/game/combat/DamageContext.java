@@ -1,5 +1,6 @@
 package org.elementarclash.game.combat;
 
+import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.units.Unit;
 
@@ -12,6 +13,7 @@ import java.util.List;
  *
  * @author @crstmkt
  */
+@Getter
 public class DamageContext {
 
     private final Unit attacker;
@@ -34,48 +36,6 @@ public class DamageContext {
         this.attacker = attacker;
         this.target = target;
         this.game = game;
-    }
-
-    // ===== GETTERS =====
-
-    public Unit getAttacker() {
-        return attacker;
-    }
-
-    public Unit getTarget() {
-        return target;
-    }
-
-    public Game getGame() {
-        return game;
-    }
-
-    public int getBaseDamage() {
-        return baseDamage;
-    }
-
-    public double getFactionMultiplier() {
-        return factionMultiplier;
-    }
-
-    public int getTerrainAttackBonus() {
-        return terrainAttackBonus;
-    }
-
-    public int getTerrainDefenseBonus() {
-        return terrainDefenseBonus;
-    }
-
-    public int getSynergyBonus() {
-        return synergyBonus;
-    }
-
-    public int getTotalDefense() {
-        return totalDefense;
-    }
-
-    public int getFinalDamage() {
-        return finalDamage;
     }
 
     // ===== SETTERS (für Handlers) =====

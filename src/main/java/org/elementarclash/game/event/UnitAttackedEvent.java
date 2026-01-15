@@ -1,8 +1,10 @@
 package org.elementarclash.game.event;
 
+import lombok.Getter;
 import org.elementarclash.game.combat.DamageResult;
 import org.elementarclash.units.Unit;
 
+@Getter
 public class UnitAttackedEvent extends GameEvent {
 
     private final Unit attacker;
@@ -27,15 +29,4 @@ public class UnitAttackedEvent extends GameEvent {
                 " for " + damageResult.totalDamage() + " damage";
     }
 
-    public Unit getAttacker() {
-        return attacker;
-    }
-
-    public Unit getTarget() {
-        return target;
-    }
-
-    public DamageResult getDamageResult() {
-        return damageResult;
-    }
 }

@@ -1,7 +1,9 @@
 package org.elementarclash.game.event;
 
+import lombok.Getter;
 import org.elementarclash.faction.Faction;
 
+@Getter
 public class TurnEndedEvent extends GameEvent {
 
     private final Faction faction;
@@ -21,7 +23,4 @@ public class TurnEndedEvent extends GameEvent {
         return faction.name() + "'s turn ended";
     }
 
-    public Faction getFaction() {
-        return faction;
-    }
 }

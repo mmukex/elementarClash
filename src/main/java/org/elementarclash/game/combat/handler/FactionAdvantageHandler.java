@@ -56,9 +56,4 @@ public class FactionAdvantageHandler extends DamageHandler {
         // Pass to next handler
         super.handle(context);
     }
-
-    @Override
-    public String getHandlerName() {
-        return "FactionAdvantageHandler";
-    }
 }

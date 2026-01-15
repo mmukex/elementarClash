@@ -21,21 +21,6 @@ public interface UnitState {
      */
     boolean hasActionsLeft(Unit unit);
 
-//    /**
-//     * Can this unit move in the current state?
-//     */
-//    boolean canMove(Unit unit);
-//
-//    /**
-//     * Can this unit attack in the current state?
-//     */
-//    boolean canAttack(Unit unit);
-
-    /**
-     * Can this unit use abilities in the current state?
-     */
-    boolean canUseAbility(Unit unit);
-
     /**
      * Transition to Moving state.
      * @return new state or this if transition not allowed

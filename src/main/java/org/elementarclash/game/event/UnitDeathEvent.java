@@ -1,7 +1,9 @@
 package org.elementarclash.game.event;
 
+import lombok.Getter;
 import org.elementarclash.units.Unit;
 
+@Getter
 public class UnitDeathEvent extends GameEvent {
 
     private final Unit unit;
@@ -21,7 +23,4 @@ public class UnitDeathEvent extends GameEvent {
         return unit.getName() + " has died";
     }
 
-    public Unit getUnit() {
-        return unit;
-    }
 }

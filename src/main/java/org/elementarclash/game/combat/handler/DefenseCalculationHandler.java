@@ -26,9 +26,4 @@ public class DefenseCalculationHandler extends DamageHandler {
         // No next handler (end of chain)
         super.handle(context);
     }
-
-    @Override
-    public String getHandlerName() {
-        return "DefenseCalculationHandler";
-    }
 }

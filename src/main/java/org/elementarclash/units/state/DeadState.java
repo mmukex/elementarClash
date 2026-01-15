@@ -21,21 +21,6 @@ public class DeadState implements UnitState {
         return false;
     }
 
-//    @Override
-//    public boolean canMove(Unit unit) {
-//        return false;
-//    }
-//
-//    @Override
-//    public boolean canAttack(Unit unit) {
-//        return false;
-//    }
-
-    @Override
-    public boolean canUseAbility(Unit unit) {
-        return false;
-    }
-
     @Override
     public UnitState transitionToMoving(Unit unit) {
         return this;

@@ -5,7 +5,6 @@ import lombok.Setter;
 import org.elementarclash.battlefield.visitor.TerrainEffectResult;
 import org.elementarclash.battlefield.visitor.TerrainVisitor;
 import org.elementarclash.faction.Faction;
-import org.elementarclash.game.phase.PlayerTurnPhase;
 import org.elementarclash.units.state.IdleState;
 import org.elementarclash.units.state.UnitState;
 import org.elementarclash.units.strategy.attack.AttackStrategy;
@@ -36,10 +35,6 @@ public abstract class Unit {
     @Setter
     private Position position;
 
-    //Durch STATE Pattern ersetzt
-    // TODO: crstmkt - State Pattern - Replace boolean flags with UnitTurnState - DONE
-    // private boolean movedThisTurn;
-    // private boolean attackedThisTurn;
     @Setter
     public int actionsThisTurn = 0;
     public final int maxActionsPerTurn = 2;
@@ -48,7 +43,7 @@ public abstract class Unit {
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
 
-    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here - DONE
+    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here
 
     private UnitState currentState;
     private final List<UnitDecorator> decorators = new ArrayList<>();
@@ -60,8 +55,6 @@ public abstract class Unit {
         this.type = type;
         this.baseStats = stats;
         this.currentHealth = stats.maxHealth();
-        // this.movedThisTurn = false;
-        // this.attackedThisTurn = false;
         this.currentState = IdleState.getInstance();
     }
 
@@ -97,8 +90,6 @@ public abstract class Unit {
      * Reset on entering new turn
      */
     public void resetTurn() {
-        // movedThisTurn = false;
-        // attackedThisTurn = false;
         this.actionsThisTurn = 0;
 
         // State Pattern
@@ -108,29 +99,6 @@ public abstract class Unit {
 
     public void setState(UnitState newState) {
         this.currentState = newState;
-    }
-
-    /**
-     * Check if unit can move based on current state.
-     * Replaces: !movedThisTurn check
-     */
-//    public boolean canMove() {
-//        return currentState.canMove(this);
-//    }
-//
-//    /**
-//     * Check if unit can attack based on current state.
-//     * Replaces: !attackedThisTurn check
-//     */
-//    public boolean canAttack() {
-//        return currentState.canAttack(this);
-//    }
-
-    /**
-     * Check if unit can use abilities based on current state.
-     */
-    public boolean canUseAbility() {
-        return currentState.canUseAbility(this);
     }
 
     /**
@@ -172,30 +140,6 @@ public abstract class Unit {
     private void transitionToDead() {
         currentState = currentState.transitionToDead(this);
     }
-
-//    public void markMovedThisTurn() {
-//        movedThisTurn = true;
-//    }
-//
-//    public void markAttackedThisTurn() {
-//        attackedThisTurn = true;
-//    }
-//
-//    public void clearMovedThisTurn() {
-//        movedThisTurn = false;
-//    }
-//
-//    public void clearAttackedThisTurn() {
-//        attackedThisTurn = false;
-//    }
-//
-//    public boolean hasMovedThisTurn() {
-//        return movedThisTurn;
-//    }
-//
-//    public boolean hasAttackedThisTurn() {
-//        return attackedThisTurn;
-//    }
 
     public MovementStrategy getMovementStrategy() {
         if (movementStrategy == null) {

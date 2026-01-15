@@ -1,5 +1,6 @@
 package org.elementarclash.game.phase;
 
+import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.faction.Faction;
@@ -9,6 +10,7 @@ import org.elementarclash.game.command.ValidationResult;
  * Player turn phase: Commands are allowed.
  * Max 2 actions per unit (move + attack/ability).
  */
+@Getter
 public class PlayerTurnPhase implements GamePhaseState {
 
     private final Faction activeFaction;
@@ -68,11 +70,7 @@ public class PlayerTurnPhase implements GamePhaseState {
         return "PlayerTurn (" + activeFaction.name() + ")";
     }
 
-    public Faction getActiveFaction() {
-        return activeFaction;
-    }
-
-//    public void incrementActionCount() {
+    //    public void incrementActionCount() {
 //        actionsThisTurn++;
 //    }
 //

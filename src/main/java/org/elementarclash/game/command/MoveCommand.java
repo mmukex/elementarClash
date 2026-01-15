@@ -78,7 +78,6 @@ public class MoveCommand implements Command {
         this.previousPosition = actor.getPosition();
         game.moveUnitInternal(actor, targetPosition);
         actor.incrementActionsThisTurn();
-        // actor.markMovedThisTurn();
         actor.startMoving();
         this.wasExecuted = true;
     }

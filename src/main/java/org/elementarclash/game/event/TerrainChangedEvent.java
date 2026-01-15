@@ -1,8 +1,10 @@
 package org.elementarclash.game.event;
 
+import lombok.Getter;
 import org.elementarclash.battlefield.Terrain;
 import org.elementarclash.util.Position;
 
+@Getter
 public class TerrainChangedEvent extends GameEvent {
 
     private final Position position;
@@ -27,15 +29,4 @@ public class TerrainChangedEvent extends GameEvent {
                 oldTerrain.getGermanName() + " to " + newTerrain.getGermanName();
     }
 
-    public Position getPosition() {
-        return position;
-    }
-
-    public Terrain getOldTerrain() {
-        return oldTerrain;
-    }
-
-    public Terrain getNewTerrain() {
-        return newTerrain;
-    }
 }

@@ -1,8 +1,10 @@
 package org.elementarclash.game.event;
 
+import lombok.Getter;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
 
+@Getter
 public class UnitMovedEvent extends GameEvent {
 
     private final Unit unit;
@@ -26,15 +28,4 @@ public class UnitMovedEvent extends GameEvent {
         return unit.getName() + " moved from " + from + " to " + to;
     }
 
-    public Unit getUnit() {
-        return unit;
-    }
-
-    public Position getFrom() {
-        return from;
-    }
-
-    public Position getTo() {
-        return to;
-    }
 }

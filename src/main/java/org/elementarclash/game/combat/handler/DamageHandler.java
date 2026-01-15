@@ -41,9 +41,4 @@ public abstract class DamageHandler {
             next.handle(context);
         }
     }
-
-    /**
-     * Get handler name for logging/debugging.
-     */
-    public abstract String getHandlerName();
 }

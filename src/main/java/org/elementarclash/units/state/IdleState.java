@@ -19,20 +19,6 @@ public class IdleState implements UnitState {
     public boolean hasActionsLeft(Unit unit){
         return unit.getActionsThisTurn() < unit.getMaxActionsPerTurn();
     }
-//    @Override
-//    public boolean canMove(Unit unit) {
-//        return !unit.hasMovedThisTurn();
-//    }
-//
-//    @Override
-//    public boolean canAttack(Unit unit) {
-//        return !unit.hasAttackedThisTurn();
-//    }
-
-    @Override
-    public boolean canUseAbility(Unit unit) {
-        return true;
-    }
 
     @Override
     public UnitState transitionToMoving(Unit unit) {
