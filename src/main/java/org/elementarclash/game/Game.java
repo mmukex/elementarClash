@@ -58,8 +58,6 @@ public class Game {
     private GamePhaseState currentPhase;
     private final List<GameObserver> observers = new ArrayList<>();
 
-    // TODO: crstmkt - Observer Pattern - Add event system for game events
-
     Game(Battlefield battlefield) {
         this.battlefield = battlefield;
         this.units = new ArrayList<>();
@@ -103,7 +101,11 @@ public class Game {
         if (checkVictoryCondition()) {
             return; // Game is over
         }
+
+        // Notify: current factions turn is ending
         Faction endingFaction = activeFaction;
+        notifyObservers(new TurnEndedEvent(endingFaction));
+
         // PlayerTurn → EventPhase
         transitionToPhase(currentPhase.transitionToEventPhase(this));
 
@@ -111,7 +113,9 @@ public class Game {
         Faction nextFaction = getNextFaction();
         transitionToPhase(currentPhase.transitionToPlayerTurn(this, nextFaction));
         this.activeFaction = nextFaction;
-        notifyObservers(new TurnEndedEvent(endingFaction));
+
+        // notify new factions turn is starting
+        notifyObservers(new TurnStartedEvent(nextFaction));
     }
 
     /**
@@ -169,17 +173,10 @@ public class Game {
         TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
         TerrainEffectResult effect = unit.accept(visitor);
 
-        // TODO: crstmkt - Observer Pattern - Dispatch terrain change event
-        // Add: if (effect.terrainChange() != null) {
-        //          Terrain oldTerrain = terrain;
-        //          battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
-        //          eventDispatcher.dispatchEvent(new TerrainChangedEvent(unit.getPosition(), oldTerrain, effect.terrainChange()));
-        //      }
         // Listeners: TerrainVisualRenderer, UnitStatRecalculator
         if (effect.terrainChange() != null) {
             battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange(), this);
         }
-
         // Apply terrain bonus as Decorator
         // Remove old terrain bonus, add new one
         unit.removeDecoratorsOfType(TerrainBonus.class);
@@ -214,7 +211,6 @@ public class Game {
         removeUnit(unit);
         notifyObservers(new UnitDeathEvent(unit)); //Notify Observers before victory Check
         checkVictoryCondition();  // Check if game should end
-        // TODO: crstmkt - Observer Pattern - Dispatch unit death event here
     }
 
     public Unit getUnitAt(Position position) {
@@ -263,12 +259,6 @@ public class Game {
         this.activeFaction = faction;
     }
 
-//    public void startGame() {
-//        ensureActiveFactionIsSet();
-//        this.status = GameStatus.IN_PROGRESS;
-//        turnManager.startGame();
-//    }
-
     private void ensureActiveFactionIsSet() {
         if (activeFaction == null) {
             activeFaction = determineFirstFaction();
@@ -300,15 +290,12 @@ public class Game {
     }
 
     public void nextTurn() {
-        // TODO: crstmkt - Observer Pattern - Dispatch turn transition events
-        // Before faction change: eventDispatcher.dispatchEvent(new TurnEndingEvent(activeFaction));
-        // After faction change: eventDispatcher.dispatchEvent(new TurnStartingEvent(activeFaction));
-        // Listeners: UIRenderer (update faction display), UnitManager (reset flags), TerrainEffectApplier, AbilityCooldownReducer
         List<Faction> aliveFactions = getAliveFactions();
         resetCurrentFactionUnits();
         applyPerTurnTerrainEffects();
 
-        endTurn();
+        // Transition to next faction and notify
+        endTurn(); // <- dispatched TurnEndedEvent
     }
 
     private void applyPerTurnTerrainEffects() {

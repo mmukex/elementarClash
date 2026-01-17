@@ -8,6 +8,7 @@ import org.elementarclash.game.event.UnitDeathEvent;
 
 /**
  * Observes unit deaths to check victory conditions.
+ *  ToDo: Behalten oder weg? (weil Victory condition jetzt in Game.handleUnitDeath() geprüft wird. Siehe Zeile 24
  */
 public class VictoryConditionObserver implements GameObserver {
 

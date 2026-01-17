@@ -29,6 +29,11 @@ public class ConsoleUI {
         return scanner.nextLine().trim();
     }
 
+    public String promptViewLog(String prompt){
+        System.out.print(prompt);
+        return scanner.nextLine().trim();
+    }
+
     public void showError(String message) {
         System.out.println("Fehler: " + message);
     }

@@ -131,14 +131,6 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
                             }
                             sb.append("]");
                         }
-
-//                        if (unit.hasMovedThisTurn() || unit.hasAttackedThisTurn()) {
-//                            sb.append(" [");
-//                            if (unit.hasMovedThisTurn()) sb.append("Bewegt");
-//                            if (unit.hasMovedThisTurn() && unit.hasAttackedThisTurn()) sb.append(", ");
-//                            if (unit.hasAttackedThisTurn()) sb.append("Angegriffen");
-//                            sb.append("]");
-//                        }
                     } else {
                         sb.append(String.format("%s = %-20s (%s) | HP: %3d/%3d | Pos: %s",
                                 unit.getId(),
@@ -171,6 +163,8 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
             case UNIT_DIED -> handleUnitDeath((UnitDeathEvent) event);
             case TERRAIN_CHANGED -> handleTerrainChanged((TerrainChangedEvent) event);
             case TURN_ENDED -> handleTurnEnded((TurnEndedEvent) event);
+            case TURN_STARTED -> handleTurnStarted((TurnStartedEvent) event);
+            case GAME_STARTED -> handleGameStarted((GameStartedEvent) event);
             case GAME_OVER -> handleGameOver((GameOverEvent) event);
             default -> {}  // Ignore other events
         }
@@ -207,6 +201,16 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
         System.out.println("\n" + "=".repeat(50));
         System.out.println("  " + event.getFaction().name() + "'s turn ended");
         System.out.println("=".repeat(50) + "\n");
+    }
+
+    private void handleTurnStarted(TurnStartedEvent event) {
+        System.out.println("\n=== " + event.getFaction().name() + "'s turn Started");
+    }
+
+    private void handleGameStarted(GameStartedEvent event) {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("       🎮 GAME STARTED! 🎮");
+        System.out.println("=".repeat(60) + "\n");
     }
 
     private void handleGameOver(GameOverEvent event) {
