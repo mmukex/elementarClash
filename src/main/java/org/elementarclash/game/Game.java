@@ -18,7 +18,7 @@ import org.elementarclash.ui.ConsoleGameRenderer;
 import org.elementarclash.ui.GameRenderer;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.bonus.SynergyBonus;
-import org.elementarclash.units.bonus.TerrainBonus;
+import org.elementarclash.units.bonus.UnitDecorator;
 import org.elementarclash.util.Position;
 import org.elementarclash.game.event.*;
 
@@ -53,7 +53,7 @@ public class Game {
     private final List<Unit> units;
     private final Map<Position, Unit> positionToUnit;
     private final CommandExecutor commandExecutor;
-    private final TurnManager turnManager;
+    private final RoundManager roundManager;
     private Faction activeFaction;
     private GamePhaseState currentPhase;
     private final List<GameObserver> observers = new ArrayList<>();
@@ -65,7 +65,7 @@ public class Game {
         this.activeFaction = null;
         this.currentPhase = SetupPhase.getInstance();
         this.commandExecutor = new CommandExecutor();
-        this.turnManager = new TurnManager();
+        this.roundManager = new RoundManager();
     }
 
     private void transitionToPhase(GamePhaseState newPhase) {
@@ -83,10 +83,10 @@ public class Game {
         }
 
         Faction firstFaction = determineFirstFaction();
-        transitionToPhase(currentPhase.transitionToPlayerTurn(this, firstFaction));
+        this.roundManager.startGame();
         this.activeFaction = firstFaction;
-        this.turnManager.startGame();
         notifyObservers(new GameStartedEvent());
+        transitionToPhase(currentPhase.transitionToPlayerTurn(this, firstFaction));
     }
 
     /**
@@ -106,14 +106,26 @@ public class Game {
         Faction endingFaction = activeFaction;
         notifyObservers(new TurnEndedEvent(endingFaction));
 
+        // Tick Decorators
+        for (Unit unit : units) {
+            if (unit.isAlive()) {
+                for (UnitDecorator decorator : unit.getDecorators()) {
+                    decorator.tick();
+                }
+                unit.removeExpiredDecorators();
+            }
+        }
+
         // PlayerTurn → EventPhase
         transitionToPhase(currentPhase.transitionToEventPhase(this));
 
         // EventPhase → next PlayerTurn
         Faction nextFaction = getNextFaction();
-        transitionToPhase(currentPhase.transitionToPlayerTurn(this, nextFaction));
         this.activeFaction = nextFaction;
+        transitionToPhase(currentPhase.transitionToPlayerTurn(this, nextFaction));
 
+
+        if(isFirstFaction(nextFaction)){roundManager.incrementRound();}
         // notify new factions turn is starting
         notifyObservers(new TurnStartedEvent(nextFaction));
     }
@@ -177,12 +189,6 @@ public class Game {
         if (effect.terrainChange() != null) {
             battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange(), this);
         }
-        // Apply terrain bonus as Decorator
-        // Remove old terrain bonus, add new one
-        unit.removeDecoratorsOfType(TerrainBonus.class);
-        if (effect.attackBonus() != 0 || effect.defenseBonus() != 0) {
-            unit.addDecorator(new TerrainBonus(effect));
-        }
 
         // Recalculate synergy bonus (in case unit moved next to allies)
         unit.removeDecoratorsOfType(SynergyBonus.class);
@@ -223,12 +229,6 @@ public class Game {
                 .toList();
     }
 
-    public List<Unit> getEnemiesOf(Faction faction) {
-        return units.stream()
-                .filter(u -> u.getFaction() != faction)
-                .toList();
-    }
-
     public List<Unit> getUnitsAdjacentTo(Position position) {
         return Arrays.stream(position.getAdjacentPositions())
                 .filter(Objects::nonNull)
@@ -244,26 +244,21 @@ public class Game {
     }
 
     public boolean isValidMove(Unit unit, Position target) {
-        return unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, unit.getBaseStats().movement());
+        return unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, unit.getMovement());
     }
 
     public Terrain getTerrainAt(Position position) {
         return battlefield.getTerrainAt(position);
     }
 
-    public int getTurnNumber() {
-        return turnManager.getTurnNumber();
+    public int getRoundNumber() {
+        return roundManager.getRoundNumber();
     }
 
     void setInitialActiveFaction(Faction faction) {
         this.activeFaction = faction;
     }
 
-    private void ensureActiveFactionIsSet() {
-        if (activeFaction == null) {
-            activeFaction = determineFirstFaction();
-        }
-    }
 
     private Faction determineFirstFaction() {
         return units.stream()
@@ -287,6 +282,18 @@ public class Game {
         }
 
         return allFactions[0];
+    }
+
+    /**
+     * Checks if the given faction is the first in the current turn order.
+     * Used to determine when a round ends.
+     *
+     * @param faction Faction to check
+     * @return true if this is the first faction in turn order
+     */
+    private boolean isFirstFaction(Faction faction) {
+        List<Faction> aliveFactions = getAliveFactions();
+        return !aliveFactions.isEmpty() && aliveFactions.get(0).equals(faction);
     }
 
     public void nextTurn() {
@@ -320,6 +327,11 @@ public class Game {
         }
     }
 
+    /**
+     * Get list of all factions that have alive units, in consistent order.
+     *
+     * @return List of alive factions (ordered consistently)
+     */
     private List<Faction> getAliveFactions() {
         return units.stream()
                 .filter(Unit::isAlive)

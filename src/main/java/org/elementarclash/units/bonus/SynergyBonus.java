@@ -44,6 +44,11 @@ public class SynergyBonus extends UnitDecorator {
     }
 
     @Override
+    public int getMovementBonus(Unit unit) {
+        return 0;
+    }
+
+    @Override
     public boolean isExpired() {
         return false; // Recalculated dynamically
     }

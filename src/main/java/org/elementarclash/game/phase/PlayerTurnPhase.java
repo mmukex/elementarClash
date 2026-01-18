@@ -5,6 +5,7 @@ import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.units.Faction;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.units.bonus.BuffDebuffManager;
 
 /**
  * Player turn phase: Commands are allowed.
@@ -32,13 +33,14 @@ public class PlayerTurnPhase implements GamePhaseState {
         }
         return true;
 
-//
-//        // Check action limit (simplified - could be per-unit)
-//        return actionsThisTurn < MAX_ACTIONS_PER_UNIT;
     }
 
     @Override
     public void onEnter(Game game) {
+        // Apply random (De-)Buff as decorator by chance
+        BuffDebuffManager buffDebuffManager = new BuffDebuffManager();
+        buffDebuffManager.tryApplyRandomEffect(game, game.getRoundNumber());
+
         // Reset all units of active faction
         game.getUnitsOfFaction(activeFaction).forEach(unit -> {
             unit.resetTurn();
@@ -70,11 +72,4 @@ public class PlayerTurnPhase implements GamePhaseState {
         return "PlayerTurn (" + activeFaction.name() + ")";
     }
 
-    //    public void incrementActionCount() {
-//        actionsThisTurn++;
-//    }
-//
-//    public void decrementActionCount(){
-//        actionsThisTurn--;
-//    }
 }

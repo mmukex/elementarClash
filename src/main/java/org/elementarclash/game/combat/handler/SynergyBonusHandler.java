@@ -2,7 +2,6 @@ package org.elementarclash.game.combat.handler;
 
 import org.elementarclash.game.combat.DamageContext;
 import org.elementarclash.units.Faction;
-import org.elementarclash.units.bonus.TerrainBonus;
 import org.elementarclash.units.bonus.UnitDecorator;
 
 /**
@@ -22,7 +21,6 @@ public class SynergyBonusHandler extends DamageHandler {
         // Note: Terrain bonus is already added by TerrainEffectHandler
         // Only add non-terrain bonuses here (synergies, abilities)
         int synergyBonus = context.getAttacker().getDecorators().stream()
-                .filter(d -> !(d instanceof TerrainBonus))
                 .filter(d -> !d.isExpired())
                 .mapToInt(d -> d.getAttackBonus(context.getAttacker()))
                 .sum();

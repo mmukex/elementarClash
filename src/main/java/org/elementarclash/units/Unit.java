@@ -246,4 +246,18 @@ public abstract class Unit {
         }
         return defense;
     }
+
+    /**
+     * Get total movement including decorator bonuses (Slowed/Hastened).
+     * REPLACES: baseStats.movement()
+     */
+    public int getMovement() {
+        int movement = baseStats.movement();
+        for (UnitDecorator decorator : decorators) {
+            if (!decorator.isExpired()) {
+                movement += decorator.getMovementBonus(this);
+            }
+        }
+        return Math.max(1, movement); // Minimum 1 Movement
+    }
 }

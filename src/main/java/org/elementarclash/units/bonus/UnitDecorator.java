@@ -33,6 +33,12 @@ public abstract class UnitDecorator {
     public abstract int getDefenseBonus(Unit unit);
 
     /**
+     * Movement Bonus from this decorator
+     */
+    public abstract int getMovementBonus(Unit unit);
+
+
+    /**
      * Is this decorator expired? (for temporary buffs)
      */
     public abstract boolean isExpired();

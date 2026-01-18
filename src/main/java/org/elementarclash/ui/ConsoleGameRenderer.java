@@ -29,7 +29,7 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
 
     private void renderHeader(StringBuilder sb, Game game) {
         sb.append("################################################################################################").append(System.lineSeparator());
-        sb.append("               ELEMENTARCLASH - Runde ").append(game.getTurnNumber()).append(System.lineSeparator());
+        sb.append("               ELEMENTARCLASH - Runde ").append(game.getRoundNumber()).append(System.lineSeparator());
         sb.append("################################################################################################").append(System.lineSeparator()).append(System.lineSeparator());
 
         if (game.getActiveFaction() != null) {
