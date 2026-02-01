@@ -8,6 +8,8 @@ import org.elementarclash.units.bonus.UnitDecorator;
  * Apply synergy bonuses from adjacent units.
  *
  * Integration Point: Will use @crstmkt Decorator Pattern (Pattern #4)
+ *
+ * ToDo Crstmkt: in Readme ergänzen
  */
 public class SynergyBonusHandler extends DamageHandler {
 
@@ -26,25 +28,5 @@ public class SynergyBonusHandler extends DamageHandler {
 
         // Pass to next handler
         super.handle(context);
-    }
-
-    /**
-     * Temporary implementation until Decorator Pattern is done.
-     * README: "Benachbarte Feuer-Einheiten gewähren einander +1 Angriff"
-     */
-    private int calculateAdjacentBonus(DamageContext context) {
-        long adjacentAllies = context.getGame()
-                .getUnitsAdjacentTo(context.getAttacker().getPosition())
-                .stream()
-                .filter(u -> u.getFaction() == context.getAttacker().getFaction())
-                .filter(u -> u.isAlive())
-                .count();
-
-        // Fire faction: +1 attack per adjacent ally
-        if (context.getAttacker().getFaction() == Faction.FIRE) {
-            return (int) adjacentAllies;
-        }
-
-        return 0;
     }
 }

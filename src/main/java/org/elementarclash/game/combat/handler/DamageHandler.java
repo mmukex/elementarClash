@@ -4,13 +4,13 @@ import org.elementarclash.game.combat.DamageContext;
 
 /**
  * Chain of Responsibility Pattern (GoF #9)
- *
+ * <p>
  * Abstract handler for damage calculation pipeline.
  * Each handler adds its modifiers and passes to next handler.
- *
+ * <p>
  * Why Chain of Responsibility?
  * - Damage calculation involves multiple independent steps:
- *   Base Damage → Faction Advantage → Terrain → Synergies → Defense
+ * Base Damage → Faction Advantage → Terrain → Synergies → Defense
  * - Each step is isolated and testable
  * - Easy to add new modifiers (e.g., weather effects, artifacts)
  * - Clear separation of concerns
@@ -23,6 +23,7 @@ public abstract class DamageHandler {
 
     /**
      * Set next handler in chain.
+     *
      * @return next handler (for fluent chaining)
      */
     public DamageHandler setNext(DamageHandler next) {

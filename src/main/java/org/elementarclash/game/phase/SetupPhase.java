@@ -12,11 +12,12 @@ public class SetupPhase implements GamePhaseState {
 
     private static final SetupPhase INSTANCE = new SetupPhase();
 
+    private SetupPhase() {
+    }
+
     public static SetupPhase getInstance() {
         return INSTANCE;
     }
-
-    private SetupPhase() {}
 
     @Override
     public boolean canExecuteCommand(Game game, Command command) {

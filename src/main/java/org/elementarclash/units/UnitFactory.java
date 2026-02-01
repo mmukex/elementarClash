@@ -36,7 +36,7 @@ public abstract class UnitFactory {
             );
         }
 
-        String id = generateUnitId(type);
+        String id = generateUnitId();
         return createUnitInternal(id, type);
     }
 
@@ -53,7 +53,7 @@ public abstract class UnitFactory {
     /**
      * Generates a unique ID for units (e.g., "F1", "W2", "E3").
      */
-    private String generateUnitId(UnitType type) {
+    private String generateUnitId() {
         unitCounter++;
         return faction.name().substring(0, 1) + unitCounter;
     }

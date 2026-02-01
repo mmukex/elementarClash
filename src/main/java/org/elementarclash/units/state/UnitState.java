@@ -4,9 +4,9 @@ import org.elementarclash.units.Unit;
 
 /**
  * State Pattern (GoF #8) - Unit State Machine
- *
+ * <p>
  * Manages unit states: Idle, Moving, Attacking, Stunned, Dead
- *
+ * <p>
  * Why State Pattern?
  * - Units can only perform certain actions in certain states
  * - Clear state transitions prevent invalid actions
@@ -23,24 +23,28 @@ public interface UnitState {
 
     /**
      * Transition to Moving state.
+     *
      * @return new state or this if transition not allowed
      */
     UnitState transitionToMoving(Unit unit);
 
     /**
      * Transition to Attacking state.
+     *
      * @return new state or this if transition not allowed
      */
     UnitState transitionToAttacking(Unit unit);
 
     /**
      * Transition to Idle state (after action completed).
+     *
      * @return new state
      */
     UnitState transitionToIdle(Unit unit);
 
     /**
      * Transition to Stunned state (e.g., from Frost Mage ability).
+     *
      * @param rounds number of rounds stunned
      * @return StunnedState
      */
@@ -48,6 +52,7 @@ public interface UnitState {
 
     /**
      * Transition to Dead state.
+     *
      * @return DeadState
      */
     UnitState transitionToDead(Unit unit);

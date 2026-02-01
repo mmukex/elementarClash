@@ -8,7 +8,6 @@ import org.elementarclash.game.event.UnitAttackedEvent;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.state.DeadState;
 import org.elementarclash.units.state.StunnedState;
-import org.elementarclash.units.state.UnitState;
 
 /**
  * Command for attacking a target unit.
@@ -68,7 +67,7 @@ public class AttackCommand implements Command {
             );
         }
 
-        if (!actor.hasActionsLeft()) {
+        if (actor.hasNoActionsLeft()) {
             return ValidationResult.failure(
                     String.format("%s has already attacked this turn", actor.getName())
             );

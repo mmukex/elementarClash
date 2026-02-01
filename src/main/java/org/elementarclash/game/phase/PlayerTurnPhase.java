@@ -1,34 +1,24 @@
 package org.elementarclash.game.phase;
 
-import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
-import org.elementarclash.units.Faction;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.units.Faction;
+import org.elementarclash.units.Unit;
 import org.elementarclash.units.bonus.BuffDebuffManager;
 
 /**
  * Player turn phase: Commands are allowed.
  * Max 2 actions per unit (move + attack/ability).
  */
-@Getter
-public class PlayerTurnPhase implements GamePhaseState {
-
-    private final Faction activeFaction;
-
-    public PlayerTurnPhase(Faction faction) {
-        this.activeFaction = faction;
-    }
+public record PlayerTurnPhase(Faction activeFaction) implements GamePhaseState {
 
     @Override
     public boolean canExecuteCommand(Game game, Command command) {
 
         // Check if command actor belongs to active faction
         ValidationResult result = command.validate(game);
-        if (!result.isValid()) {
-            return false;
-        }
-        return true;
+        return result.isValid();
 
     }
 
@@ -39,9 +29,7 @@ public class PlayerTurnPhase implements GamePhaseState {
         buffDebuffManager.tryApplyRandomEffect(game, game.getRoundNumber());
 
         // Reset all units of active faction
-        game.getUnitsOfFaction(activeFaction).forEach(unit -> {
-            unit.resetTurn();
-        });
+        game.getUnitsOfFaction(activeFaction).forEach(Unit::resetTurn);
     }
 
     @Override

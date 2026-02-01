@@ -1,14 +1,13 @@
 package org.elementarclash.units.bonus;
 
-import org.elementarclash.units.Faction;
 import org.elementarclash.game.Game;
+import org.elementarclash.units.Faction;
 import org.elementarclash.units.Unit;
 
 /**
  * Synergy bonus from adjacent allied units.
- *
+ * <p>
  * Example (README): "Benachbarte Feuer-Einheiten gewähren einander +1 Angriff"
- * ToDO: Mechanismus ausdenken, damit alle Fraktionen unterschiedliche Synergien haben und das in der README ergänzen
  */
 public class SynergyBonus extends UnitDecorator {
 
@@ -27,7 +26,7 @@ public class SynergyBonus extends UnitDecorator {
             long adjacentAllies = game.getUnitsAdjacentTo(unit.getPosition())
                     .stream()
                     .filter(u -> u.getFaction() == faction)
-                    .filter(u -> u.isAlive())
+                    .filter(Unit::isAlive)
                     .count();
 
             return (int) adjacentAllies;

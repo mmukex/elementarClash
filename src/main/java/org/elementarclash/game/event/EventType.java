@@ -1,7 +1,5 @@
 package org.elementarclash.game.event;
 
-// ToDo: Ungenutze Events entweder implementieren  oder entfernen. Brauchen wir die ungenutzten Events noch?
-
 public enum EventType {
     // Unit events
     // UNIT_CREATED, Maybe future implementation

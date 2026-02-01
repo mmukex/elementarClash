@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
 import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
+import org.elementarclash.units.bonus.UnitDecorator;
 import org.elementarclash.units.state.IdleState;
 import org.elementarclash.units.state.UnitState;
 import org.elementarclash.units.strategy.attack.AttackStrategy;
@@ -11,7 +12,7 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
 import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
 import org.elementarclash.units.strategy.movement.MovementStrategy;
 import org.elementarclash.util.Position;
-import org.elementarclash.units.bonus.UnitDecorator;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,29 +24,24 @@ import java.util.List;
  * Design Pattern: Factory Method creates instances of Unit subclasses.
  */
 @Getter
+@Setter
 public abstract class Unit {
+    public static final int MAX_ACTIONS_PER_TURN = 2;
+
     private final String id;
     private final String name;
     private final Faction faction;
     private final UnitType type;
     private final UnitStats baseStats;
+    private final List<UnitDecorator> decorators;
 
+
+    private int actionsThisTurn;
     private int currentHealth;
-    @Setter
     private Position position;
-
-    @Setter
-    public int actionsThisTurn = 0;
-    public final int maxActionsPerTurn = 2;
-
-    @Setter
     private MovementStrategy movementStrategy;
     private AttackStrategy attackStrategy;
-
-    // TODO: crstmkt - Decorator Pattern - Add buff/debuff system here
-
     private UnitState currentState;
-    private final List<UnitDecorator> decorators = new ArrayList<>();
 
     protected Unit(String id, String name, Faction faction, UnitType type, UnitStats stats) {
         this.id = id;
@@ -53,6 +49,9 @@ public abstract class Unit {
         this.faction = faction;
         this.type = type;
         this.baseStats = stats;
+        this.decorators = new ArrayList<>();
+
+        this.actionsThisTurn = 0;
         this.currentHealth = stats.maxHealth();
         this.currentState = IdleState.getInstance();
     }
@@ -74,14 +73,14 @@ public abstract class Unit {
     }
 
     public void setCurrentHealth(int health) {
-        this.currentHealth = Math.max(0, Math.min(baseStats.maxHealth(), health));
+        this.currentHealth = Math.clamp(0, baseStats.maxHealth(), health);
     }
 
-    public void incrementActionsThisTurn(){
+    public void incrementActionsThisTurn() {
         this.actionsThisTurn++;
     }
 
-    public void decrementActionsThisTurn(){
+    public void decrementActionsThisTurn() {
         this.actionsThisTurn--;
     }
 
@@ -104,8 +103,8 @@ public abstract class Unit {
      *
      * Check if unit has actions left this turn.
      */
-    public boolean hasActionsLeft(){
-        return currentState.hasActionsLeft(this);
+    public boolean hasNoActionsLeft() {
+        return !currentState.hasActionsLeft(this);
     }
 
     /**
@@ -202,7 +201,7 @@ public abstract class Unit {
      * Remove all decorators of a specific class.
      */
     public void removeDecoratorsOfType(Class<? extends UnitDecorator> decoratorClass) {
-        decorators.removeIf(d -> decoratorClass.isInstance(d));
+        decorators.removeIf(decoratorClass::isInstance);
     }
 
     /**

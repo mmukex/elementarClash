@@ -1,13 +1,13 @@
 package org.elementarclash.game.combat.handler;
 
-import org.elementarclash.units.Faction;
 import org.elementarclash.game.combat.DamageContext;
+import org.elementarclash.units.Faction;
 
 import java.util.Map;
 
 /**
  * Apply faction advantage multipliers.
- *
+ * <p>
  * Faction Advantages (from README):
  * - Fire vs Earth: +25% damage
  * - Fire vs Water: -25% damage
@@ -17,6 +17,8 @@ import java.util.Map;
  * - Earth vs Air: -25% damage
  * - Air vs Earth: +25% damage
  * - Air vs Fire: -25% damage
+ * <p>
+ * ToDo Crstmkt: in Readme ergänzen
  */
 public class FactionAdvantageHandler extends DamageHandler {
 

@@ -57,7 +57,7 @@ public class MoveCommand implements Command {
             );
         }
 
-        if (!actor.hasActionsLeft()) {
+        if (actor.hasNoActionsLeft()) {
             return ValidationResult.failure(
                     String.format("%s has no more actions left", actor.getName())
             );

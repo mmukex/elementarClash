@@ -1,12 +1,12 @@
 package org.elementarclash.ui;
 
-import org.elementarclash.game.event.observer.EventLogObserver;
-import org.elementarclash.units.Faction;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.AttackCommand;
 import org.elementarclash.game.command.MoveCommand;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.game.event.observer.EventLogObserver;
 import org.elementarclash.game.phase.GameOverPhase;
+import org.elementarclash.units.Faction;
 
 /**
  * Controls the main game loop.
@@ -52,7 +52,7 @@ public class GameController {
     private void processTurn() {
         boolean turnEnded = false;
 
-          while (!turnEnded && !(game.getCurrentPhase() instanceof GameOverPhase)){
+        while (!turnEnded && !(game.getCurrentPhase() instanceof GameOverPhase)) {
             String action = ui.promptAction();
             turnEnded = handleAction(action);
         }

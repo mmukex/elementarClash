@@ -16,7 +16,7 @@ public class StunnedState implements UnitState {
         this.remainingRounds = rounds;
     }
 
-    public boolean hasActionsLeft(Unit unit){
+    public boolean hasActionsLeft(Unit unit) {
         // always false because stunned unit can not move or attack independently from actions left
         return false;
     }
@@ -54,9 +54,6 @@ public class StunnedState implements UnitState {
     @Override
     public void onTurnEnd(Unit unit) {
         remainingRounds--;
-        if (remainingRounds <= 0) {
-            // Transition to idle will happen on next action check
-        }
     }
 
     @Override

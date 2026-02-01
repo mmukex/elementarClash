@@ -17,7 +17,7 @@ public class MovingState implements UnitState {
     private MovingState() {}
 
     public boolean hasActionsLeft(Unit unit){
-        return unit.getActionsThisTurn() < unit.getMaxActionsPerTurn();
+        return unit.getActionsThisTurn() < Unit.MAX_ACTIONS_PER_TURN;
     }
 
     @Override

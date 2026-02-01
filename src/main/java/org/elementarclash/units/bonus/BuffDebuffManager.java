@@ -33,17 +33,18 @@ public class BuffDebuffManager {
 
     /**
      * Versucht, einen Buff/Debuff zu vergeben.
-     * @param game Spielinstanz
+     *
+     * @param game         Spielinstanz
      * @param currentRound aktuelle Rundennummer
      * @return true wenn Effekt vergeben wurde
      */
-    public boolean tryApplyRandomEffect(Game game, int currentRound) {
+    public void tryApplyRandomEffect(Game game, int currentRound) {
         // 1. Wahrscheinlichkeit berechnen
         double chance = calculateChance(currentRound);
 
         // 2. Würfeln
         if (RANDOM.nextDouble() > chance) {
-            return false; // Kein Effekt dieses Mal
+            return; // Kein Effekt dieses Mal
         }
 
         // 3. Zufällige lebende Unit der aktiven Fraktion wählen
@@ -53,7 +54,7 @@ public class BuffDebuffManager {
                 .toList();
 
         if (eligibleUnits.isEmpty()) {
-            return false; // Keine gültigen Targets
+            return; // Keine gültigen Targets
         }
 
         Unit target = eligibleUnits.get(RANDOM.nextInt(eligibleUnits.size()));
@@ -71,8 +72,6 @@ public class BuffDebuffManager {
         String effectType = isBuff ? "BUFF" : "DEBUFF";
         System.out.println("[Event] " + effectType + " applied: " +
                 target.getName() + " received " + decorator.getDescription());
-
-        return true;
     }
 
     /**
@@ -80,7 +79,7 @@ public class BuffDebuffManager {
      * Formel: BASE_CHANCE + ((currentRound-1) * INCREASE_PER_ROUND), capped bei MAX_CHANCE
      */
     private double calculateChance(int currentRound) {
-        double chance = BASE_CHANCE + ((currentRound-1) * INCREASE_PER_ROUND);
+        double chance = BASE_CHANCE + ((currentRound - 1) * INCREASE_PER_ROUND);
         return Math.min(chance, MAX_CHANCE);
     }
 }

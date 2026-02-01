@@ -19,7 +19,8 @@ public class DamageContext {
     private final Unit attacker;
     private final Unit target;
     private final Game game;
-
+    // Logging/debugging
+    private final List<String> calculationSteps = new ArrayList<>();
     // Damage calculation stages
     private int baseDamage = 0;
     private double factionMultiplier = 1.0;
@@ -28,9 +29,6 @@ public class DamageContext {
     private int synergyBonus = 0;
     private int totalDefense = 0;
     private int finalDamage = 0;
-
-    // Logging/debugging
-    private final List<String> calculationSteps = new ArrayList<>();
 
     public DamageContext(Unit attacker, Unit target, Game game) {
         this.attacker = attacker;

@@ -1,7 +1,5 @@
 package org.elementarclash.game.combat;
 
-import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
-
 import java.util.List;
 
 /**

@@ -29,7 +29,7 @@ public class ConsoleUI {
         return scanner.nextLine().trim();
     }
 
-    public String promptViewLog(String prompt){
+    public String promptViewLog(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine().trim();
     }

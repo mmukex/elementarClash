@@ -1,12 +1,19 @@
 package org.elementarclash.game;
 
+import lombok.Getter;
+
 /**
  * Manages turn and round counting for the game.
  */
+@Getter
 public class RoundManager {
     private static final int INITIAL_ROUND = 0;
     private static final int STARTING_ROUND = 1;
 
+    /**
+     * -- GETTER --
+     * Returns the current turn number.
+     */
     private int roundNumber;
 
     public RoundManager() {
@@ -27,10 +34,4 @@ public class RoundManager {
         this.roundNumber++;
     }
 
-    /**
-     * Returns the current turn number.
-     */
-    public int getRoundNumber() {
-        return roundNumber;
-    }
 }

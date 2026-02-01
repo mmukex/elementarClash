@@ -7,9 +7,9 @@ import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
 import org.elementarclash.battlefield.terraineffect.TerrainVisitorFactory;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.combat.DamageResult;
+import org.elementarclash.game.event.*;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
-import org.elementarclash.game.event.*;
 
 /**
  * Renders game state as ASCII text for console output.
@@ -166,7 +166,8 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
             case TURN_STARTED -> handleTurnStarted((TurnStartedEvent) event);
             case GAME_STARTED -> handleGameStarted((GameStartedEvent) event);
             case GAME_OVER -> handleGameOver((GameOverEvent) event);
-            default -> {}  // Ignore other events
+            default -> {
+            }  // Ignore other events
         }
     }
 

@@ -47,8 +47,6 @@ import java.util.stream.Collectors;
 @Getter
 public class Game {
 
-    private static final int SINGLE_FACTION_REMAINING = 1;
-
     private final Battlefield battlefield;
     private final List<Unit> units;
     private final Map<Position, Unit> positionToUnit;
@@ -93,7 +91,7 @@ public class Game {
      * End current player's turn (PlayerTurn → EventPhase → next PlayerTurn).
      */
     public void endTurn() {
-        if (!(currentPhase instanceof PlayerTurnPhase playerTurn)) {
+        if (!(currentPhase instanceof PlayerTurnPhase)) {
             throw new IllegalStateException("Can only end turn during PlayerTurn phase");
         }
 
@@ -297,7 +295,6 @@ public class Game {
     }
 
     public void nextTurn() {
-        List<Faction> aliveFactions = getAliveFactions();
         resetCurrentFactionUnits();
         applyPerTurnTerrainEffects();
 

@@ -2,9 +2,9 @@ package org.elementarclash.game.event;
 
 /**
  * Observer Pattern (GoF #9)
- *
+ * <p>
  * Observer for game events (unit movement, attacks, deaths, terrain changes).
- *
+ * <p>
  * Why Observer Pattern?
  * - Decouples game logic from UI updates
  * - Multiple observers can listen to same events (UI + logger + AI)
