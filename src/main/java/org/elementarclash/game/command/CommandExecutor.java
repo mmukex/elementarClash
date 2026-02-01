@@ -67,12 +67,4 @@ public class CommandExecutor {
     public void clearHistory() {
         history.clear();
     }
-
-    public boolean canUndo() {
-        return history.canUndo();
-    }
-
-    public boolean canRedo() {
-        return history.canRedo();
-    }
 }

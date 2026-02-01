@@ -1,11 +1,12 @@
 package org.elementarclash.ui;
 
-import org.elementarclash.faction.Faction;
 import org.elementarclash.game.Game;
-import org.elementarclash.game.Game.GameStatus;
 import org.elementarclash.game.command.AttackCommand;
 import org.elementarclash.game.command.MoveCommand;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.game.event.observer.EventLogObserver;
+import org.elementarclash.game.phase.GameOverPhase;
+import org.elementarclash.units.Faction;
 
 /**
  * Controls the main game loop.
@@ -16,20 +17,24 @@ public class GameController {
     private final ConsoleUI ui;
     private final CommandParser parser;
     private final GameRenderer renderer;
+    private final EventLogObserver eventLog;
 
     public GameController(Game game) {
         this.game = game;
         this.ui = new ConsoleUI();
         this.parser = new CommandParser(ui);
         this.renderer = new ConsoleGameRenderer();
+        this.eventLog = new EventLogObserver();
 
-        // TODO: crstmkt - Observer Pattern - Register renderer as event listener
+        // register Observers
+        game.addObserver((ConsoleGameRenderer) renderer);
+        game.addObserver(eventLog);
     }
 
     public void start() {
         game.startGame();
 
-        while (game.getStatus() == GameStatus.IN_PROGRESS) {
+        while (!(game.getCurrentPhase() instanceof GameOverPhase)) {
             displayGameState();
             processTurn();
         }
@@ -47,7 +52,7 @@ public class GameController {
     private void processTurn() {
         boolean turnEnded = false;
 
-        while (!turnEnded && game.getStatus() == GameStatus.IN_PROGRESS) {
+        while (!turnEnded && !(game.getCurrentPhase() instanceof GameOverPhase)) {
             String action = ui.promptAction();
             turnEnded = handleAction(action);
         }
@@ -136,6 +141,10 @@ public class GameController {
             ui.display(System.lineSeparator() + winner + " hat gewonnen!");
         } else {
             ui.display(System.lineSeparator() + "Unentschieden!");
+        }
+
+        if (ui.promptViewLog("\nEvent-Log anzeigen? (j/n): ").equalsIgnoreCase("j")) {
+            eventLog.printLog();
         }
     }
 }

@@ -61,12 +61,4 @@ public class CommandHistory {
         executedCommands.clear();
         undoneCommands.clear();
     }
-
-    public boolean canUndo() {
-        return !executedCommands.isEmpty();
-    }
-
-    public boolean canRedo() {
-        return !undoneCommands.isEmpty();
-    }
 }

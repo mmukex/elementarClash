@@ -1,5 +1,6 @@
 package org.elementarclash.battlefield;
 
+import org.elementarclash.game.Game;
 import org.elementarclash.util.Position;
 
 import java.util.*;
@@ -95,12 +96,50 @@ public class Battlefield implements BattlefieldComponent {
         return getCell(position.x(), position.y()).getTerrain();
     }
 
-    public void setTerrainAt(Position position, Terrain terrain) {
-        getCell(position.x(), position.y()).setTerrain(terrain);
+    /**
+     * Set terrain at position and notify game (for Observer Pattern).
+     *
+     * @author @crstmkt (Observer integration)
+     */
+    public void setTerrainAt(Position position, Terrain newTerrain, Game game) {
+        Cell cell = getCell(position.x(), position.y());
+        Terrain oldTerrain = cell.getTerrain();
+
+        cell.setTerrain(newTerrain);
+
+        if (game != null && oldTerrain != newTerrain) {
+            game.notifyTerrainChanged(position, oldTerrain, newTerrain);
+        }
     }
 
     public Cell getCell(int x, int y) {
         return rows.get(y).getCell(x);
+    }
+
+    public Region getRegion(int x1, int y1, int x2, int y2) {
+        List<Cell> regionCells = new ArrayList<>();
+        for (int y = y1; y <= y2; y++) {
+            for (int x = x1; x <= x2; x++) {
+                if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE) {
+                    regionCells.add(getCell(x, y));
+                }
+            }
+        }
+        return new Region(regionCells);
+    }
+
+    /**
+     * Get a random region for dynamic events.
+     * Used by EventPhase for forest fires, geysers, etc.
+     *
+     * @author @crstmkt (integration helper for State Pattern)
+     */
+    public Region getRandomRegion() {
+        if (rows.isEmpty()) {
+            throw new IllegalStateException("No regions in battlefield");
+        }
+        int randomIndex = new Random().nextInt(rows.size());
+        return rows.get(randomIndex);
     }
 
     @Override

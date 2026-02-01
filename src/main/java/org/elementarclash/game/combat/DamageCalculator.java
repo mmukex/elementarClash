@@ -1,53 +1,48 @@
 package org.elementarclash.game.combat;
 
-import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
-import org.elementarclash.battlefield.visitor.TerrainVisitor;
-import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
 import org.elementarclash.game.Game;
+import org.elementarclash.game.combat.handler.*;
 import org.elementarclash.units.Unit;
 
 /**
- * Calculates combat damage considering base attack, terrain effects, and defense.
- * Uses Strategy Pattern (attack calculation) and Visitor Pattern (terrain effects).
+ * Calculates combat damage using Chain of Responsibility Pattern.
+ * <p>
+ * Chain: Base → Faction → Terrain → Synergy → Defense
+ * <p>
+ * Integration Points:
+ * - @mmukex Strategy Pattern: BaseDamageHandler uses AttackStrategy
+ * - @mmukex Visitor Pattern: TerrainEffectHandler uses TerrainVisitorFactory
+ * - @crstmkt Decorator Pattern: SynergyBonusHandler uses Unit decorators (Week 4)
  *
- * TODO: crstmkt - Chain of Responsibility - Refactor to use damage modifier chain
+ * @author @crstmkt (refactored for Chain of Responsibility)
  */
 public class DamageCalculator {
 
-    /**
-     * Calculates total damage from attacker to target including all modifiers.
-     *
-     * @param attacker attacking unit
-     * @param target defending unit
-     * @param game game state for terrain lookup
-     * @return damage calculation result with breakdown
-     */
-    public DamageResult calculateDamage(Unit attacker, Unit target, Game game) {
-        // TODO: crstmkt - Decorator Pattern
-        int baseDamage = attacker.getAttackStrategy().calculateBaseDamage(attacker, target);
+    private final DamageHandler handlerChain;
 
-        TerrainEffectResult attackerEffect = getTerrainEffect(attacker, game);
-        TerrainEffectResult defenderEffect = getTerrainEffect(target, game);
-
-        int attackBonus = attackerEffect.attackBonus();
-        int defenseBonus = defenderEffect.defenseBonus();
-
-        int totalAttack = baseDamage + attackBonus;
-        int totalDefense = target.getBaseStats().defense() + defenseBonus;
-        int totalDamage = Math.max(1, totalAttack - totalDefense);
-
-        return new DamageResult(
-            totalDamage,
-            baseDamage,
-            attackerEffect,
-            defenderEffect
-        );
+    public DamageCalculator() {
+        // Build the chain (order matters!)
+        this.handlerChain = new BaseDamageHandler();
+        handlerChain
+                .setNext(new FactionAdvantageHandler())
+                .setNext(new TerrainEffectHandler())      // Integration with @mmukex Visitor!
+                .setNext(new SynergyBonusHandler())       // Integration with @crstmkt Decorator
+                .setNext(new DefenseCalculationHandler());
     }
 
-    private TerrainEffectResult getTerrainEffect(Unit unit, Game game) {
-        Terrain terrain = game.getTerrainAt(unit.getPosition());
-        TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
-        return unit.accept(visitor);
+    /**
+     * Calculate damage from attacker to target.
+     *
+     * @param attacker attacking unit
+     * @param target   defending unit
+     * @param game     game state (for terrain lookup, adjacent units)
+     * @return detailed damage result
+     */
+    public DamageResult calculateDamage(Unit attacker, Unit target, Game game) {
+        DamageContext context = new DamageContext(attacker, target, game);
+
+        handlerChain.handle(context);
+
+        return context.toResult();
     }
 }

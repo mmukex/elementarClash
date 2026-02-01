@@ -2,17 +2,19 @@ package org.elementarclash.ui;
 
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
-import org.elementarclash.battlefield.visitor.TerrainVisitor;
-import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
+import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitorFactory;
 import org.elementarclash.game.Game;
+import org.elementarclash.game.combat.DamageResult;
+import org.elementarclash.game.event.*;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
 
 /**
  * Renders game state as ASCII text for console output.
  */
-public class ConsoleGameRenderer implements GameRenderer {
+public class ConsoleGameRenderer implements GameRenderer, GameObserver {
 
     @Override
     public String render(Game game) {
@@ -27,14 +29,14 @@ public class ConsoleGameRenderer implements GameRenderer {
 
     private void renderHeader(StringBuilder sb, Game game) {
         sb.append("################################################################################################").append(System.lineSeparator());
-        sb.append("               ELEMENTARCLASH - Runde ").append(game.getTurnNumber()).append(System.lineSeparator());
+        sb.append("               ELEMENTARCLASH - Runde ").append(game.getRoundNumber()).append(System.lineSeparator());
         sb.append("################################################################################################").append(System.lineSeparator()).append(System.lineSeparator());
 
         if (game.getActiveFaction() != null) {
             sb.append("Aktive Fraktion: ").append(game.getActiveFaction().getGermanName()).append(System.lineSeparator());
         }
 
-        sb.append("Status: ").append(game.getStatus()).append(System.lineSeparator()).append(System.lineSeparator());
+        sb.append("Status: ").append(game.getCurrentPhase().getPhaseName()).append(System.lineSeparator()).append(System.lineSeparator());
     }
 
     private void renderGrid(StringBuilder sb, Game game) {
@@ -129,14 +131,6 @@ public class ConsoleGameRenderer implements GameRenderer {
                             }
                             sb.append("]");
                         }
-
-                        if (unit.hasMovedThisTurn() || unit.hasAttackedThisTurn()) {
-                            sb.append(" [");
-                            if (unit.hasMovedThisTurn()) sb.append("Bewegt");
-                            if (unit.hasMovedThisTurn() && unit.hasAttackedThisTurn()) sb.append(", ");
-                            if (unit.hasAttackedThisTurn()) sb.append("Angegriffen");
-                            sb.append("]");
-                        }
                     } else {
                         sb.append(String.format("%s = %-20s (%s) | HP: %3d/%3d | Pos: %s",
                                 unit.getId(),
@@ -158,5 +152,71 @@ public class ConsoleGameRenderer implements GameRenderer {
         long livingUnits = game.getUnits().stream().filter(Unit::isAlive).count();
         sb.append("Lebende Einheiten: ").append(livingUnits)
                 .append("/").append(game.getUnits().size()).append(System.lineSeparator());
+    }
+
+    // ===== OBSERVER PATTERN =====
+    @Override
+    public void onEvent(GameEvent event) {
+        switch (event.getEventType()) {
+            case UNIT_MOVED -> handleUnitMoved((UnitMovedEvent) event);
+            case UNIT_ATTACKED -> handleUnitAttacked((UnitAttackedEvent) event);
+            case UNIT_DIED -> handleUnitDeath((UnitDeathEvent) event);
+            case TERRAIN_CHANGED -> handleTerrainChanged((TerrainChangedEvent) event);
+            case TURN_ENDED -> handleTurnEnded((TurnEndedEvent) event);
+            case TURN_STARTED -> handleTurnStarted((TurnStartedEvent) event);
+            case GAME_STARTED -> handleGameStarted((GameStartedEvent) event);
+            case GAME_OVER -> handleGameOver((GameOverEvent) event);
+            default -> {
+            }  // Ignore other events
+        }
+    }
+
+    private void handleUnitMoved(UnitMovedEvent event) {
+        System.out.println("[Move] " + event.getDescription());
+        // Optional: partial re-render (only affected cells)
+    }
+
+    private void handleUnitAttacked(UnitAttackedEvent event) {
+        System.out.println("[Attack] " + event.getDescription());
+
+        // Show damage breakdown (from Chain of Responsibility)
+        DamageResult result = event.getDamageResult();
+        System.out.println("  Base: " + result.baseDamage() +
+                ", Faction: ×" + result.factionMultiplier() +
+                ", Terrain: +" + result.terrainAttackBonus() +
+                ", Synergy: +" + result.synergyBonus() +
+                ", Defense: -" + result.totalDefense() +
+                " = " + result.totalDamage() + " total");
+    }
+
+    private void handleUnitDeath(UnitDeathEvent event) {
+        System.out.println("[Death] " + event.getDescription());
+        System.out.println("  💀 " + event.getUnit().getName() + " has fallen!");
+    }
+
+    private void handleTerrainChanged(TerrainChangedEvent event) {
+        System.out.println("[Terrain] " + event.getDescription());
+    }
+
+    private void handleTurnEnded(TurnEndedEvent event) {
+        System.out.println("\n" + "=".repeat(50));
+        System.out.println("  " + event.getFaction().name() + "'s turn ended");
+        System.out.println("=".repeat(50) + "\n");
+    }
+
+    private void handleTurnStarted(TurnStartedEvent event) {
+        System.out.println("\n=== " + event.getFaction().name() + "'s turn Started");
+    }
+
+    private void handleGameStarted(GameStartedEvent event) {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("       🎮 GAME STARTED! 🎮");
+        System.out.println("=".repeat(60) + "\n");
+    }
+
+    private void handleGameOver(GameOverEvent event) {
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("       🏆 GAME OVER - " + event.getWinner().name() + " WINS! 🏆");
+        System.out.println("=".repeat(60) + "\n");
     }
 }

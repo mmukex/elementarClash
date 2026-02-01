@@ -1,0 +1,64 @@
+package org.elementarclash.units.state;
+
+import lombok.Getter;
+import org.elementarclash.units.Unit;
+
+/**
+ * Unit is stunned (e.g., by Frost Mage ability).
+ * Cannot perform any actions for a number of rounds.
+ */
+@Getter
+public class StunnedState implements UnitState {
+
+    private int remainingRounds;
+
+    public StunnedState(int rounds) {
+        this.remainingRounds = rounds;
+    }
+
+    public boolean hasActionsLeft(Unit unit) {
+        // always false because stunned unit can not move or attack independently from actions left
+        return false;
+    }
+
+    @Override
+    public UnitState transitionToMoving(Unit unit) {
+        return this; // Cannot move while stunned
+    }
+
+    @Override
+    public UnitState transitionToAttacking(Unit unit) {
+        return this; // Cannot attack while stunned
+    }
+
+    @Override
+    public UnitState transitionToIdle(Unit unit) {
+        if (remainingRounds <= 0) {
+            return IdleState.getInstance();
+        }
+        return this;
+    }
+
+    @Override
+    public UnitState transitionToStunned(Unit unit, int rounds) {
+        // Extend stun duration (doesn't stack, takes max)
+        this.remainingRounds = Math.max(this.remainingRounds, rounds);
+        return this;
+    }
+
+    @Override
+    public UnitState transitionToDead(Unit unit) {
+        return DeadState.getInstance();
+    }
+
+    @Override
+    public void onTurnEnd(Unit unit) {
+        remainingRounds--;
+    }
+
+    @Override
+    public String getStateName() {
+        return "Stunned (" + remainingRounds + " rounds)";
+    }
+
+}

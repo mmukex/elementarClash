@@ -31,4 +31,26 @@ public interface BattlefieldComponent {
     default Cell getCell(int index) {
         return cells().get(index);
     }
+
+    /**
+     * Applies an effect to all cells in this component.
+     * Used for area-of-effect operations like forest fires, earthquakes, geysers.
+     * <p>
+     * Integration: Enables dynamic events (Observer Pattern #7 @crstmkt).
+     * Events can apply effects to arbitrary regions using this method.
+     * <p>
+     * Example:
+     * <pre>
+     * region.applyEffect(cell -> {
+     *     if (cell.getTerrain() == Terrain.FOREST) {
+     *         cell.setTerrain(Terrain.LAVA);
+     *     }
+     * });
+     * </pre>
+     *
+     * @param effect consumer that modifies each cell
+     */
+    default void applyEffect(Consumer<Cell> effect) {
+        cells().forEach(effect);
+    }
 }

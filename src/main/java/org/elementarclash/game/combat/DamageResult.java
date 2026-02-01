@@ -1,18 +1,20 @@
 package org.elementarclash.game.combat;
 
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
+import java.util.List;
 
 /**
- * Result of damage calculation with breakdown for debugging and UI display.
+ * Result of damage calculation with detailed breakdown.
  *
- * @param totalDamage final damage after all modifiers (minimum 1)
- * @param baseDamage base damage from attacker's attack strategy
- * @param attackerEffect terrain effects on attacker
- * @param defenderEffect terrain effects on defender
+ * @author @crstmkt (extended for Chain of Responsibility)
  */
 public record DamageResult(
-    int totalDamage,
-    int baseDamage,
-    TerrainEffectResult attackerEffect,
-    TerrainEffectResult defenderEffect
-) {}
+        int totalDamage,
+        int baseDamage,
+        double factionMultiplier,
+        int terrainAttackBonus,
+        int terrainDefenseBonus,
+        int synergyBonus,
+        int totalDefense,
+        List<String> calculationSteps
+) {
+}

@@ -3,6 +3,8 @@ package org.elementarclash.game.command;
 import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.units.Unit;
+import org.elementarclash.units.state.DeadState;
+import org.elementarclash.units.state.StunnedState;
 import org.elementarclash.util.Position;
 
 /**
@@ -49,11 +51,18 @@ public class MoveCommand implements Command {
             return actorCheck;
         }
 
-        if (actor.hasMovedThisTurn()) {
+        if (actor.getCurrentState() instanceof StunnedState || actor.getCurrentState() instanceof DeadState) {
             return ValidationResult.failure(
-                    String.format("%s has already moved this turn", actor.getName())
+                    actor.getName() + " cannot move (State: " + actor.getCurrentState().getStateName() + ")"
             );
         }
+
+        if (actor.hasNoActionsLeft()) {
+            return ValidationResult.failure(
+                    String.format("%s has no more actions left", actor.getName())
+            );
+        }
+
 
         if (!game.isValidMove(actor, targetPosition)) {
             return ValidationResult.failure(
@@ -68,7 +77,8 @@ public class MoveCommand implements Command {
     public void execute(Game game) {
         this.previousPosition = actor.getPosition();
         game.moveUnitInternal(actor, targetPosition);
-        actor.markMovedThisTurn();
+        actor.incrementActionsThisTurn();
+        actor.startMoving();
         this.wasExecuted = true;
     }
 
@@ -79,7 +89,7 @@ public class MoveCommand implements Command {
         }
 
         game.moveUnitInternal(actor, previousPosition);
-        actor.clearMovedThisTurn();
+        actor.decrementActionsThisTurn();
     }
 
     @Override

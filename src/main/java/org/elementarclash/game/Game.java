@@ -3,19 +3,27 @@ package org.elementarclash.game;
 import lombok.Getter;
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.battlefield.visitor.TerrainEffectResult;
-import org.elementarclash.battlefield.visitor.TerrainVisitor;
-import org.elementarclash.battlefield.visitor.TerrainVisitorFactory;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.battlefield.terraineffect.TerrainEffectResult;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitor;
+import org.elementarclash.battlefield.terraineffect.TerrainVisitorFactory;
+import org.elementarclash.units.Faction;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.game.command.CommandExecutor;
 import org.elementarclash.game.command.ValidationResult;
+import org.elementarclash.game.phase.GameOverPhase;
+import org.elementarclash.game.phase.GamePhaseState;
+import org.elementarclash.game.phase.SetupPhase;
+import org.elementarclash.game.phase.PlayerTurnPhase;
 import org.elementarclash.ui.ConsoleGameRenderer;
 import org.elementarclash.ui.GameRenderer;
 import org.elementarclash.units.Unit;
+import org.elementarclash.units.bonus.SynergyBonus;
+import org.elementarclash.units.bonus.UnitDecorator;
 import org.elementarclash.util.Position;
+import org.elementarclash.game.event.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Central game manager for ElementarClash.
@@ -39,26 +47,102 @@ import java.util.*;
 @Getter
 public class Game {
 
-    private static final int SINGLE_FACTION_REMAINING = 1;
-
     private final Battlefield battlefield;
     private final List<Unit> units;
     private final Map<Position, Unit> positionToUnit;
     private final CommandExecutor commandExecutor;
-    private final TurnManager turnManager;
+    private final RoundManager roundManager;
     private Faction activeFaction;
-    private GameStatus status;
-
-    // TODO: crstmkt - Observer Pattern - Add event system for game events
+    private GamePhaseState currentPhase;
+    private final List<GameObserver> observers = new ArrayList<>();
 
     Game(Battlefield battlefield) {
         this.battlefield = battlefield;
         this.units = new ArrayList<>();
         this.positionToUnit = new HashMap<>();
         this.activeFaction = null;
-        this.status = GameStatus.SETUP;
+        this.currentPhase = SetupPhase.getInstance();
         this.commandExecutor = new CommandExecutor();
-        this.turnManager = new TurnManager();
+        this.roundManager = new RoundManager();
+    }
+
+    private void transitionToPhase(GamePhaseState newPhase) {
+        currentPhase.onExit(this);
+        this.currentPhase = newPhase;
+        newPhase.onEnter(this);
+    }
+
+    /**
+     * Start the game (Setup → PlayerTurn).
+     */
+    public void startGame() {
+        if (!(currentPhase instanceof SetupPhase)) {
+            throw new IllegalStateException("Can only start game from Setup phase");
+        }
+
+        Faction firstFaction = determineFirstFaction();
+        this.roundManager.startGame();
+        this.activeFaction = firstFaction;
+        notifyObservers(new GameStartedEvent());
+        transitionToPhase(currentPhase.transitionToPlayerTurn(this, firstFaction));
+    }
+
+    /**
+     * End current player's turn (PlayerTurn → EventPhase → next PlayerTurn).
+     */
+    public void endTurn() {
+        if (!(currentPhase instanceof PlayerTurnPhase)) {
+            throw new IllegalStateException("Can only end turn during PlayerTurn phase");
+        }
+
+        // Check victory condition
+        if (checkVictoryCondition()) {
+            return; // Game is over
+        }
+
+        // Notify: current factions turn is ending
+        Faction endingFaction = activeFaction;
+        notifyObservers(new TurnEndedEvent(endingFaction));
+
+        // Tick Decorators
+        for (Unit unit : units) {
+            if (unit.isAlive()) {
+                for (UnitDecorator decorator : unit.getDecorators()) {
+                    decorator.tick();
+                }
+                unit.removeExpiredDecorators();
+            }
+        }
+
+        // PlayerTurn → EventPhase
+        transitionToPhase(currentPhase.transitionToEventPhase(this));
+
+        // EventPhase → next PlayerTurn
+        Faction nextFaction = getNextFaction();
+        this.activeFaction = nextFaction;
+        transitionToPhase(currentPhase.transitionToPlayerTurn(this, nextFaction));
+
+
+        if(isFirstFaction(nextFaction)){roundManager.incrementRound();}
+        // notify new factions turn is starting
+        notifyObservers(new TurnStartedEvent(nextFaction));
+    }
+
+    /**
+     * Check victory condition and transition to GameOver if met.
+     */
+    private boolean checkVictoryCondition() {
+        Map<Faction, Long> aliveCounts = units.stream()
+                .filter(Unit::isAlive)
+                .collect(Collectors.groupingBy(Unit::getFaction, Collectors.counting()));
+
+        if (aliveCounts.size() == 1) {
+            Faction winner = aliveCounts.keySet().iterator().next();
+            transitionToPhase(currentPhase.transitionToGameOver(this, winner));
+            notifyObservers(new GameOverEvent(winner));
+            return true;
+        }
+        return false;
     }
 
     public boolean isPositionOccupied(Position position) {
@@ -84,12 +168,14 @@ public class Game {
         if (!units.contains(unit) || isPositionOccupied(newPosition)) {
             return;
         }
+        Position oldPosition = unit.getPosition();
 
         positionToUnit.remove(unit.getPosition());
         positionToUnit.put(newPosition, unit);
         unit.setPosition(newPosition);
 
         applyTerrainTransformation(unit);
+        notifyObservers(new UnitMovedEvent(unit, oldPosition, newPosition));
     }
 
     private void applyTerrainTransformation(Unit unit) {
@@ -97,19 +183,23 @@ public class Game {
         TerrainVisitor visitor = TerrainVisitorFactory.getVisitor(terrain);
         TerrainEffectResult effect = unit.accept(visitor);
 
-        // TODO: crstmkt - Observer Pattern - Dispatch terrain change event
-        // Add: if (effect.terrainChange() != null) {
-        //          Terrain oldTerrain = terrain;
-        //          battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
-        //          eventDispatcher.dispatchEvent(new TerrainChangedEvent(unit.getPosition(), oldTerrain, effect.terrainChange()));
-        //      }
         // Listeners: TerrainVisualRenderer, UnitStatRecalculator
         if (effect.terrainChange() != null) {
-            battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange());
+            battlefield.setTerrainAt(unit.getPosition(), effect.terrainChange(), this);
         }
+
+        // Recalculate synergy bonus (in case unit moved next to allies)
+        unit.removeDecoratorsOfType(SynergyBonus.class);
+        unit.addDecorator(new SynergyBonus(this, unit.getFaction()));
     }
 
     public ValidationResult executeCommand(Command command) {
+        if (!currentPhase.canExecuteCommand(this, command)) {
+            return ValidationResult.failure(
+                    "Command not allowed in " + currentPhase.getPhaseName()
+            );
+        }
+
         return commandExecutor.execute(command, this);
     }
 
@@ -121,16 +211,10 @@ public class Game {
         return commandExecutor.redo(this);
     }
 
-    public boolean canUndo() {
-        return commandExecutor.canUndo();
-    }
-
-    public boolean canRedo() {
-        return commandExecutor.canRedo();
-    }
-
     public void handleUnitDeath(Unit unit) {
-        // TODO: crstmkt - Observer Pattern - Dispatch unit death event here
+        removeUnit(unit);
+        notifyObservers(new UnitDeathEvent(unit)); //Notify Observers before victory Check
+        checkVictoryCondition();  // Check if game should end
     }
 
     public Unit getUnitAt(Position position) {
@@ -140,12 +224,6 @@ public class Game {
     public List<Unit> getUnitsOfFaction(Faction faction) {
         return units.stream()
                 .filter(u -> u.getFaction() == faction)
-                .toList();
-    }
-
-    public List<Unit> getEnemiesOf(Faction faction) {
-        return units.stream()
-                .filter(u -> u.getFaction() != faction)
                 .toList();
     }
 
@@ -159,80 +237,69 @@ public class Game {
                 .toList();
     }
 
-    public List<Unit> getUnitsInRange(Position position, int range) {
-        return units.stream()
-                .filter(u -> u.isAlive() && u.getPosition().isInRange(position, range))
-                .toList();
-    }
-
     public boolean canAttack(Unit attacker, Unit target) {
         return attacker.getAttackStrategy().canAttack(this, attacker, target);
     }
 
     public boolean isValidMove(Unit unit, Position target) {
-        return unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, unit.getBaseStats().movement());
+        return unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, unit.getMovement());
     }
 
     public Terrain getTerrainAt(Position position) {
         return battlefield.getTerrainAt(position);
     }
 
-    public int getTurnNumber() {
-        return turnManager.getTurnNumber();
-    }
-
-    public List<Unit> getValidAttackTargets(Unit attacker) {
-        return attacker.getAttackStrategy().getValidTargets(this, attacker);
-    }
-
-    public List<Position> getValidMovePositions(Unit unit) {
-        List<Position> validPositions = new ArrayList<>();
-        int maxMovement = unit.getBaseStats().movement();
-
-        for (int y = 0; y < Battlefield.GRID_SIZE; y++) {
-            for (int x = 0; x < Battlefield.GRID_SIZE; x++) {
-                Position target = new Position(x, y);
-                if (unit.getMovementStrategy().canMoveTo(this, unit.getPosition(), target, maxMovement)) {
-                    validPositions.add(target);
-                }
-            }
-        }
-        return validPositions;
+    public int getRoundNumber() {
+        return roundManager.getRoundNumber();
     }
 
     void setInitialActiveFaction(Faction faction) {
         this.activeFaction = faction;
     }
 
-    public void startGame() {
-        ensureActiveFactionIsSet();
-        this.status = GameStatus.IN_PROGRESS;
-        turnManager.startGame();
-    }
 
-    private void ensureActiveFactionIsSet() {
-        if (activeFaction == null) {
-            activeFaction = findFirstFactionWithUnits();
-        }
-    }
-
-    private Faction findFirstFactionWithUnits() {
+    private Faction determineFirstFaction() {
         return units.stream()
                 .map(Unit::getFaction)
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No units on battlefield"));
     }
 
-    public void nextTurn() {
-        // TODO: crstmkt - Observer Pattern - Dispatch turn transition events
-        // Before faction change: eventDispatcher.dispatchEvent(new TurnEndingEvent(activeFaction));
-        // After faction change: eventDispatcher.dispatchEvent(new TurnStartingEvent(activeFaction));
-        // Listeners: UIRenderer (update faction display), UnitManager (reset flags), TerrainEffectApplier, AbilityCooldownReducer
+    private Faction getNextFaction() {
+        // Simple round-robin
+        Faction[] allFactions = units.stream()
+                .filter(Unit::isAlive)
+                .map(Unit::getFaction)
+                .distinct()
+                .toArray(Faction[]::new);
+
+        for (int i = 0; i < allFactions.length; i++) {
+            if (allFactions[i] == activeFaction) {
+                return allFactions[(i + 1) % allFactions.length];
+            }
+        }
+
+        return allFactions[0];
+    }
+
+    /**
+     * Checks if the given faction is the first in the current turn order.
+     * Used to determine when a round ends.
+     *
+     * @param faction Faction to check
+     * @return true if this is the first faction in turn order
+     */
+    private boolean isFirstFaction(Faction faction) {
         List<Faction> aliveFactions = getAliveFactions();
+        return !aliveFactions.isEmpty() && aliveFactions.get(0).equals(faction);
+    }
+
+    public void nextTurn() {
         resetCurrentFactionUnits();
         applyPerTurnTerrainEffects();
-        activeFaction = determineNextFaction(aliveFactions);
-        updateGameStatus();
+
+        // Transition to next faction and notify
+        endTurn(); // <- dispatched TurnEndedEvent
     }
 
     private void applyPerTurnTerrainEffects() {
@@ -257,6 +324,11 @@ public class Game {
         }
     }
 
+    /**
+     * Get list of all factions that have alive units, in consistent order.
+     *
+     * @return List of alive factions (ordered consistently)
+     */
     private List<Faction> getAliveFactions() {
         return units.stream()
                 .filter(Unit::isAlive)
@@ -271,31 +343,6 @@ public class Game {
         commandExecutor.clearHistory();
     }
 
-    private Faction determineNextFaction(List<Faction> aliveFactions) {
-        int currentIndex = aliveFactions.indexOf(activeFaction);
-        int nextIndex = (currentIndex + 1) % aliveFactions.size();
-
-        if (isNewRound(nextIndex)) {
-            turnManager.incrementTurn();
-        }
-
-        return aliveFactions.get(nextIndex);
-    }
-
-    private boolean isNewRound(int nextIndex) {
-        return nextIndex == 0;
-    }
-
-    private void updateGameStatus() {
-        if (isGameOver()) {
-            status = GameStatus.GAME_OVER;
-        }
-    }
-
-    private boolean isGameOver() {
-        return getAliveFactions().size() <= SINGLE_FACTION_REMAINING;
-    }
-
     public Faction getWinner() {
         if (!isGameFinished()) {
             return null;
@@ -305,7 +352,7 @@ public class Game {
     }
 
     private boolean isGameFinished() {
-        return status == GameStatus.GAME_OVER;
+        return currentPhase instanceof GameOverPhase;
     }
 
     private Faction findRemainingFaction() {
@@ -321,10 +368,23 @@ public class Game {
         return RENDERER.render(this);
     }
 
-    // TODO: crstmkt - State Pattern - Convert GameStatus enum to State Pattern
-    public enum GameStatus {
-        SETUP,
-        IN_PROGRESS,
-        GAME_OVER
+    // ===== OBSERVER PATTERN METHODS =====
+
+    public void addObserver(GameObserver observer) {
+        observers.add(observer);
+    }
+
+    public void removeObserver(GameObserver observer) {
+        observers.remove(observer);
+    }
+
+    public void notifyObservers(GameEvent event) {
+        for (GameObserver observer : observers) {
+            observer.onEvent(event);
+        }
+    }
+
+    public void notifyTerrainChanged(Position position, Terrain oldTerrain, Terrain newTerrain) {
+        notifyObservers(new TerrainChangedEvent(position, oldTerrain, newTerrain));
     }
 }

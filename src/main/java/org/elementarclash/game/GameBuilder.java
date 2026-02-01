@@ -2,7 +2,7 @@ package org.elementarclash.game;
 
 import org.elementarclash.battlefield.Battlefield;
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.faction.Faction;
+import org.elementarclash.units.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
 
@@ -77,12 +77,11 @@ public class GameBuilder {
         }
     }
 
-    public GameBuilder addUnit(Unit unit, Faction faction) {
+    public void addUnit(Unit unit, Faction faction) {
         if (!factions.contains(faction)) {
             throw new IllegalArgumentException("Faction " + faction + " not registered. Call withFactions() first.");
         }
         unitPlacements.add(new UnitPlacement(unit, faction));
-        return this;
     }
 
     public Game build() {

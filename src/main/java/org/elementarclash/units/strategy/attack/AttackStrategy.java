@@ -33,16 +33,6 @@ public interface AttackStrategy {
     boolean canAttack(Game game, Unit attacker, Unit target);
 
     /**
-     * Returns all units this attacker can currently target.
-     * Considers range, obstacles, and faction (cannot attack allies).
-     *
-     * @param game     game instance for unit lookup
-     * @param attacker attacking unit
-     * @return list of valid targets
-     */
-    List<Unit> getValidTargets(Game game, Unit attacker);
-
-    /**
      * Calculates base damage before modifiers.
      * Default: returns attacker's attack stat.
      * Can be overridden for special damage calculations.

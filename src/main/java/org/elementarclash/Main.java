@@ -1,14 +1,14 @@
 package org.elementarclash;
 
 import org.elementarclash.battlefield.Terrain;
-import org.elementarclash.faction.Faction;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.GameBuilder;
 import org.elementarclash.ui.GameController;
+import org.elementarclash.units.Faction;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.UnitType;
-import org.elementarclash.units.fire.FireUnitFactory;
-import org.elementarclash.units.water.WaterUnitFactory;
+import org.elementarclash.units.types.fire.FireUnitFactory;
+import org.elementarclash.units.types.water.WaterUnitFactory;
 
 import java.util.Map;
 
@@ -35,6 +35,7 @@ public class Main {
                         Terrain.STONE, 20
                 ));
 
+        // ToDo: random Seeds to play with different Terrains and Fractions
         addFireUnits(builder);
         addWaterUnits(builder);
 

@@ -5,6 +5,7 @@ import lombok.Setter;
 import org.elementarclash.util.Position;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Leaf in the Composite Pattern representing a single battlefield cell.
