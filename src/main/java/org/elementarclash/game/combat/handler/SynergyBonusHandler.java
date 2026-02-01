@@ -9,7 +9,7 @@ import org.elementarclash.units.bonus.UnitDecorator;
  *
  * Integration Point: Will use @crstmkt Decorator Pattern (Pattern #4)
  *
- * ToDo Crstmkt: in Readme ergänzen
+ * ToDo: Crstmkt: in Readme ergänzen
  */
 public class SynergyBonusHandler extends DamageHandler {
 

@@ -1,0 +1,75 @@
+\documentclass[a4paper, numbers=withenddot, 11pt, twoside, openany]{scrbook}
+
+% Vorlage für Ausarbeitungen
+% Kompiliere mit: lualatex Doku.tex
+% Version 2024-09-26
+
+% Hier Daten eintragen:
+\newcommand{\name}{Max Meier \\ Matrikelnummer: \\ Christian Stiens \\ Matrikelnummer: 30394676}
+\newcommand{\modulname}{Design Pattern in der OOP}
+\newcommand{\thema}{elementarClash}
+\newcommand{\hochschule}{Fachhochschule Südwestfalen}
+\newcommand{\datum}{\today}
+% Ende der Daten
+
+% Systemschriftarten mit fontspec (LuaLaTeX/XeLaTeX)
+\usepackage{fontspec}
+
+% Automatische Schriftauswahl mit Fallback
+\IfFontExistsTF{Adwaita Sans}{
+    % Linux/Gnome: Adwaita Sans
+    \setsansfont{Adwaita Sans}
+}{
+    \IfFontExistsTF{Segoe UI}{
+        % Windows: Segoe UI
+        \setsansfont{Segoe UI}
+    }{
+        % Fallback: Latin Modern Sans
+        \setsansfont{Latin Modern Sans}
+    }
+}
+
+\renewcommand{\familydefault}{\sfdefault}
+\usepackage[ngerman]{babel}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{scrhack}
+\setkomafont{disposition}{\normalfont\bfseries}
+
+% Kopf- und Fußzeilen
+\usepackage[automark]{scrlayer-scrpage}
+\clearpairofpagestyles
+\ihead{\leftmark}  % Innen: Kapitelnummer und -titel
+\ofoot*{\pagemark}  % Außen: Seitenzahl
+\pagestyle{scrheadings}
+\setlength{\footheight}{10pt}  % Reduzierte Höhe der Fußzeile
+
+% Kopfzeile auch auf Kapitelanfangsseiten
+\renewcommand*{\chapterpagestyle}{scrheadings}
+
+% Weniger Abstand über Kapiteltitel
+\renewcommand*{\chapterheadstartvskip}{\vspace*{1cm}}
+\usepackage{setspace}\setstretch{1.1}
+\parindent0pt\parskip6pt
+\clubpenalty=10000
+\widowpenalty=10000
+\displaywidowpenalty=10000
+
+\usepackage{listings}
+\renewcommand{\lstlistingname}{Listing}
+\lstset{basicstyle=\small\ttfamily, breaklines=true, keepspaces=true, columns=fixed}
+
+\title{\thema}
+\author{\name\\ \hochschule \\[5mm] Schriftliche Ausarbeitung im Modul\\ „\modulname“}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\include{Erklaerung}
+\include{Kap1}
+
+\end{document}

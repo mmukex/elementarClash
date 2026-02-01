@@ -1,0 +1,22 @@
+\chapter{Einleitung}
+
+\section{Der Name}
+Der Name \textit{Quarks} ist eine Hommage an \textit{Quarks Bar} aus der Serie \textit{Star Trek: Deep Space Nine}, die von 1993 bis 1999 produziert wurde.
+In dieser Serie ist Quark ein Ferengi\footnote{Eine humanoide Spezies deren gesellschaftliche Grundlage das Streben nach Profit ist. https://memory-alpha.fandom.com/de/wiki/Ferengi},
+der eine Bar auf der Raumstation \textit{Deep Space Nine} betreibt.
+In dieser Bar finden verschiedene Formen des Glücksspiels und des Handels statt, was gut zu dem Konzept eines Crypto-Trackers passt.
+
+\section{Das Projekt}
+Ursprünglich sollte Quarks ein automatisierter Crypto-Trading-Bot sein, welcher auf Basis von Alarmen der Plattform TradingView Käufe und Verkäufe tätigt.
+Diese Alarme sollten auf Basis einer Tradingstrategie (Chandellier Exit Indikator mit Zero lag LSMA) \footnote{Chandelier Exit Indicator Strategy https://www.youtube.com/watch?v=AozW0YAVokQ} ausgelöst werden, sodass Quarks anhand des jeweiligen Alert-Types (BUY bzw. SELL) eine entsprechende Order an den Broker (Bitvavo) sendet.
+Jedoch hat sich bei einer Simulation der Strategie über die vergangenen Jahre (Backtesting) herausgestellt, dass diese langfristig - auch aufgrund von Order Gebühren - nicht profitabel ist.
+Daher wurde diese Idee verworfen.
+
+Nach weiteren Überlegungen entstand die Idee, Quarks als eine Art Crypto-Portfolio-Tracker zu entwickeln.
+Ich wollte eine Plattform schaffen, die es dem Nutzer ermöglicht, seine Crypto-Investitionen zu verfolgen und zu verwalten.
+Hierzu waren folgende Leitgedanken wichtig:
+\begin{itemize}
+	\item In Deutschland gilt (Stand: Januar 2026) bei Crypto-Investitionen eine Haltefrist von einem Jahr, nach dessen Ablauf Gewinne steuerfrei realisierbar sind.\footnote{https://www.blockpit.io/de-de/steuer-guides/krypto-haltefrist} Daher sollte Quarks dem Nutzer helfen, diese Frist zu überwachen.
+	\item In Deutschland gibt es für Crypto zwar keine entsprechende Rechtsprechung, allerdings spricht sich das BMF bei Crypto-Handel ebenso wie bei anderen Wertpapieren (Aktien, ETFs, etc.) für das FIFO Prinzip aus.\footnote{https://www.blockpit.io/de-de/steuer-guides/verbrauchsfolgeverfahren}. Das bedeutet, dass die zuerst gekauften Assets auch zuerst verkauft werden. Quarks sollte dem Nutzer helfen, diese Regel zu beachten.
+	\item Es soll ein einfaches, intuitives Layout haben
+\end{itemize}
