@@ -15,8 +15,6 @@ import org.elementarclash.units.bonus.BuffDebuffManager;
 public class PlayerTurnPhase implements GamePhaseState {
 
     private final Faction activeFaction;
-    // private int actionsThisTurn = 0;
-    // private static final int MAX_ACTIONS_PER_UNIT = 2;
 
     public PlayerTurnPhase(Faction faction) {
         this.activeFaction = faction;
@@ -26,7 +24,6 @@ public class PlayerTurnPhase implements GamePhaseState {
     public boolean canExecuteCommand(Game game, Command command) {
 
         // Check if command actor belongs to active faction
-        // Kann das vereinfacht werden zu return command.validate(game).isValid()?
         ValidationResult result = command.validate(game);
         if (!result.isValid()) {
             return false;

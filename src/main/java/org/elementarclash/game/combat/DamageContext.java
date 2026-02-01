@@ -107,15 +107,4 @@ public class DamageContext {
     private void logStep(String step) {
         calculationSteps.add(step);
     }
-
-    public List<String> getCalculationSteps() {
-        return new ArrayList<>(calculationSteps);
-    }
-
-    public void printCalculationLog() {
-        System.out.println("\n=== Damage Calculation ===");
-        System.out.println(attacker.getName() + " → " + target.getName());
-        calculationSteps.forEach(step -> System.out.println("  " + step));
-        System.out.println("=========================\n");
-    }
 }

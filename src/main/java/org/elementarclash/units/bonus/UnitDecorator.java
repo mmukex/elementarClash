@@ -4,21 +4,20 @@ import org.elementarclash.units.Unit;
 
 /**
  * Decorator Pattern (GoF #4) - Unit Buffs/Debuffs
- *
+ * <p>
  * Wraps Unit with additional stat bonuses/penalties.
  * Multiple decorators can be stacked (terrain + synergy + abilities).
- *
+ * <p>
  * Why Decorator Pattern?
  * - Units receive dynamic bonuses from multiple sources:
- *   * Terrain (via @mmukex Visitor Pattern)
- *   * Adjacent allies (synergy)
- *   * Abilities (temporary buffs)
+ * * Terrain (via @mmukex Visitor Pattern)
+ * * Adjacent allies (synergy)
+ * * Abilities (temporary buffs)
  * - Decorator allows stacking without modifying Unit class
  * - Clean separation: Unit = base stats, Decorators = modifiers
  *
  * @author @crstmkt
  *
- * ToDo: Buff wie Tod auf einem Feld oder Fee für tempörere Buffs oder Debuffs in Kombi mit Observer kann das gut klappen
  */
 public abstract class UnitDecorator {
 

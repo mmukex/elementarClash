@@ -77,12 +77,11 @@ public class GameBuilder {
         }
     }
 
-    public GameBuilder addUnit(Unit unit, Faction faction) {
+    public void addUnit(Unit unit, Faction faction) {
         if (!factions.contains(faction)) {
             throw new IllegalArgumentException("Faction " + faction + " not registered. Call withFactions() first.");
         }
         unitPlacements.add(new UnitPlacement(unit, faction));
-        return this;
     }
 
     public Game build() {

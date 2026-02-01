@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Event phase: Dynamic events occur (Forest Fires, Geysers, Earthquakes).
  * No player commands allowed.
- *
+ * <p>
  * Integration Point: Uses @mmukex Composite Pattern (battlefield.applyEffect)
  */
 public class EventPhase implements GamePhaseState {
@@ -20,11 +20,12 @@ public class EventPhase implements GamePhaseState {
     private static final EventPhase INSTANCE = new EventPhase();
     private static final Random RANDOM = new Random();
 
+    private EventPhase() {
+    }
+
     public static EventPhase getInstance() {
         return INSTANCE;
     }
-
-    private EventPhase() {}
 
     @Override
     public boolean canExecuteCommand(Game game, Command command) {

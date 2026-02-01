@@ -2,8 +2,6 @@ package org.elementarclash.game;
 
 /**
  * Manages turn and round counting for the game.
- *
- * TODO: crstmkt - JavaDoc
  */
 public class RoundManager {
     private static final int INITIAL_ROUND = 0;

@@ -6,9 +6,9 @@ import org.elementarclash.units.Unit;
 
 /**
  * Calculates combat damage using Chain of Responsibility Pattern.
- *
+ * <p>
  * Chain: Base → Faction → Terrain → Synergy → Defense
- *
+ * <p>
  * Integration Points:
  * - @mmukex Strategy Pattern: BaseDamageHandler uses AttackStrategy
  * - @mmukex Visitor Pattern: TerrainEffectHandler uses TerrainVisitorFactory
@@ -34,19 +34,14 @@ public class DamageCalculator {
      * Calculate damage from attacker to target.
      *
      * @param attacker attacking unit
-     * @param target defending unit
-     * @param game game state (for terrain lookup, adjacent units)
+     * @param target   defending unit
+     * @param game     game state (for terrain lookup, adjacent units)
      * @return detailed damage result
      */
     public DamageResult calculateDamage(Unit attacker, Unit target, Game game) {
         DamageContext context = new DamageContext(attacker, target, game);
-        // TODO: crstmkt - Decorator Pattern -> Warum? Alle Decorators sollten hier vergeben sein und werden durch die Chain doch berücksichtigt?
-        // Hier auf temp Buffs und Debuffs reagieren -> Innerhalb der einzelnen Handler der Chain.
-        // Execute the chain
-        handlerChain.handle(context);
 
-        // Optional: print calculation log for debugging
-        // context.printCalculationLog();
+        handlerChain.handle(context);
 
         return context.toResult();
     }

@@ -13,11 +13,6 @@ public class SynergyBonusHandler extends DamageHandler {
 
     @Override
     public void handle(DamageContext context) {
-         int totalBonus = 0;
-         for (UnitDecorator decorator : context.getAttacker().getDecorators()) {
-             totalBonus += decorator.getAttackBonus(context.getAttacker());
-         }
-
         // Note: Terrain bonus is already added by TerrainEffectHandler
         // Only add non-terrain bonuses here (synergies, abilities)
         int synergyBonus = context.getAttacker().getDecorators().stream()

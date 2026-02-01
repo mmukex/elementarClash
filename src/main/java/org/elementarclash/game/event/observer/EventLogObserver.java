@@ -16,18 +16,6 @@ public class EventLogObserver implements GameObserver {
     @Override
     public void onEvent(GameEvent event) {
         eventLog.add(event);
-
-        // Optional: write to file for persistent replay
-        // logToFile(event);
-    }
-
-    @Override
-    public String getObserverName() {
-        return "EventLogObserver";
-    }
-
-    public List<GameEvent> getEventLog() {
-        return new ArrayList<>(eventLog);
     }
 
     public void printLog() {

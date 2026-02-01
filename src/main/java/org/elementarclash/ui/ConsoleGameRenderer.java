@@ -218,9 +218,4 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
         System.out.println("       🏆 GAME OVER - " + event.getWinner().name() + " WINS! 🏆");
         System.out.println("=".repeat(60) + "\n");
     }
-
-    @Override
-    public String getObserverName() {
-        return "ConsoleUIObserver";
-    }
 }

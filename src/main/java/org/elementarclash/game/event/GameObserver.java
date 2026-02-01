@@ -20,9 +20,4 @@ public interface GameObserver {
      * @param event the event that occurred
      */
     void onEvent(GameEvent event);
-
-    /**
-     * Get observer name for debugging.
-     */
-    String getObserverName();
 }

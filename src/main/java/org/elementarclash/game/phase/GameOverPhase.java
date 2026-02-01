@@ -1,6 +1,5 @@
 package org.elementarclash.game.phase;
 
-import lombok.Getter;
 import org.elementarclash.game.Game;
 import org.elementarclash.game.command.Command;
 import org.elementarclash.units.Faction;
@@ -9,14 +8,7 @@ import org.elementarclash.units.Faction;
  * Game over phase: Game has ended.
  * No commands allowed.
  */
-@Getter
-public class GameOverPhase implements GamePhaseState {
-
-    private final Faction winner;
-
-    public GameOverPhase(Faction winner) {
-        this.winner = winner;
-    }
+public record GameOverPhase(Faction winner) implements GamePhaseState {
 
     @Override
     public boolean canExecuteCommand(Game game, Command command) {

@@ -19,23 +19,4 @@ public record DamageResult(
         int totalDefense,
         List<String> calculationSteps
 ) {
-    // Old constructor for compatibility
-    @Deprecated
-    public DamageResult(
-            int totalDamage,
-            int baseDamage,
-            TerrainEffectResult attackerEffect,
-            TerrainEffectResult defenderEffect
-    ) {
-        this(
-                totalDamage,
-                baseDamage,
-                1.0,
-                attackerEffect.attackBonus(),
-                defenderEffect.defenseBonus(),
-                0,
-                defenderEffect.defenseBonus(),
-                List.of()
-        );
-    }
 }
