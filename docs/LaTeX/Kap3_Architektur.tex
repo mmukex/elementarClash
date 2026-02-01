@@ -1,0 +1,91 @@
+\chapter{Architektur}
+\label{chap:architektur}
+
+% === ZIELUMFANG: ca. 10 Seiten (Hauptteil) ===
+% Pro Pattern: ca. 0.5–1 Seite + UML-Diagramm
+
+% Einleitung: Übersichtstabelle aller 10 Patterns (wie in README)
+
+\section{Erzeugungsmuster}
+\label{sec:erzeugungsmuster}
+
+\subsection{Factory Method}
+\label{subsec:factory-method}
+% Anwendung: Fraktionsspezifische Einheiten-Erzeugung
+% Begründung: 4 Fraktionen × 3 Einheiten, erweiterbar ohne Core-Änderungen
+% UML-Diagramm + Code-Beispiel
+% Verantwortlich: @crstmkt
+
+\subsection{Builder}
+\label{subsec:builder}
+% Anwendung: Spielfeld-Erstellung (100 Zellen, Geländeverteilung, Startpositionen)
+% Begründung: Komplexes Objekt schrittweise konfigurieren
+% UML-Diagramm + Code-Beispiel
+% Verantwortlich: @mmukex
+
+\section{Strukturmuster}
+\label{sec:strukturmuster}
+
+\subsection{Composite}
+\label{subsec:composite}
+% Anwendung: Battlefield → Regionen → Zellen
+% Begründung: Einheitliche Operationen auf Teil und Ganzem
+% UML-Diagramm
+% Verantwortlich: @mmukex
+
+\subsection{Decorator}
+\label{subsec:decorator}
+% Anwendung: Temporäre Buffs/Debuffs stapeln
+% Begründung: Dynamische Erweiterung zur Laufzeit
+% UML-Diagramm
+% Verantwortlich: @crstmkt
+
+\section{Verhaltensmuster}
+\label{sec:verhaltensmuster}
+
+\subsection{Strategy}
+\label{subsec:strategy}
+% Anwendung: Bewegung (Boden/Fliegend), Angriff (Nahkampf/Fernkampf)
+% Begründung: Austauschbare Algorithmen pro Fraktion
+% UML-Diagramm
+% Verantwortlich: @mmukex
+
+\subsection{State}
+\label{subsec:state}
+% Anwendung: Spielphasen (Setup, InProgress, GameOver)
+% Begründung: Zustandsabhängiges Verhalten
+% UML-Diagramm
+% Verantwortlich: @crstmkt
+
+\subsection{Observer}
+\label{subsec:observer}
+% Anwendung: Event-System (UI-Updates entkoppeln)
+% Begründung: Lose Kopplung zwischen Spiellogik und Darstellung
+% UML-Diagramm
+% Verantwortlich: @crstmkt
+
+\subsection{Command}
+\label{subsec:command}
+% Anwendung: MoveCommand, AttackCommand + Undo/Redo
+% Begründung: Aktionen als Objekte, CommandHistory für Rollback
+% UML-Diagramm + Code-Beispiel
+% Verantwortlich: @mmukex
+
+\subsection{Chain of Responsibility}
+\label{subsec:chain}
+% Anwendung: Schadensberechnung-Pipeline
+% Begründung: Modulare Handler-Kette für Modifikatoren
+% UML-Diagramm
+% Verantwortlich: @crstmkt
+
+\subsection{Visitor}
+\label{subsec:visitor}
+% Anwendung: Gelände-Effekte auf Einheiten (5 Gelände × 4 Fraktionen)
+% Begründung: Double Dispatch, vermeidet if-Verschachtelung
+% UML-Diagramm
+% Verantwortlich: @mmukex
+
+\section{Programmentwurf}
+\label{sec:programmentwurf}
+% Gesamtübersicht: Paketstruktur-Diagramm
+% Optional: Sequenzdiagramm Angriff

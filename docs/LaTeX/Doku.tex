@@ -5,9 +5,9 @@
 % Version 2024-09-26
 
 % Hier Daten eintragen:
-\newcommand{\name}{Max Meier \\ Matrikelnummer: \\ Christian Stiens \\ Matrikelnummer: 30394676}
+\newcommand{\name}{Max Meier \\ Matrikelnummer: 30394407 \\ Christian Stiens \\ Matrikelnummer: 30394676}
 \newcommand{\modulname}{Design Pattern in der OOP}
-\newcommand{\thema}{elementarClash}
+\newcommand{\thema}{ElementarClash}
 \newcommand{\hochschule}{Fachhochschule Südwestfalen}
 \newcommand{\datum}{\today}
 % Ende der Daten
@@ -62,14 +62,32 @@
 \renewcommand{\lstlistingname}{Listing}
 \lstset{basicstyle=\small\ttfamily, breaklines=true, keepspaces=true, columns=fixed}
 
+% Hyperref für klickbare Links (optional, aber empfohlen)
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    pdftitle={\thema},
+    pdfauthor={Max Meier, Christian Stiens}
+}
+
 \title{\thema}
-\author{\name\\ \hochschule \\[5mm] Schriftliche Ausarbeitung im Modul\\ „\modulname“}
+\author{\name\\ \hochschule \\[5mm] Schriftliche Ausarbeitung im Modul\\ „\modulname"}
 
 \begin{document}
 
 \maketitle
 \tableofcontents
+
+% ============================================
+% Kapitel einbinden
+% ============================================
 \include{Erklaerung}
-\include{Kap1}
+\include{Kap1_Einleitung}
+\include{Kap2_Anforderungen}
+\include{Kap3_Architektur}
+\include{Kap4_Implementierung}
+\include{Kap5_Zusammenfassung}
 
 \end{document}
