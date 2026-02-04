@@ -1,15 +1,11 @@
 package org.elementarclash.game.combat.handler;
 
 import org.elementarclash.game.combat.DamageContext;
-import org.elementarclash.units.Faction;
-import org.elementarclash.units.bonus.UnitDecorator;
 
 /**
  * Apply synergy bonuses from adjacent units.
- *
  * Integration Point: Will use @crstmkt Decorator Pattern (Pattern #4)
  *
- * ToDo: Crstmkt: in Readme ergänzen
  */
 public class SynergyBonusHandler extends DamageHandler {
 

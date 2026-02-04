@@ -18,7 +18,6 @@ import java.util.Map;
  * - Air vs Earth: +25% damage
  * - Air vs Fire: -25% damage
  * <p>
- * ToDo Crstmkt: in Readme ergänzen
  */
 public class FactionAdvantageHandler extends DamageHandler {
 
