@@ -9,12 +9,16 @@
 \section{Erzeugungsmuster}
 \label{sec:erzeugungsmuster}
 
-\subsection{Factory Method}
+\subsection{Factory Method (Christian Stiens)}
 \label{subsec:factory-method}
 % Anwendung: Fraktionsspezifische Einheiten-Erzeugung
 % Begründung: 4 Fraktionen × 3 Einheiten, erweiterbar ohne Core-Änderungen
 % UML-Diagramm + Code-Beispiel
 % Verantwortlich: @crstmkt
+Jede der vier Fraktion hat einen Basisstamm von drei Einheitentypen.
+Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, Verteidigungspunkte...).
+Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu ermöglichen und um nicht für jeden Einheitentypen den speziellen Kontruktor aufrufen zu müssen wir Factory Method verwedent.
+
 
 \subsection{Builder}
 \label{subsec:builder}
@@ -33,12 +37,15 @@
 % UML-Diagramm
 % Verantwortlich: @mmukex
 
-\subsection{Decorator}
+\subsection{Decorator (Christian Stiens)}
 \label{subsec:decorator}
 % Anwendung: Temporäre Buffs/Debuffs stapeln
 % Begründung: Dynamische Erweiterung zur Laufzeit
 % UML-Diagramm
 % Verantwortlich: @crstmkt
+Im Spielverlauf wir mit steigender Rundenzahl die Wahrscheinlichkeit erhöhte, dass während der Eventphase eine zufällig ausgewählte Einheit der aktiven Fraktion einen (von 6 fest definierten) zufällig ausgewählten (De-)Buff erhält.
+Dieser (De-)Buff wird per Decorator Pattern an die Unit "angeklebt".
+Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt
 
 \section{Verhaltensmuster}
 \label{sec:verhaltensmuster}
@@ -52,7 +59,7 @@
 
 \subsection{State}
 \label{subsec:state}
-% Anwendung: Spielphasen (Setup, InProgress, GameOver)
+% Anwendung: Spielphasen (Setup, Event, InProgress, GameOver)
 % Begründung: Zustandsabhängiges Verhalten
 % UML-Diagramm
 % Verantwortlich: @crstmkt

@@ -9,7 +9,11 @@ import org.elementarclash.game.Game;
 import org.elementarclash.game.combat.DamageResult;
 import org.elementarclash.game.event.*;
 import org.elementarclash.units.Unit;
+import org.elementarclash.units.bonus.SynergyBonus;
+import org.elementarclash.units.bonus.UnitDecorator;
 import org.elementarclash.util.Position;
+
+import java.util.List;
 
 /**
  * Renders game state as ASCII text for console output.
@@ -130,6 +134,20 @@ public class ConsoleGameRenderer implements GameRenderer, GameObserver {
                                 sb.append("HP").append(effect.hpPerTurn() > 0 ? "+" : "").append(effect.hpPerTurn()).append("/turn");
                             }
                             sb.append("]");
+                        }
+
+                        List<UnitDecorator> activeDecorators = unit.getDecorators().stream()
+                                .filter(d -> !d.isExpired())
+                                .filter(d -> !(d instanceof SynergyBonus))
+                                .toList();
+
+                        if (!activeDecorators.isEmpty()) {
+                            sb.append(" {");
+                            for (int i = 0; i < activeDecorators.size(); i++) {
+                                if (i > 0) sb.append(", ");
+                                sb.append(activeDecorators.get(i).getDescription());
+                            }
+                            sb.append("}");
                         }
                     } else {
                         sb.append(String.format("%s = %-20s (%s) | HP: %3d/%3d | Pos: %s",
