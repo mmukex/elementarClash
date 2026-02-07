@@ -1,0 +1,258 @@
+@startuml State Pattern - ElementarClash
+
+!define ABSTRACT_CLASS abstract class
+!define INTERFACE interface
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<State>> LightYellow
+    BorderColor<<State>> DarkOrange
+    BackgroundColor<<ConcreteState>> LightBlue
+    BorderColor<<ConcreteState>> DarkBlue
+    BackgroundColor<<Context>> LightGreen
+    BorderColor<<Context>> DarkGreen
+}
+
+title State Pattern - ElementarClash Game Phases\nGoF #6: Object Behavior Changes Based on Internal State
+
+package "org.elementarclash.game.phase" {
+
+    ' ===== State Interface =====
+    INTERFACE GamePhaseState <<State>> {
+        + canExecuteCommand(game: Game, command: Command): boolean
+        + onEnter(game: Game): void
+        + onExit(game: Game): void
+        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+        + transitionToEventPhase(game: Game): GamePhaseState
+        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+        + getPhaseName(): String
+    }
+
+    ' ===== Concrete States =====
+    class SetupPhase <<ConcreteState>> {
+        - {static} INSTANCE: SetupPhase
+        __
+        - SetupPhase()
+        + {static} getInstance(): SetupPhase
+        __
+        + canExecuteCommand(game: Game, command: Command): boolean
+        + onEnter(game: Game): void
+        + onExit(game: Game): void
+        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+        + transitionToEventPhase(game: Game): GamePhaseState
+        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+        + getPhaseName(): String
+    }
+
+    class "PlayerTurnPhase\n<<record>>" as PlayerTurnPhase <<ConcreteState>> {
+        + activeFaction: Faction
+        __
+        + PlayerTurnPhase(activeFaction: Faction)
+        __
+        + canExecuteCommand(game: Game, command: Command): boolean
+        + onEnter(game: Game): void
+        + onExit(game: Game): void
+        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+        + transitionToEventPhase(game: Game): GamePhaseState
+        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+        + getPhaseName(): String
+    }
+
+    class EventPhase <<ConcreteState>> {
+        - {static} INSTANCE: EventPhase
+        - {static} RANDOM: Random
+        __
+        - EventPhase()
+        + {static} getInstance(): EventPhase
+        __
+        + canExecuteCommand(game: Game, command: Command): boolean
+        + onEnter(game: Game): void
+        + onExit(game: Game): void
+        - executeRandomEvent(game: Game): void
+        - executeForestFire(game: Game): void
+        - executeGeyser(game: Game): void
+        - executeEarthquake(game: Game): void
+        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+        + transitionToEventPhase(game: Game): GamePhaseState
+        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+        + getPhaseName(): String
+    }
+
+    class "GameOverPhase\n<<record>>" as GameOverPhase <<ConcreteState>> {
+        + winner: Faction
+        __
+        + GameOverPhase(winner: Faction)
+        __
+        + canExecuteCommand(game: Game, command: Command): boolean
+        + onEnter(game: Game): void
+        + onExit(game: Game): void
+        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+        + transitionToEventPhase(game: Game): GamePhaseState
+        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+        + getPhaseName(): String
+    }
+}
+
+package "org.elementarclash.game" {
+
+    ' ===== Context =====
+    class Game <<Context>> {
+        - currentPhase: GamePhaseState
+        - activeFaction: Faction
+        - roundManager: RoundManager
+        __
+        + startGame(): void
+        + endTurn(): void
+        + executeCommand(command: Command): ValidationResult
+        - transitionToPhase(newPhase: GamePhaseState): void
+        - checkVictoryCondition(): boolean
+        - determineFirstFaction(): Faction
+        - getNextFaction(): Faction
+    }
+
+    class RoundManager {
+        - roundNumber: int
+        __
+        + startGame(): void
+        + incrementRound(): void
+        + getRoundNumber(): int
+    }
+}
+
+' ===== Inheritance =====
+GamePhaseState <|.. SetupPhase
+GamePhaseState <|.. PlayerTurnPhase
+GamePhaseState <|.. EventPhase
+GamePhaseState <|.. GameOverPhase
+
+' ===== Associations =====
+Game *-right-> GamePhaseState : currentPhase
+Game *--> RoundManager
+
+' ===== Notes =====
+note right of GamePhaseState
+  **State Pattern (GoF #6)**
+
+  **Purpose:**
+  Manage game flow as a state machine.
+  Each phase defines allowed actions
+  and valid transitions.
+
+  **State Machine:**
+  Setup -> PlayerTurn -> EventPhase -> PlayerTurn -> ... -> GameOver
+
+  **Key Benefit:**
+  Phase-specific behavior without
+  complex if-else chains in Game class.
+  Adding new phases requires no changes
+  to existing phase implementations.
+end note
+
+note bottom of SetupPhase
+  **Initial State (Singleton)**
+
+  - No commands allowed
+  - Game being constructed via GameBuilder
+  - Can only transition to PlayerTurn
+  - transitionToEventPhase() throws
+    IllegalStateException
+end note
+
+note bottom of PlayerTurnPhase
+  **Active Gameplay State (Record)**
+
+  Stores activeFaction for the current turn.
+
+  **onEnter():**
+  1. BuffDebuffManager.tryApplyRandomEffect()
+     (Decorator Pattern integration)
+  2. Reset all units of active faction
+
+  **canExecuteCommand():**
+  Delegates to command.validate(game)
+
+  **Transitions:**
+  - endTurn() -> EventPhase
+  - checkVictory() -> GameOver
+  - next faction -> new PlayerTurnPhase
+end note
+
+note bottom of EventPhase
+  **Dynamic Events State (Singleton)**
+
+  No commands allowed.
+
+  **onEnter() triggers random event:**
+  - Forest Fire: Forest -> Lava, 10 dmg
+    (uses Composite Pattern: region.applyEffect())
+  - Geyser: 8 dmg to units on Ice
+  - Earthquake: Stuns units on Stone
+
+  **Auto-transition:**
+  Called inline from Game.endTurn(),
+  immediately transitions to next PlayerTurn.
+end note
+
+note bottom of GameOverPhase
+  **Terminal State (Record)**
+
+  Stores winning Faction.
+
+  - No commands allowed
+  - All transitions return self
+  - Displays victory message on entry
+  - No exit logic (game ends)
+end note
+
+note left of Game
+  **Context - State Transition Logic**
+
+  **transitionToPhase(newPhase):**
+  1. currentPhase.onExit(this)
+  2. this.currentPhase = newPhase
+  3. newPhase.onEnter(this)
+
+  **Game Flow (endTurn):**
+  1. Check victory condition
+  2. Notify TurnEndedEvent (Observer)
+  3. Tick decorators (Decorator)
+  4. Transition: PlayerTurn -> EventPhase
+  5. Transition: EventPhase -> next PlayerTurn
+  6. Increment round if first faction
+  7. Notify TurnStartedEvent (Observer)
+
+  **executeCommand() delegation:**
+  Checks currentPhase.canExecuteCommand()
+  before delegating to CommandExecutor.
+end note
+
+note as TransitionDiagram
+  **State Transition Diagram**
+
+  +-------------+
+  | SetupPhase  |  (Initial)
+  +------+------+
+         | startGame()
+         v
+  +------------------+
+  | PlayerTurnPhase  |<--------+
+  | (Faction)        |         |
+  +-----+------+-----+        |
+        |      |               |
+        |      | victory       |
+        |      v               |
+        |  +-------------+    |
+        |  | GameOverPhase|   |
+        |  | (Terminal)   |   |
+        |  +-------------+    |
+        |                      |
+        | endTurn()            |
+        v                      |
+  +-------------+              |
+  | EventPhase  |--------------+
+  | (Events)    |  auto: next PlayerTurn
+  +-------------+
+end note
+
+@enduml

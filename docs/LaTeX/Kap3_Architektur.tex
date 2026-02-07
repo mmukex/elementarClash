@@ -16,7 +16,7 @@
 % UML-Diagramm + Code-Beispiel
 % Verantwortlich: @crstmkt
 Jede der vier Fraktion hat einen Basisstamm von drei Einheitentypen.
-Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, Verteidigungspunkte...).
+Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, Verteidigungspunkte etc.).
 Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu ermöglichen und um nicht für jeden Einheitentypen den speziellen Kontruktor aufrufen zu müssen wir Factory Method verwedent.
 
 
@@ -44,8 +44,8 @@ Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu er
 % UML-Diagramm
 % Verantwortlich: @crstmkt
 Im Spielverlauf wir mit steigender Rundenzahl die Wahrscheinlichkeit erhöhte, dass während der Eventphase eine zufällig ausgewählte Einheit der aktiven Fraktion einen (von 6 fest definierten) zufällig ausgewählten (De-)Buff erhält.
-Dieser (De-)Buff wird per Decorator Pattern an die Unit "angeklebt".
-Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt
+Dieser (De-)Buff wird per Decorator Pattern an die Unit angeklebt.
+Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
 
 \section{Verhaltensmuster}
 \label{sec:verhaltensmuster}
@@ -84,6 +84,7 @@ Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt
 % Begründung: Modulare Handler-Kette für Modifikatoren
 % UML-Diagramm
 % Verantwortlich: @crstmkt
+Trefferschaden, Terraineffekte, (temporäre) (De-)Buffs
 
 \subsection{Visitor}
 \label{subsec:visitor}
