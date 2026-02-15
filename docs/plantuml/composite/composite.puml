@@ -1,0 +1,99 @@
+@startuml Composite Pattern - ElementarClash
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Component>> #FFF9C4
+    BorderColor<<Component>> #F9A825
+    BackgroundColor<<Leaf>> #DCEDC8
+    BorderColor<<Leaf>> #558B2F
+    BackgroundColor<<Composite>> #BBDEFB
+    BorderColor<<Composite>> #1565C0
+}
+
+' ===== Component Interface =====
+interface BattlefieldComponent <<Component>> {
+    + cells(): List<Cell>
+    + {default} applyEffect(effect: Consumer<Cell>): void
+    + {default} getCell(index: int): Cell
+}
+
+' ===== Leaf =====
+class Cell <<Leaf>> {
+    - position: Position
+    - terrain: Terrain
+    __
+    + Cell(position: Position, terrain: Terrain)
+    + cells(): List<Cell>
+    + getTerrain(): Terrain
+    + setTerrain(terrain: Terrain): void
+    + getPosition(): Position
+}
+
+' ===== Composite =====
+class Region <<Composite>> <<record>> {
+    - cells: List<Cell>
+    __
+    + Region(cells: List<Cell>)
+    + cells(): List<Cell>
+}
+
+class Battlefield <<Composite>> {
+    + {static} GRID_SIZE: int = 10
+    - {static} TOTAL_CELLS: int = 100
+    - rows: List<Region>
+    __
+    + cells(): List<Cell>
+    + initializeTerrain(distribution: Map<Terrain, Integer>, seed: Long): void
+    + getTerrainAt(position: Position): Terrain
+    + setTerrainAt(position: Position, terrain: Terrain, game: Game): void
+    + getCell(x: int, y: int): Cell
+    + getRegion(x1: int, y1: int, x2: int, y2: int): Region
+}
+
+' ===== Supporting Types =====
+class Position <<record>> {
+    + x: int
+    + y: int
+    + manhattanDistanceTo(other: Position): int
+}
+
+enum Terrain {
+    LAVA
+    ICE
+    FOREST
+    DESERT
+    STONE
+}
+
+' ===== Composite Relationships =====
+BattlefieldComponent <|.. Cell
+BattlefieldComponent <|.. Region
+BattlefieldComponent <|.. Battlefield
+
+Battlefield *-- "10" Region : rows
+Region *-- "10" Cell : cells
+Cell --> "1" Position
+Cell --> "1" Terrain
+
+note right of BattlefieldComponent
+  **Composite Pattern**
+  Einheitliche Schnittstelle fuer:
+  - Einzelne Zelle (Leaf)
+  - Region (Composite)
+  - Gesamtes Schlachtfeld (Root)
+
+  applyEffect() propagiert
+  rekursiv ueber cells().
+end note
+
+note bottom of Battlefield
+  **Root Composite**
+  Hierarchie:
+  Battlefield -> 10 Regions -> 100 Cells
+
+  getRegion() erstellt dynamische
+  Regionen fuer Flaecheneffekte.
+end note
+
+@enduml

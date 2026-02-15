@@ -1,0 +1,115 @@
+@startuml Builder Pattern - ElementarClash
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Builder>> #DCEDC8
+    BorderColor<<Builder>> #558B2F
+    BackgroundColor<<Product>> #BBDEFB
+    BorderColor<<Product>> #1565C0
+    BackgroundColor<<Enum>> #FFF9C4
+    BorderColor<<Enum>> #F9A825
+}
+
+' ===== Builder =====
+class GameBuilder <<Builder>> {
+    - {static} MIN_FACTIONS: int = 2
+    - {static} MAX_FACTIONS: int = 4
+    - {static} SPAWN_REGION_SIZE: int = 3
+    - factions: Set<Faction>
+    - unitPlacements: List<UnitPlacement>
+    - customTerrainDistribution: Map<Terrain, Integer>
+    - randomSeed: Long
+    __
+    + withFactions(factions: Faction...): GameBuilder
+    + withCustomTerrain(distribution: Map<Terrain, Integer>): GameBuilder
+    + withRandomSeed(seed: long): GameBuilder
+    + addUnit(unit: Unit, faction: Faction): void
+    + build(): Game
+    - validate(): void
+    - placeUnitsOnBattlefield(game: Game): void
+    - calculateSpawnZones(factions: Set<Faction>): Map<Faction, List<Position>>
+}
+
+class "UnitPlacement" as UP <<record>> {
+    + unit: Unit
+    + faction: Faction
+}
+
+' ===== Product =====
+class Game <<Product>> {
+    - battlefield: Battlefield
+    - units: List<Unit>
+    - positionToUnit: Map<Position, Unit>
+    - currentRound: int
+    - activeFaction: Faction
+    - status: GameStatus
+    __
+    ~ Game(battlefield: Battlefield)
+    + startGame(): void
+    + nextTurn(): void
+    + addUnit(unit: Unit, position: Position): void
+    + getWinner(): Faction
+}
+
+class Battlefield <<Product>> {
+    + {static} GRID_SIZE: int = 10
+    - rows: List<Region>
+    __
+    + initializeTerrain(distribution: Map<Terrain, Integer>, seed: Long): void
+    + getTerrainAt(position: Position): Terrain
+    + getCell(x: int, y: int): Cell
+}
+
+enum GameStatus <<Enum>> {
+    SETUP
+    IN_PROGRESS
+    GAME_OVER
+}
+
+enum Terrain <<Enum>> {
+    LAVA (15%)
+    ICE (15%)
+    FOREST (20%)
+    DESERT (30%)
+    STONE (20%)
+}
+
+enum Faction <<Enum>> {
+    FIRE
+    WATER
+    EARTH
+    AIR
+}
+
+' ===== Relationships =====
+GameBuilder ..> Game : <<creates>>
+GameBuilder ..> Battlefield : <<creates>>
+GameBuilder +-- UP
+
+Game *-- "1" Battlefield : contains
+Game *-- GameStatus
+Game o-- "0..*" Unit
+
+GameBuilder ..> Faction : <<configures>>
+GameBuilder ..> Terrain : <<configures>>
+
+Battlefield o-- "100" Terrain : grid cells
+
+note right of GameBuilder
+  **Builder Pattern**
+  Schrittweise Erstellung:
+  1. Fraktionen konfigurieren (2-4)
+  2. Gelande-Verteilung setzen
+  3. Einheiten hinzufuegen
+  4. build() -> Validierung + Konstruktion
+
+  Fluent API (Konfiguration):
+  GameBuilder builder = new GameBuilder()
+    .withFactions(FIRE, WATER)
+    .withCustomTerrain(...);
+  builder.addUnit(warrior, FIRE);
+  Game game = builder.build();
+end note
+
+@enduml

@@ -1,0 +1,117 @@
+@startuml Visitor Pattern - ElementarClash
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Visitor>> #FFF9C4
+    BorderColor<<Visitor>> #F9A825
+    BackgroundColor<<ConcreteVisitor>> #BBDEFB
+    BorderColor<<ConcreteVisitor>> #1565C0
+    BackgroundColor<<Element>> #DCEDC8
+    BorderColor<<Element>> #558B2F
+    BackgroundColor<<ValueObject>> #F5F5F5
+    BorderColor<<ValueObject>> #616161
+}
+
+' ===== Visitor Interface =====
+interface TerrainVisitor <<Visitor>> {
+    + visitFireUnit(unit: Unit): TerrainEffectResult
+    + visitWaterUnit(unit: Unit): TerrainEffectResult
+    + visitEarthUnit(unit: Unit): TerrainEffectResult
+    + visitAirUnit(unit: Unit): TerrainEffectResult
+}
+
+' ===== Abstract Base Visitor =====
+abstract class AbstractTerrainVisitor <<Visitor>> {
+    - terrainType: Terrain
+    __
+    # AbstractTerrainVisitor(terrainType: Terrain)
+    + visitFireUnit(unit: Unit): TerrainEffectResult
+    + visitWaterUnit(unit: Unit): TerrainEffectResult
+    + visitEarthUnit(unit: Unit): TerrainEffectResult
+    + visitAirUnit(unit: Unit): TerrainEffectResult
+    # createAttackBonus(bonus: int, desc: String): TerrainEffectResult
+    # createDefenseBonus(bonus: int, desc: String): TerrainEffectResult
+    # createPerTurnEffect(hpPerTurn: int, desc: String): TerrainEffectResult
+    # createDefenseAndHpEffect(def: int, hp: int, desc: String): TerrainEffectResult
+}
+
+' ===== Concrete Visitor (Beispiel) =====
+class LavaTerrainVisitor <<ConcreteVisitor>> {
+    - {static} FIRE_ATTACK_BONUS: int = 2
+    - {static} WATER_HP_DRAIN: int = -5
+    __
+    + LavaTerrainVisitor()
+    + visitFireUnit(unit: Unit): TerrainEffectResult
+    + visitWaterUnit(unit: Unit): TerrainEffectResult
+}
+
+' ===== Element =====
+abstract class Unit <<Element>> {
+    - faction: Faction
+    - currentHealth: int
+    - position: Position
+    __
+    + accept(visitor: TerrainVisitor): TerrainEffectResult
+}
+
+enum Faction {
+    FIRE
+    WATER
+    EARTH
+    AIR
+}
+
+' ===== Value Object =====
+class TerrainEffectResult <<ValueObject>> <<record>> {
+    + attackBonus: int
+    + defenseBonus: int
+    + hpPerTurn: int
+    + terrainChange: Terrain
+    + effectDescription: String
+    __
+    + {static} NEUTRAL: TerrainEffectResult
+    + hasPerTurnEffect(): boolean
+}
+
+' ===== Factory =====
+class TerrainVisitorFactory {
+    - {static} VISITORS: EnumMap<Terrain, TerrainVisitor>
+    __
+    + {static} getVisitor(terrain: Terrain): TerrainVisitor
+}
+
+' ===== Relationships =====
+TerrainVisitor <|.. AbstractTerrainVisitor
+AbstractTerrainVisitor <|-- LavaTerrainVisitor
+
+TerrainVisitor ..> TerrainEffectResult : <<returns>>
+TerrainVisitorFactory ..> TerrainVisitor : <<provides>>
+
+Unit ..> TerrainVisitor : <<accepts>>
+Unit --> "1" Faction
+
+note right of TerrainVisitor
+  **Visitor Pattern - Double Dispatch**
+  1. unit.accept(visitor)
+  2. switch(faction) -> visitor.visitFireUnit(this)
+  3. Visitor liefert TerrainEffectResult
+
+  5 Gelaende x 4 Fraktionen = 20 Kombinationen
+  ohne verschachtelte if-Statements.
+end note
+
+note bottom of LavaTerrainVisitor
+  **Beispiel: Lava-Gelaende**
+  Feuer-Einheit: +2 Angriff
+  Wasser-Einheit: -5 LP/Runde
+  Erde/Luft: NEUTRAL (geerbt)
+end note
+
+note bottom of TerrainVisitorFactory
+  **Flyweight-Caching**
+  Stateless Visitors werden als
+  Singletons in EnumMap gecacht.
+end note
+
+@enduml

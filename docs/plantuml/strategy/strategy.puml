@@ -1,0 +1,101 @@
+@startuml Strategy Pattern - ElementarClash
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Strategy>> #FFF9C4
+    BorderColor<<Strategy>> #F9A825
+    BackgroundColor<<ConcreteStrategy>> #BBDEFB
+    BorderColor<<ConcreteStrategy>> #1565C0
+    BackgroundColor<<Context>> #DCEDC8
+    BorderColor<<Context>> #558B2F
+}
+
+' ===== Context =====
+abstract class Unit <<Context>> {
+    - movementStrategy: MovementStrategy
+    - attackStrategy: AttackStrategy
+    __
+    + getMovementStrategy(): MovementStrategy
+    + getAttackStrategy(): AttackStrategy
+    # setMovementStrategy(strategy: MovementStrategy): void
+    # setAttackStrategy(strategy: AttackStrategy): void
+}
+
+' ===== Movement Strategy =====
+interface MovementStrategy <<Strategy>> {
+    + calculateMovementCost(terrain: Terrain): double
+    + canMoveTo(game: Game, current: Position, target: Position, maxMovement: int): boolean
+}
+
+class GroundMovementStrategy <<ConcreteStrategy>> {
+    - faction: Faction
+    __
+    + GroundMovementStrategy(faction: Faction)
+    + calculateMovementCost(terrain: Terrain): double
+    + canMoveTo(game: Game, current: Position, target: Position, maxMovement: int): boolean
+    - applyFireModifiers(terrain: Terrain, baseCost: double): double
+    - applyWaterModifiers(terrain: Terrain, baseCost: double): double
+    - applyEarthModifiers(terrain: Terrain, baseCost: double): double
+}
+
+' ===== Attack Strategy =====
+interface AttackStrategy <<Strategy>> {
+    + canAttack(game: Game, attacker: Unit, target: Unit): boolean
+    + {default} calculateBaseDamage(attacker: Unit, target: Unit): int
+    + getAttackRange(unit: Unit): int
+}
+
+class RangedAttackStrategy <<ConcreteStrategy>> {
+    - ignoresForestDefense: boolean
+    __
+    + RangedAttackStrategy(ignoresForestDefense: boolean)
+    + canAttack(game: Game, attacker: Unit, target: Unit): boolean
+    + getAttackRange(unit: Unit): int
+    - hasLineOfSight(game: Game, from: Position, to: Position): boolean
+}
+
+' ===== Example Concrete Unit =====
+class FlameArcher <<Context>> {
+    + FlameArcher(id: String, stats: UnitStats)
+}
+
+' ===== Relationships =====
+MovementStrategy <|.. GroundMovementStrategy
+
+AttackStrategy <|.. RangedAttackStrategy
+
+Unit o-- "1" MovementStrategy : movement
+Unit o-- "1" AttackStrategy : attack
+
+Unit <|-- FlameArcher
+
+FlameArcher ..> GroundMovementStrategy : <<creates>>
+FlameArcher ..> RangedAttackStrategy : <<creates>>
+
+note right of MovementStrategy
+  **Strategy Pattern - Bewegung**
+  Beispiel: GroundMovementStrategy
+  Fraktionsspezifische Gelaendekosten:
+  - Feuer auf Lava: 1.0 (schnell)
+  - Wasser auf Eis: 1.0 (schnell)
+  Weitere Strategie: FlyingMovementStrategy
+  (Luft-Fraktion, immer Kosten 1.0)
+end note
+
+note right of AttackStrategy
+  **Strategy Pattern - Angriff**
+  Beispiel: RangedAttackStrategy
+  Reichweite 3-4, Sichtlinie durch
+  Wald blockierbar (ausser ignoresForest)
+  Weitere Strategie: MeleeAttackStrategy
+  (Reichweite 1, keine Sichtlinie)
+end note
+
+note bottom of FlameArcher
+  **Beispiel: Flammen-Bogenschuetze**
+  movement = GroundMovement(FIRE)
+  attack = RangedAttack(ignoresForest=true)
+end note
+
+@enduml

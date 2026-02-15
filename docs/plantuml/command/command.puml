@@ -1,0 +1,120 @@
+@startuml Command Pattern - ElementarClash
+
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam class {
+    BackgroundColor<<Command>> #FFF9C4
+    BorderColor<<Command>> #F9A825
+    BackgroundColor<<ConcreteCommand>> #BBDEFB
+    BorderColor<<ConcreteCommand>> #1565C0
+    BackgroundColor<<Invoker>> #DCEDC8
+    BorderColor<<Invoker>> #558B2F
+    BackgroundColor<<History>> #F8BBD0
+    BorderColor<<History>> #C2185B
+}
+
+' ===== Command Interface =====
+interface Command <<Command>> {
+    + validate(game: Game): ValidationResult
+    + execute(game: Game): void
+    + undo(game: Game): void
+    + getType(): CommandType
+}
+
+enum CommandType {
+    MOVE
+    ATTACK
+}
+
+class ValidationResult <<record>> {
+    + isValid: boolean
+    + errorMessage: String
+    __
+    + {static} success(): ValidationResult
+    + {static} failure(message: String): ValidationResult
+}
+
+' ===== Concrete Commands =====
+class MoveCommand <<ConcreteCommand>> {
+    - actor: Unit
+    - targetPosition: Position
+    - previousPosition: Position
+    - wasExecuted: boolean
+    __
+    + MoveCommand(actor: Unit, targetPosition: Position)
+    + validate(game: Game): ValidationResult
+    + execute(game: Game): void
+    + undo(game: Game): void
+    + getType(): CommandType
+}
+
+class AttackCommand <<ConcreteCommand>> {
+    - actor: Unit
+    - target: Unit
+    - targetPreviousHealth: int
+    - damageDealt: int
+    - targetWasAlive: boolean
+    - wasExecuted: boolean
+    __
+    + AttackCommand(actor: Unit, target: Unit)
+    + validate(game: Game): ValidationResult
+    + execute(game: Game): void
+    + undo(game: Game): void
+    + getType(): CommandType
+}
+
+' ===== Invoker =====
+class CommandExecutor <<Invoker>> {
+    - history: CommandHistory
+    __
+    + execute(command: Command, game: Game): ValidationResult
+    + undo(game: Game): boolean
+    + redo(game: Game): boolean
+    + clearHistory(): void
+}
+
+' ===== History =====
+class CommandHistory <<History>> {
+    - executedCommands: Deque<Command>
+    - undoneCommands: Deque<Command>
+    __
+    + push(command: Command): void
+    + popForUndo(): Command
+    + popForRedo(): Command
+    + pushUndone(command: Command): void
+    + clear(): void
+    + canUndo(): boolean
+    + canRedo(): boolean
+}
+
+' ===== Relationships =====
+Command <|.. MoveCommand
+Command <|.. AttackCommand
+Command ..> ValidationResult : <<returns>>
+Command ..> CommandType : <<uses>>
+
+CommandExecutor *-- "1" CommandHistory : contains
+CommandExecutor ..> Command : validates & executes
+CommandHistory o-- "0..*" Command : manages
+
+MoveCommand ..> Unit : modifies position
+AttackCommand ..> Unit : modifies health
+
+note right of Command
+  **Command Pattern**
+  Jeder Spielzug als Objekt:
+  1. validate() - Vorbedingungen pruefen
+  2. execute() - Zustand aendern
+  3. undo() - Rollback ausfuehren
+end note
+
+note bottom of CommandHistory
+  **Two-Stack Undo/Redo**
+  execute -> push(executedCommands)
+  undo -> pop(executed) + push(undone)
+  redo -> pop(undone) + push(executed)
+
+  Per-Turn Scope: clear() bei Rundenwechsel.
+end note
+
+@enduml
