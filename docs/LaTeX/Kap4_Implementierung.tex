@@ -6,33 +6,52 @@
 \section{Spielobjekte}
 \label{sec:spielobjekte}
 
-% Kompakte Darstellung:
+\subsection{Einheiten-Erzeugung (Christian Stiens)}
+\label{subsec:einheiten-erzeugung}
 % - Einheiten-Tabelle (alle 12 Einheiten mit Stats)
+% - Pattern-Bezug: Factory Method
+
+\subsection{Spielfeld \& Gelände (Max Meier)}
+\label{subsec:spielfeld-gelaende}
 % - Gelände-Tabelle (Bewegungskosten, Boni, Fraktions-Effekte)
-% - Ggf. Screenshot der Konsolen-UI
+% - Pattern-Bezug: Builder, Composite, Visitor
 
 \section{Spiellogik}
 \label{sec:spiellogik}
 
-\subsection{Rundenablauf}
+\subsection{Rundenablauf \& Phasen (Christian Stiens)}
 \label{subsec:rundenablauf}
 % - Aktionen pro Runde: 1× Bewegen, 1× Angreifen
 % - Zugwechsel zwischen Fraktionen
+% - Pattern-Bezug: State
 
-\subsection{Kampfsystem}
-\label{subsec:kampfsystem}
+\subsection{Bewegung \& Angriffsstrategie (Max Meier)}
+\label{subsec:bewegung-angriffsstrategie}
+% - Boden-/Flugbewegung, Nahkampf/Fernkampf
+% - Pattern-Bezug: Strategy
+
+\subsection{Schadensberechnung (Christian Stiens)}
+\label{subsec:schadensberechnung}
 % - Schadensformel
 % - Gelände-Modifikatoren
 % - Elementare Stärken/Schwächen (+25%/-25%)
+% - Pattern-Bezug: Chain of Responsibility
 
-\subsection{Undo/Redo}
+\subsection{Buffs/Debuffs (Christian Stiens)}
+\label{subsec:buffs-debuffs}
+% - Temporäre (De-)Buffs zur Laufzeit
+% - Pattern-Bezug: Decorator
+
+\subsection{Undo/Redo (Max Meier)}
 \label{subsec:undo-redo}
 % - Per-Turn Rollback
 % - CommandHistory mit zwei Stacks
+% - Pattern-Bezug: Command
 
-\section{Benutzeroberfläche}
+\section{Benutzeroberfläche (Christian Stiens)}
 \label{sec:ui}
 
 % - ASCII-Darstellung des Spielfelds
 % - Eingabe-Aktionen: [B]ewegen, [A]ngreifen, [U]ndo, [R]edo, [Z]ug beenden
 % - Ggf. Screenshot
+% - Pattern-Bezug: Observer

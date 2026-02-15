@@ -20,7 +20,7 @@ Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, 
 Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu ermöglichen und um nicht für jeden Einheitentypen den speziellen Kontruktor aufrufen zu müssen wir Factory Method verwedent.
 
 
-\subsection{Builder}
+\subsection{Builder (Max Meier)}
 \label{subsec:builder}
 % Anwendung: Spielfeld-Erstellung (100 Zellen, Geländeverteilung, Startpositionen)
 % Begründung: Komplexes Objekt schrittweise konfigurieren
@@ -30,7 +30,7 @@ Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu er
 \section{Strukturmuster}
 \label{sec:strukturmuster}
 
-\subsection{Composite}
+\subsection{Composite (Max Meier)}
 \label{subsec:composite}
 % Anwendung: Battlefield → Regionen → Zellen
 % Begründung: Einheitliche Operationen auf Teil und Ganzem
@@ -50,35 +50,35 @@ Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
 \section{Verhaltensmuster}
 \label{sec:verhaltensmuster}
 
-\subsection{Strategy}
+\subsection{Strategy (Max Meier)}
 \label{subsec:strategy}
 % Anwendung: Bewegung (Boden/Fliegend), Angriff (Nahkampf/Fernkampf)
 % Begründung: Austauschbare Algorithmen pro Fraktion
 % UML-Diagramm
 % Verantwortlich: @mmukex
 
-\subsection{State}
+\subsection{State (Christian Stiens)}
 \label{subsec:state}
 % Anwendung: Spielphasen (Setup, Event, InProgress, GameOver)
 % Begründung: Zustandsabhängiges Verhalten
 % UML-Diagramm
 % Verantwortlich: @crstmkt
 
-\subsection{Observer}
+\subsection{Observer (Christian Stiens)}
 \label{subsec:observer}
 % Anwendung: Event-System (UI-Updates entkoppeln)
 % Begründung: Lose Kopplung zwischen Spiellogik und Darstellung
 % UML-Diagramm
 % Verantwortlich: @crstmkt
 
-\subsection{Command}
+\subsection{Command (Max Meier)}
 \label{subsec:command}
 % Anwendung: MoveCommand, AttackCommand + Undo/Redo
 % Begründung: Aktionen als Objekte, CommandHistory für Rollback
 % UML-Diagramm + Code-Beispiel
 % Verantwortlich: @mmukex
 
-\subsection{Chain of Responsibility}
+\subsection{Chain of Responsibility (Christian Stiens)}
 \label{subsec:chain}
 % Anwendung: Schadensberechnung-Pipeline
 % Begründung: Modulare Handler-Kette für Modifikatoren
@@ -86,7 +86,7 @@ Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
 % Verantwortlich: @crstmkt
 Trefferschaden, Terraineffekte, (temporäre) (De-)Buffs
 
-\subsection{Visitor}
+\subsection{Visitor (Max Meier)}
 \label{subsec:visitor}
 % Anwendung: Gelände-Effekte auf Einheiten (5 Gelände × 4 Fraktionen)
 % Begründung: Double Dispatch, vermeidet if-Verschachtelung
