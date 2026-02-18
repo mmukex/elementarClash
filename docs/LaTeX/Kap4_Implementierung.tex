@@ -48,6 +48,18 @@ Anschließend beginnt eine neue \texttt{PlayerTurnPhase}
 % - Elementare Stärken/Schwächen (+25%/-25%)
 % - Pattern-Bezug: Chain of Responsibility
 
+Die Schadensberechnung wird über das Chain of Responsibility Pattern abgebildet.
+Jeder Angriff durchläuft dabei eine fest definierte Kette von fünf Handlern, die gemeinsam auf dem \texttt{DamageContext}-Objekt arbeiten und dieses schrittweise anreichern.
+
+Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den jeweils nächsten Handler und leitet den Kontext nach getaner Arbeit via \texttt{super.handle()} weiter (vgl. \texttt{DamageHandler.java Z. 22, 40ff}).
+Die Kette wird im Konstruktor von \texttt{DamageCalculator} über fluente \texttt{setNext()}-Aufrufe zusammengestellt und durch \texttt{handlerChain.handle(context)} gestartet (vgl. \texttt{DamageCalculator.java Z. 25ff, 44}).
+Der erste Handler, \texttt{BaseDamageHandler}, liest den Grundschaden über das Strategy Pattern aus und schreibt ihn in den Kontext (vgl. \texttt{BaseDamageHandler.java Z. 14ff}).
+Der \texttt{FactionAdvantageHandler} wendet anschließend einen Multiplikator aus einer statischen Fraktionsmatrix an, etwa $\times 1{,}25$ bei Vorteil oder $\times 0{,}75$ bei Nachteil (vgl. \texttt{FactionAdvantageHandler.java Z. 25ff}).
+Der \texttt{TerrainEffectHandler} integriert das Visitor Pattern: Für Angreifer und Verteidiger wird je ein \texttt{TerrainVisitor} dispatcht, dessen Boni in den Kontext einfließen (vgl. \texttt{TerrainEffectHandler.java Z. 21ff}).
+Der \texttt{SynergyBonusHandler} greift auf die aktiven Dekoratoren der angreifenden Einheit zu und summiert deren Angriffsboni, womit das Decorator Pattern in die Kette eingebunden wird (vgl. \texttt{SynergyBonusHandler.java Z. 16ff}).
+Als terminaler Handler berechnet der \texttt{DefenseCalculationHandler} schließlich den Endschaden nach der Formel $\text{finalDamage} = \max(1,\ \text{totalAttack} - \text{totalDefense})$ und schreibt das Ergebnis in den Kontext (vgl. \texttt{DefenseCalculationHandler.java Z. 15ff}).
+Der fertige Kontext wird anschließend in ein unveränderliches \texttt{DamageResult}-Record umgewandelt und vom \texttt{AttackCommand} genutzt, um den Schaden auf die Zieleinheit anzuwenden und die Observer zu benachrichtigen (vgl. \texttt{DamageContext.java Z. 90ff}, \texttt{AttackCommand.java Z. 91ff}).
+
 \subsection{Buffs/Debuffs (Christian Stiens)}
 \label{subsec:buffs-debuffs}
 % - Temporäre (De-)Buffs zur Laufzeit
