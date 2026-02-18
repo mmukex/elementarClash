@@ -10,6 +10,7 @@
 \label{subsec:einheiten-erzeugung}
 % - Einheiten-Tabelle (alle 12 Einheiten mit Stats)
 % - Pattern-Bezug: Factory Method
+Jede der vier Fraktionen hat 3 verschiedene Einheitentypen.
 
 \subsection{Spielfeld \& Gelände (Max Meier)}
 \label{subsec:spielfeld-gelaende}
@@ -23,10 +24,17 @@
 \label{subsec:rundenablauf}
 % - Aktionen pro Runde: 1× Bewegen, 1× Angreifen
 % - Zugwechsel zwischen Fraktionen
-% - Pattern-Bezug: State
+% - Pattern-Bezug: State / Decorator
 
-Das Spiel ist gegliedert in 4 Phasen.
-Diese werden über das State Pattern abgebildet.
+Das Spiel ist in vier Phasen gegliedert, die über das State Pattern abgebildet werden.
+Die erste Phase ist die \texttt{SetupPhase}, in welcher grundlegende Initialisierungen vorgenommen werden, etwa die Festlegung des startenden Spielers sowie die Instanziierung des \texttt{RoundManager} (vgl. Game.java Z. 59ff, 78ff).
+Die \texttt{SetupPhase} geht über in die \texttt{PlayerTurnPhase}, in der zunächst mit rundenweise steigender Wahrscheinlichkeit ein zufällig gewählter (De-)Buff aus einem Pool von sechs Effekten auf eine zufällige Einheit des aktiven Spielers angewendet wird (vgl. \texttt{PlayerTurnPhase.java Z. 26ff} bzw. \texttt{BuffDebuffManager.java}).
+Anschließend werden die Einheiten der aktiven Fraktion für den Spielzug vorbereitet, indem jede Einheit ihre maximale Aktionsanzahl (2) sowie die entsprechende Bewegungsreichweite zurückerhält.
+Die \texttt{PlayerTurnPhase} wird durch Spielereingabe beendet und geht entweder in die \texttt{GameOverPhase} (falls der gegnerische Spieler besiegt wurde) oder die \texttt{EventPhase} über.
+In der \texttt{EventPhase} wird eines von drei Events gefeuert, welches Einfluss auf die Geländebeschaffenheit haben kann.
+Anschließend beginnt eine neue \texttt{PlayerTurnPhase}
+
+
 
 \subsection{Bewegung \& Angriffsstrategie (Max Meier)}
 \label{subsec:bewegung-angriffsstrategie}
@@ -44,6 +52,9 @@ Diese werden über das State Pattern abgebildet.
 \label{subsec:buffs-debuffs}
 % - Temporäre (De-)Buffs zur Laufzeit
 % - Pattern-Bezug: Decorator
+
+Im Verlauf des Spiels wird mit rundenweise steigender Wahrscheinlichkeit (max. 60\%) zu Beginn eines jeden Spielzugs einer von 6 Effekten (3 Buffs, 3 Debuffs) auf eine zufällig ausgewählte, nicht tote Einheit der aktiven Fraktion angewendet (vgl. \texttt{BuffDebuffManager.java Z. 41ff}).
+Dieser Effekt wird als Decorator an die Unit Klasse angefügt.
 
 \subsection{Undo/Redo (Max Meier)}
 \label{subsec:undo-redo}
