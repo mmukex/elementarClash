@@ -19,6 +19,7 @@ Jede der vier Fraktion hat einen Basisstamm von drei Einheitentypen.
 Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, Verteidigungspunkte etc.).
 Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu ermöglichen und um nicht für jeden Einheitentypen den speziellen Kontruktor aufrufen zu müssen wir Factory Method verwedent.
 
+\includegraphics[width=\textwidth]{pictures/Factory_Method_Pattern___ElementarClash}
 
 \subsection{Builder (Max Meier)}
 \label{subsec:builder}
@@ -47,6 +48,8 @@ Im Spielverlauf wir mit steigender Rundenzahl die Wahrscheinlichkeit erhöhte, d
 Dieser (De-)Buff wird per Decorator Pattern an die Unit angeklebt.
 Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
 
+\includegraphics[width=\textwidth]{pictures/Decorator_Pattern___ElementarClash-Decorator_Pattern___ElementarClash_Unit_Buffs_Debuffs__GoF__4__Dynamically_Attaching_Responsibilities}
+
 \section{Verhaltensmuster}
 \label{sec:verhaltensmuster}
 
@@ -63,7 +66,7 @@ Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
 % Begründung: Zustandsabhängiges Verhalten
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Spielphasen (SetupPhase, PlayerTurnPhase, EventPhase, GameOverPhase) und UnitStates
+Spielphasen (SetupPhase, PlayerTurnPhase, EventPhase, GameOverPhase) und UnitStates (Attacking, Moving, Stunned, Idle, Dead) werden über das State Pattern implementiert.
 
 \subsection{Observer (Christian Stiens)}
 \label{subsec:observer}
