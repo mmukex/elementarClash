@@ -55,6 +55,14 @@ Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den jew
 Die Kette wird im Konstruktor von \texttt{DamageCalculator} über fluente \texttt{setNext()}-Aufrufe zusammengestellt und durch \texttt{handlerChain.handle(context)} gestartet (vgl. \texttt{DamageCalculator.java Z. 25ff, 44}).
 Der erste Handler, \texttt{BaseDamageHandler}, liest den Grundschaden über das Strategy Pattern aus und schreibt ihn in den Kontext (vgl. \texttt{BaseDamageHandler.java Z. 14ff}).
 Der \texttt{FactionAdvantageHandler} wendet anschließend einen Multiplikator aus einer statischen Fraktionsmatrix an, etwa $\times 1{,}25$ bei Vorteil oder $\times 0{,}75$ bei Nachteil (vgl. \texttt{FactionAdvantageHandler.java Z. 25ff}).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[scale=0.5]{images/Fraktions_Korrelationsmatrix}
+	\caption{Fraktions-Korrelationsmatrix zur Berechnung von Angriffsvorteilen}
+	\label{fig:fraktions-korrelationsmatrix}
+\end{figure}
+
 Der \texttt{TerrainEffectHandler} integriert das Visitor Pattern: Für Angreifer und Verteidiger wird je ein \texttt{TerrainVisitor} dispatcht, dessen Boni in den Kontext einfließen (vgl. \texttt{TerrainEffectHandler.java Z. 21ff}).
 Der \texttt{SynergyBonusHandler} greift auf die aktiven Dekoratoren der angreifenden Einheit zu und summiert deren Angriffsboni, womit das Decorator Pattern in die Kette eingebunden wird (vgl. \texttt{SynergyBonusHandler.java Z. 16ff}).
 Als terminaler Handler berechnet der \texttt{DefenseCalculationHandler} schließlich den Endschaden nach der Formel $\text{finalDamage} = \max(1,\ \text{totalAttack} - \text{totalDefense})$ und schreibt das Ergebnis in den Kontext (vgl. \texttt{DefenseCalculationHandler.java Z. 15ff}).
@@ -81,3 +89,9 @@ Dieser Effekt wird als Decorator an die Unit Klasse angefügt.
 % - Eingabe-Aktionen: [B]ewegen, [A]ngreifen, [U]ndo, [R]edo, [Z]ug beenden
 % - Ggf. Screenshot
 % - Pattern-Bezug: Observer
+Das 10x10 Spielfeld wird als ASCII in der Konsole gerendert.
+Eine echte grafische Oberfläche hätte nach Ansicht der Autoren den zeitlichen Rahmen des Projektes gesprengt.
+Über Konsoleneingaben ([B]ewegen, [A]ngreifen, [U]ndo, [R]edo, [Z]ug beenden) gibt der Spieler seinen Zug an.
+
+
+

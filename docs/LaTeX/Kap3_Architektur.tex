@@ -19,7 +19,12 @@ Jede der vier Fraktion hat einen Basisstamm von drei Einheitentypen.
 Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, Verteidigungspunkte etc.).
 Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu ermöglichen und um nicht für jeden Einheitentypen den speziellen Kontruktor aufrufen zu müssen wir Factory Method verwedent.
 
-\includegraphics[width=\textwidth]{pictures/Factory_Method_Pattern___ElementarClash}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Factory_Method_Pattern___ElementarClash}
+	\caption{Factory Method Pattern für die Einheitenerzeugung}
+	\label{fig:factory-method}
+\end{figure}
 
 \subsection{Builder (Max Meier)}
 \label{subsec:builder}
@@ -44,11 +49,16 @@ Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu er
 % Begründung: Dynamische Erweiterung zur Laufzeit
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Im Spielverlauf wir mit steigender Rundenzahl die Wahrscheinlichkeit erhöhte, dass während der Eventphase eine zufällig ausgewählte Einheit der aktiven Fraktion einen (von 6 fest definierten) zufällig ausgewählten (De-)Buff erhält.
+Im Spielverlauf wir mit steigender Rundenzahl die Wahrscheinlichkeit erhöhte, dass während der Eventphase eine zufällig ausgewählte Einheit der aktiven Fraktion einen (von sechs fest definierten) zufällig ausgewählten (De-)Buff erhält.
 Dieser (De-)Buff wird per Decorator Pattern an die Unit angeklebt.
-Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
+Im UI werden diese (De-)Buffs in geschweiften Klammern angezeigt.
 
-\includegraphics[width=\textwidth]{pictures/Decorator_Pattern___ElementarClash-Decorator_Pattern___ElementarClash_Unit_Buffs_Debuffs__GoF__4__Dynamically_Attaching_Responsibilities}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Decorator_Pattern___ElementarClash-Decorator_Pattern___ElementarClash_Unit_Buffs_Debuffs__GoF__4__Dynamically_Attaching_Responsibilities}
+	\caption{Decorator Pattern für temporäre Buffs und Debuffs}
+	\label{fig:decorator-pattern}
+\end{figure}
 
 \section{Verhaltensmuster}
 \label{sec:verhaltensmuster}
@@ -68,14 +78,27 @@ Im UI werden diese (De-)buffs in geschweiften Klammern angezeigt.
 % Verantwortlich: @crstmkt
 Spielphasen (SetupPhase, PlayerTurnPhase, EventPhase, GameOverPhase) und UnitStates (Attacking, Moving, Stunned, Idle, Dead) werden über das State Pattern implementiert.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/State_Pattern___ElementarClash-State_Pattern___ElementarClash_Game_Phases__GoF__6__Object_Behavior_Changes_Based_on_Internal_State}
+	\caption{State Pattern für Spielphasen und Einheitenzustände}
+	\label{fig:state-pattern}
+\end{figure}
+
 \subsection{Observer (Christian Stiens)}
 \label{subsec:observer}
 % Anwendung: Event-System (UI-Updates entkoppeln)
 % Begründung: Lose Kopplung zwischen Spiellogik und Darstellung
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Entkopplung von UI-Updates, Achievements und dynamische Ereignissen.
+Entkopplung von UI-Updates und dynamische Ereignissen.
 
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Observer_Pattern___ElementarClash-Observer_Pattern___ElementarClash_Event_System__GoF__7__One_to_Many_Dependency_for_Event_Notification}
+	\caption{Observer Pattern für UI-Updates und Event-System}
+	\label{fig:observer-pattern}
+\end{figure}
 
 \subsection{Command (Max Meier)}
 \label{subsec:command}
@@ -92,6 +115,13 @@ Entkopplung von UI-Updates, Achievements und dynamische Ereignissen.
 % Verantwortlich: @crstmkt
 Trefferschaden, Terraineffekte, (temporäre) Effekte auf die Einheit addieren sich zu einem Gesamtschaden, den die Einheit erleidet.
 CoR berechnet diesen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Chain_of_Responsibility_Pattern___ElementarClash-Chain_of_Responsibility_Pattern___ElementarClash_Damage_Pipeline__GoF__9__Decoupled_Request_Processing_Through_Handler_Chain}
+	\caption{Chain of Responsibility Pattern für modulare Schadensberechnung}
+	\label{fig:chain-of-responsibility}
+\end{figure}
 
 \subsection{Visitor (Max Meier)}
 \label{subsec:visitor}
