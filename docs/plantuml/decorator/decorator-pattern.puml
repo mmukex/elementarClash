@@ -18,135 +18,126 @@ skinparam class {
 
 title Decorator Pattern - ElementarClash Unit Buffs/Debuffs\nGoF #4: Dynamically Attaching Responsibilities
 
-package "org.elementarclash.units.bonus" {
-
-    ' ===== Abstract Decorator =====
-    ABSTRACT_CLASS UnitDecorator <<Abstract>> {
-        + {abstract} getAttackBonus(unit: Unit): int
-        + {abstract} getDefenseBonus(unit: Unit): int
-        + {abstract} getMovementBonus(unit: Unit): int
-        + {abstract} isExpired(): boolean
-        + {abstract} tick(): void
-        + {abstract} getDecoratorName(): String
-        + {abstract} getDescription(): String
-    }
-
-    ' ===== Permanent Decorator =====
-    class SynergyBonus <<Concrete>> {
-        - game: Game
-        - faction: Faction
-        __
-        + SynergyBonus(game: Game, faction: Faction)
-        __
-        + getAttackBonus(unit: Unit): int
-        + getDefenseBonus(unit: Unit): int
-        + getMovementBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDecoratorName(): String
-        + getDescription(): String
-    }
-
-    ' ===== Buff/Debuff Manager =====
-    class BuffDebuffManager <<Manager>> {
-        - {static} RANDOM: Random
-        - {static} BASE_CHANCE: double = 0.03
-        - {static} INCREASE_PER_ROUND: double = 0.06
-        - {static} MAX_CHANCE: double = 0.60
-        - {static} BUFF_POOL: List<Supplier<UnitDecorator>>
-        - {static} DEBUFF_POOL: List<Supplier<UnitDecorator>>
-        __
-        + tryApplyRandomEffect(game: Game, currentRound: int): void
-        - calculateChance(currentRound: int): double
-    }
+' ===== Abstract Decorator =====
+ABSTRACT_CLASS UnitDecorator <<Abstract>> {
+    + {abstract} getAttackBonus(unit: Unit): int
+    + {abstract} getDefenseBonus(unit: Unit): int
+    + {abstract} getMovementBonus(unit: Unit): int
+    + {abstract} isExpired(): boolean
+    + {abstract} tick(): void
+    + {abstract} getDecoratorName(): String
+    + {abstract} getDescription(): String
 }
 
-package "org.elementarclash.units.bonus.temporary" {
-
-    ' ===== Temporary Buff Decorators =====
-    class AttackBuffDecorator <<Temporary>> {
-        - {static} BONUS: int = 2
-        - {static} DURATION: int = 2
-        - remainingRounds: int
-        __
-        + getAttackBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDescription(): String
-    }
-
-    class AttackDebuffDecorator <<Temporary>> {
-        - {static} BONUS: int = -2
-        - {static} DURATION: int = 2
-        - remainingRounds: int
-        __
-        + getAttackBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDescription(): String
-    }
-
-    class DefenseBuffDecorator <<Temporary>> {
-        - {static} BONUS: int = 2
-        - {static} DURATION: int = 2
-        - remainingRounds: int
-        __
-        + getDefenseBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDescription(): String
-    }
-
-    class DefenseDebuffDecorator <<Temporary>> {
-        - {static} BONUS: int = -2
-        - {static} DURATION: int = 2
-        - remainingRounds: int
-        __
-        + getDefenseBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDescription(): String
-    }
-
-    class HastenedDecorator <<Temporary>> {
-        - {static} MOVEMENT_PENALTY: int = -1
-        - {static} DURATION: int = 2
-        - remainingRounds: int
-        __
-        + getMovementBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDescription(): String
-    }
-
-    class SlowedDecorator <<Temporary>> {
-        - {static} MOVEMENT_PENALTY: int = -1
-        - {static} DURATION: int = 2
-        - remainingRounds: int
-        __
-        + getMovementBonus(unit: Unit): int
-        + isExpired(): boolean
-        + tick(): void
-        + getDescription(): String
-    }
+' ===== Permanent Decorator =====
+class SynergyBonus <<Concrete>> {
+    - game: Game
+    - faction: Faction
+    __
+    + SynergyBonus(game: Game, faction: Faction)
+    __
+    + getAttackBonus(unit: Unit): int
+    + getDefenseBonus(unit: Unit): int
+    + getMovementBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDecoratorName(): String
+    + getDescription(): String
 }
 
-package "org.elementarclash.units" {
+' ===== Buff/Debuff Manager =====
+class BuffDebuffManager <<Manager>> {
+    - {static} RANDOM: Random
+    - {static} BASE_CHANCE: double = 0.03
+    - {static} INCREASE_PER_ROUND: double = 0.06
+    - {static} MAX_CHANCE: double = 0.60
+    - {static} BUFF_POOL: List<Supplier<UnitDecorator>>
+    - {static} DEBUFF_POOL: List<Supplier<UnitDecorator>>
+    __
+    + tryApplyRandomEffect(game: Game, currentRound: int): void
+    - calculateChance(currentRound: int): double
+}
 
-    ' ===== Component (decorated class) =====
-    ABSTRACT_CLASS Unit <<Abstract>> {
-        - decorators: List<UnitDecorator>
-        __
-        + addDecorator(decorator: UnitDecorator): void
-        + removeDecorator(decorator: UnitDecorator): void
-        + removeDecoratorsOfType(clazz: Class): void
-        + removeExpiredDecorators(): void
-        + getDecorators(): List<UnitDecorator>
-        __
-        + getAttack(): int
-        + getDefense(): int
-        + getMovement(): int
-    }
+' ===== Temporary Buff Decorators =====
+class AttackBuffDecorator <<Temporary>> {
+    - {static} BONUS: int = 2
+    - {static} DURATION: int = 2
+    - remainingRounds: int
+    __
+    + getAttackBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDescription(): String
+}
+
+class AttackDebuffDecorator <<Temporary>> {
+    - {static} BONUS: int = -2
+    - {static} DURATION: int = 2
+    - remainingRounds: int
+    __
+    + getAttackBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDescription(): String
+}
+
+class DefenseBuffDecorator <<Temporary>> {
+    - {static} BONUS: int = 2
+    - {static} DURATION: int = 2
+    - remainingRounds: int
+    __
+    + getDefenseBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDescription(): String
+}
+
+class DefenseDebuffDecorator <<Temporary>> {
+    - {static} BONUS: int = -2
+    - {static} DURATION: int = 2
+    - remainingRounds: int
+    __
+    + getDefenseBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDescription(): String
+}
+
+class HastenedDecorator <<Temporary>> {
+    - {static} MOVEMENT_PENALTY: int = -1
+    - {static} DURATION: int = 2
+    - remainingRounds: int
+    __
+    + getMovementBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDescription(): String
+}
+
+class SlowedDecorator <<Temporary>> {
+    - {static} MOVEMENT_PENALTY: int = -1
+    - {static} DURATION: int = 2
+    - remainingRounds: int
+    __
+    + getMovementBonus(unit: Unit): int
+    + isExpired(): boolean
+    + tick(): void
+    + getDescription(): String
+}
+
+' ===== Component (decorated class) =====
+ABSTRACT_CLASS Unit <<Abstract>> {
+    - decorators: List<UnitDecorator>
+    __
+    + addDecorator(decorator: UnitDecorator): void
+    + removeDecorator(decorator: UnitDecorator): void
+    + removeDecoratorsOfType(clazz: Class): void
+    + removeExpiredDecorators(): void
+    + getDecorators(): List<UnitDecorator>
+    __
+    + getAttack(): int
+    + getDefense(): int
+    + getMovement(): int
 }
 
 ' ===== Inheritance =====

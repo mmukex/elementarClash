@@ -18,145 +18,133 @@ skinparam class {
 
 title Observer Pattern - ElementarClash Event System\nGoF #7: One-to-Many Dependency for Event Notification
 
-package "org.elementarclash.game.event" {
-
-    ' ===== Observer Interface =====
-    INTERFACE GameObserver <<Observer>> {
-        + onEvent(event: GameEvent): void
-    }
-
-    ' ===== Event Base Class =====
-    ABSTRACT_CLASS GameEvent <<Event>> {
-        - timestamp: long
-        __
-        # GameEvent()
-        __
-        + {abstract} getEventType(): EventType
-        + {abstract} getDescription(): String
-        + getTimestamp(): long
-    }
-
-    ' ===== Event Type Enum =====
-    enum EventType {
-        UNIT_MOVED
-        UNIT_ATTACKED
-        UNIT_DIED
-        TERRAIN_CHANGED
-        TURN_STARTED
-        TURN_ENDED
-        GAME_STARTED
-        GAME_OVER
-    }
-
-    ' ===== Concrete Events =====
-    class UnitMovedEvent <<Event>> {
-        - unit: Unit
-        - from: Position
-        - to: Position
-        __
-        + UnitMovedEvent(unit, from, to)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class UnitAttackedEvent <<Event>> {
-        - attacker: Unit
-        - target: Unit
-        - damageResult: DamageResult
-        __
-        + UnitAttackedEvent(attacker, target, damageResult)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class UnitDeathEvent <<Event>> {
-        - unit: Unit
-        __
-        + UnitDeathEvent(unit)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class TerrainChangedEvent <<Event>> {
-        - position: Position
-        - oldTerrain: Terrain
-        - newTerrain: Terrain
-        __
-        + TerrainChangedEvent(position, oldTerrain, newTerrain)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class TurnStartedEvent <<Event>> {
-        - faction: Faction
-        __
-        + TurnStartedEvent(faction)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class TurnEndedEvent <<Event>> {
-        - faction: Faction
-        __
-        + TurnEndedEvent(faction)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class GameStartedEvent <<Event>> {
-        + GameStartedEvent()
-        + getEventType(): EventType
-        + getDescription(): String
-    }
-
-    class GameOverEvent <<Event>> {
-        - winner: Faction
-        __
-        + GameOverEvent(winner)
-        + getEventType(): EventType
-        + getDescription(): String
-    }
+' ===== Observer Interface =====
+INTERFACE GameObserver <<Observer>> {
+    + onEvent(event: GameEvent): void
 }
 
-package "org.elementarclash.game.event.observer" {
-
-    ' ===== Concrete Observer: Event Log =====
-    class EventLogObserver <<ConcreteObserver>> {
-        - eventLog: List<GameEvent>
-        __
-        + onEvent(event: GameEvent): void
-        + printLog(): void
-    }
+' ===== Event Base Class =====
+ABSTRACT_CLASS GameEvent <<Event>> {
+    - timestamp: long
+    __
+    # GameEvent()
+    __
+    + {abstract} getEventType(): EventType
+    + {abstract} getDescription(): String
+    + getTimestamp(): long
 }
 
-package "org.elementarclash.ui" {
-
-    ' ===== Concrete Observer: Console Renderer =====
-    class ConsoleGameRenderer <<ConcreteObserver>> {
-        __
-        + onEvent(event: GameEvent): void
-        - handleUnitMoved(event: UnitMovedEvent): void
-        - handleUnitAttacked(event: UnitAttackedEvent): void
-        - handleUnitDeath(event: UnitDeathEvent): void
-        - handleTerrainChanged(event: TerrainChangedEvent): void
-        - handleTurnStarted(event: TurnStartedEvent): void
-        - handleTurnEnded(event: TurnEndedEvent): void
-        - handleGameStarted(event: GameStartedEvent): void
-        - handleGameOver(event: GameOverEvent): void
-    }
+' ===== Event Type Enum =====
+enum EventType {
+    UNIT_MOVED
+    UNIT_ATTACKED
+    UNIT_DIED
+    TERRAIN_CHANGED
+    TURN_STARTED
+    TURN_ENDED
+    GAME_STARTED
+    GAME_OVER
 }
 
-package "org.elementarclash.game" {
+' ===== Concrete Events =====
+class UnitMovedEvent <<Event>> {
+    - unit: Unit
+    - from: Position
+    - to: Position
+    __
+    + UnitMovedEvent(unit, from, to)
+    + getEventType(): EventType
+    + getDescription(): String
+}
 
-    ' ===== Subject =====
-    class Game <<Subject>> {
-        - observers: List<GameObserver>
-        __
-        + addObserver(observer: GameObserver): void
-        + removeObserver(observer: GameObserver): void
-        + notifyObservers(event: GameEvent): void
-        + notifyTerrainChanged(pos: Position, old: Terrain, new: Terrain): void
-    }
+class UnitAttackedEvent <<Event>> {
+    - attacker: Unit
+    - target: Unit
+    - damageResult: DamageResult
+    __
+    + UnitAttackedEvent(attacker, target, damageResult)
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+class UnitDeathEvent <<Event>> {
+    - unit: Unit
+    __
+    + UnitDeathEvent(unit)
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+class TerrainChangedEvent <<Event>> {
+    - position: Position
+    - oldTerrain: Terrain
+    - newTerrain: Terrain
+    __
+    + TerrainChangedEvent(position, oldTerrain, newTerrain)
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+class TurnStartedEvent <<Event>> {
+    - faction: Faction
+    __
+    + TurnStartedEvent(faction)
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+class TurnEndedEvent <<Event>> {
+    - faction: Faction
+    __
+    + TurnEndedEvent(faction)
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+class GameStartedEvent <<Event>> {
+    + GameStartedEvent()
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+class GameOverEvent <<Event>> {
+    - winner: Faction
+    __
+    + GameOverEvent(winner)
+    + getEventType(): EventType
+    + getDescription(): String
+}
+
+' ===== Concrete Observer: Event Log =====
+class EventLogObserver <<ConcreteObserver>> {
+    - eventLog: List<GameEvent>
+    __
+    + onEvent(event: GameEvent): void
+    + printLog(): void
+}
+
+' ===== Concrete Observer: Console Renderer =====
+class ConsoleGameRenderer <<ConcreteObserver>> {
+    __
+    + onEvent(event: GameEvent): void
+    - handleUnitMoved(event: UnitMovedEvent): void
+    - handleUnitAttacked(event: UnitAttackedEvent): void
+    - handleUnitDeath(event: UnitDeathEvent): void
+    - handleTerrainChanged(event: TerrainChangedEvent): void
+    - handleTurnStarted(event: TurnStartedEvent): void
+    - handleTurnEnded(event: TurnEndedEvent): void
+    - handleGameStarted(event: GameStartedEvent): void
+    - handleGameOver(event: GameOverEvent): void
+}
+
+' ===== Subject =====
+class Game <<Subject>> {
+    - observers: List<GameObserver>
+    __
+    + addObserver(observer: GameObserver): void
+    + removeObserver(observer: GameObserver): void
+    + notifyObservers(event: GameEvent): void
+    + notifyTerrainChanged(pos: Position, old: Terrain, new: Terrain): void
 }
 
 ' ===== Inheritance =====
