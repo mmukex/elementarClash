@@ -1,94 +1,158 @@
-\documentclass[a4paper, numbers=withenddot, 11pt, twoside, openany]{scrbook}
-
-% Vorlage für Ausarbeitungen
+% =============================================================================
+% ElementarClash - Schriftliche Ausarbeitung
+% FH Südwestfalen | Modul: Design Pattern in der OOP
 % Kompiliere mit: lualatex Doku.tex
-% Version 2024-09-26
+% =============================================================================
+\documentclass[a4paper,12pt]{article}
 
-% Hier Daten eintragen:
-\newcommand{\name}{Max Meier \\ Matrikelnummer: 30394407 \\ Christian Stiens \\ Matrikelnummer: 30394676}
-\newcommand{\modulname}{Design Pattern in der OOP}
-\newcommand{\thema}{ElementarClash}
-\newcommand{\hochschule}{Fachhochschule Südwestfalen}
-\newcommand{\datum}{\today}
-% Ende der Daten
-
-% Systemschriftarten mit fontspec (LuaLaTeX/XeLaTeX)
-\usepackage{fontspec}
-
-% Automatische Schriftauswahl mit Fallback
-\IfFontExistsTF{Adwaita Sans}{
-    % Linux/Gnome: Adwaita Sans
-    \setsansfont{Adwaita Sans}
-}{
-    \IfFontExistsTF{Segoe UI}{
-        % Windows: Segoe UI
-        \setsansfont{Segoe UI}
-    }{
-        % Fallback: Latin Modern Sans
-        \setsansfont{Latin Modern Sans}
-    }
-}
-
-\renewcommand{\familydefault}{\sfdefault}
+% --- Encoding & Sprache ---
 \usepackage[ngerman]{babel}
-\usepackage{booktabs}
-\usepackage{multirow}
-\usepackage{microtype}
+
+% --- Layout ---
+\usepackage[
+    left=2.5cm,
+    right=2.5cm,
+    top=2.5cm,
+    bottom=2.5cm
+]{geometry}
+\usepackage{parskip}
+\usepackage{fancyhdr}
+\setlength{\headheight}{14.5pt}
+
+% --- Grafiken & Tabellen ---
 \usepackage{graphicx}
 \usepackage{float}
-\usepackage{tikz}
-\usepackage{scrhack}
-\setkomafont{disposition}{\normalfont\bfseries}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{longtable}
 
-% Kopf- und Fußzeilen
-\usepackage[automark]{scrlayer-scrpage}
-\clearpairofpagestyles
-\ihead{\leftmark}  % Innen: Kapitelnummer und -titel
-\ofoot*{\pagemark}  % Außen: Seitenzahl
-\pagestyle{scrheadings}
-\setlength{\footheight}{10pt}  % Reduzierte Höhe der Fußzeile
+% --- Links ---
+\usepackage[
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=black,
+    pdftitle={ElementarClash},
+    pdfauthor={Max Meier, Christian Stiens}
+]{hyperref}
 
-% Kopfzeile auch auf Kapitelanfangsseiten
-\renewcommand*{\chapterpagestyle}{scrheadings}
+% --- Mathe ---
+\usepackage{amsmath}
 
-% Weniger Abstand über Kapiteltitel
-\renewcommand*{\chapterheadstartvskip}{\vspace*{1cm}}
-\usepackage{setspace}\setstretch{1.1}
-\parindent0pt\parskip6pt
+% --- Code-Listings ---
+\usepackage{xcolor}
+\usepackage{listings}
+
+\definecolor{codegreen}{rgb}{0,0.5,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.95}
+
+\lstset{
+    language=Java,
+    backgroundcolor=\color{backcolour},
+    basicstyle=\ttfamily\small,
+    keywordstyle=\color{blue}\bfseries,
+    stringstyle=\color{codegreen},
+    commentstyle=\color{codegray}\itshape,
+    numberstyle=\tiny\color{codegray},
+    numbers=left,
+    numbersep=8pt,
+    breaklines=true,
+    breakatwhitespace=false,
+    showstringspaces=false,
+    frame=single,
+    framerule=0.5pt,
+    rulecolor=\color{codegray},
+    tabsize=4,
+    captionpos=b,
+    xleftmargin=1.5em,
+    framexleftmargin=1.5em,
+    aboveskip=1em,
+    belowskip=1em,
+    keepspaces=true,
+    columns=fixed,
+    literate={ä}{{\"a}}1 {ö}{{\"o}}1 {ü}{{\"u}}1
+             {Ä}{{\"A}}1 {Ö}{{\"O}}1 {Ü}{{\"U}}1
+             {ß}{{\ss}}1
+}
+
+% --- Makros ---
+\newcommand{\name}{Max Meier \\ Matrikelnummer: 30394407 \\ Christian Stiens \\ Matrikelnummer: 30394676}
+\newcommand{\datum}{\today}
+
+% --- Kopf-/Fußzeilen ---
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small ElementarClash -- Design Pattern in der OOP}
+\fancyhead[R]{\small mmukex}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% --- Sonstiges ---
+\usepackage{microtype}
 \clubpenalty=10000
 \widowpenalty=10000
 \displaywidowpenalty=10000
 
-\usepackage{listings}
-\renewcommand{\lstlistingname}{Listing}
-\lstset{basicstyle=\small\ttfamily, breaklines=true, keepspaces=true, columns=fixed}
-
-% Hyperref für klickbare Links (optional, aber empfohlen)
-\usepackage{hyperref}
-\hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    urlcolor=blue,
-    pdftitle={\thema},
-    pdfauthor={Max Meier, Christian Stiens}
-}
-
-\title{\thema}
-\author{\name\\ \hochschule \\[5mm] Schriftliche Ausarbeitung im Modul\\ „\modulname"}
-
+% =============================================================================
+% Titelseite
+% =============================================================================
 \begin{document}
+\pagenumbering{Alph}
 
-\maketitle
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+
+    {\Huge\bfseries ElementarClash\par}
+    \vspace{0.5cm}
+    {\Large Rundenbasiertes Strategiespiel\par}
+    \vspace{0.3cm}
+    {\large mit elementaren Fraktionen und Design Patterns\par}
+
+    \vspace{2cm}
+
+    {\large Schriftliche Ausarbeitung\par}
+    \vspace{0.3cm}
+    {\large im Modul \textbf{Design Pattern in der OOP}\par}
+
+    \vspace{2cm}
+
+    \begin{tabular}{rl}
+        \textbf{Autoren:}    & Max Meier (30394407) \\
+                             & Christian Stiens (30394676) \\
+        \textbf{Hochschule:} & FH Südwestfalen \\
+        \textbf{Datum:}      & \today \\
+    \end{tabular}
+
+    \vfill
+\end{titlepage}
+
+% =============================================================================
+% Inhaltsverzeichnis
+% =============================================================================
+\clearpage
+\pagenumbering{arabic}
 \tableofcontents
+\newpage
 
-% ============================================
-% Kapitel einbinden
-% ============================================
-\include{Erklaerung}
-\include{Kap1_Einleitung}
-\include{Kap2_Anforderungen}
-\include{Kap3_Architektur}
-\include{Kap4_Implementierung}
-\include{Kap5_Zusammenfassung}
+% =============================================================================
+% Kapitel
+% =============================================================================
+\newpage
+\input{Kap1_Einleitung}
+\newpage
+\input{Kap2_Anforderungen}
+\newpage
+\input{Kap3_Architektur}
+\newpage
+\input{Kap4_Implementierung}
+\newpage
+\input{Kap5_Zusammenfassung}
+\newpage
+\input{Erklaerung}
 
 \end{document}

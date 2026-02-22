@@ -1,31 +1,125 @@
-\chapter{Anforderungen (Max Meier)}
+\section{Anforderungen (Max Meier)}
 \label{chap:anforderungen}
 
 % === ZIELUMFANG: ca. 2 Seiten ===
 
-\section{Funktionale Anforderungen}
+\subsection{Funktionale Anforderungen}
 \label{sec:funktionale-anforderungen}
 
-% Tabelle F1-F6 (kompakt):
-% F1: Spielfeld 10×10 mit Geländearten
-% F2: Einheiten mit unterschiedlichen Fähigkeiten
-% F3: Rundenbasierte Logik
-% F4: Aktionen: Bewegen, Angreifen, Undo/Redo
-% F5: Siegbedingung: Alle Gegner besiegen
-% F6: Textbasierte Konsolenoberfläche
+Die funktionalen Anforderungen orientieren sich an der Aufgabenstellung und wurden für ElementarClash wie folgt konkretisiert.
 
-\section{Nicht-funktionale Anforderungen}
+\begin{table}[H]
+\centering
+\begin{tabular}{l l p{9cm}}
+\toprule
+\textbf{ID} & \textbf{Anforderung} & \textbf{Beschreibung} \\
+\midrule
+F1 & Spielfeld & 2D-Raster (10$\times$10) mit unterschiedlichen Geländearten. Umgesetzt als 5 Geländetypen (Lava, Eis, Wald, Wüste, Stein) mit fester Verteilung: 30\,\% Wüste, 20\,\% Wald, 20\,\% Stein, 15\,\% Lava, 15\,\% Eis. \\
+F2 & Einheiten & Verschiedene Einheitentypen, die sich bewegen und handeln können. Umgesetzt als 4 Fraktionen (Feuer, Wasser, Erde, Luft) mit je 3 Einheitentypen und individuellen Werten für LP, Angriff, Verteidigung, Bewegung und Reichweite. \\
+F3 & Rundenlogik & Spieler führen abwechselnd Züge aus; nach jeder Runde werden Ereignisse ausgewertet. Umgesetzt als Phasensystem (Setup, Spielerzug, Event, Spielende) mit 2 Aktionen pro Einheit und Runde. \\
+F4 & Aktionen & Mindestens drei Aktionstypen. Umgesetzt als Bewegen (geländeabhängige Kosten), Angreifen (Nah-/Fernkampf) und Undo/Redo (Rücknahme aller Aktionen innerhalb einer Runde). \\
+F5 & Siegbedingung & Das Spiel endet, wenn ein Spieler alle gegnerischen Einheiten besiegt hat. \\
+F6 & Oberfläche & Einfache textuelle Darstellung des Spielfelds und der Spielzüge. Umgesetzt als ASCII-Konsolenoberfläche mit Eingabeaufforderungen. \\
+\bottomrule
+\end{tabular}
+\caption{Funktionale Anforderungen (konkretisiert für ElementarClash)}
+\label{tab:funktionale-anforderungen}
+\end{table}
+
+\subsection{Nicht-funktionale Anforderungen}
 \label{sec:nicht-funktionale-anforderungen}
 
-% - Java 21, Gradle 8.14
-% - Mind. 8 GoF-Patterns (wir nutzen 10)
-% - Modularität und Erweiterbarkeit
-% - PlantUML-Dokumentation
+Die Aufgabenstellung fordert die Verwendung von Java, C\# oder TypeScript, mindestens 8 sinnvoll integrierte GoF-Patterns, Modularität und Erweiterbarkeit sowie UML-Dokumentation.
 
-\section{Spielkonzept}
+\begin{table}[H]
+\centering
+\begin{tabular}{l p{10cm}}
+\toprule
+\textbf{Anforderung} & \textbf{Umsetzung} \\
+\midrule
+Programmiersprache & Java 21 \\
+Build-System & Gradle 8.14 mit Wrapper \\
+Design Patterns & Gefordert: mindestens 8 GoF-Patterns aus den Kategorien Erzeugung, Struktur und Verhalten. Umgesetzt: 10 Patterns (siehe Kapitel~\ref{chap:architektur}, Tabelle~\ref{tab:pattern-uebersicht}). \\
+Modularität & Erweiterbar ohne Änderungen am Core-Code (z.\,B. neue Fraktionen, Einheiten, Geländearten) durch konsequenten Einsatz von Interfaces und Polymorphie. \\
+Dokumentation & PlantUML-Diagramme für alle Patterns, schriftliche Ausarbeitung in \LaTeX. \\
+Tests & JUnit-5-Tests für alle 10 Design Patterns. \\
+\bottomrule
+\end{tabular}
+\caption{Nicht-funktionale Anforderungen}
+\label{tab:nicht-funktionale-anforderungen}
+\end{table}
+
+\subsection{Spielkonzept}
 \label{sec:spielkonzept}
 
-% Kompakte Übersicht:
-% - 4 Fraktionen mit je 3 Einheiten (Tabelle)
-% - 5 Geländearten mit Effekten (Tabelle)
-% - Kern-Spielmechaniken
+ElementarClash ist ein rundenbasiertes Strategiespiel, in dem zwei Spieler jeweils eine elementare Fraktion steuern.\footnote{Die Architektur des \texttt{GameBuilder} unterstützt 2--4 Fraktionen; die aktuelle Spieloberfläche ist jedoch auf zwei Spieler ausgelegt.}
+Jede Fraktion verkörpert einen eigenen Spielstil: Feuer (aggressiv), Wasser (defensiv), Erde (kontrollierend) und Luft (mobil).
+
+\subsubsection{Fraktionen und Einheiten}
+\label{subsec:fraktionen-einheiten}
+
+Jede Fraktion verfügt über drei Einheitentypen mit individuellen Werten.
+Zusätzlich besitzt jede Fraktion einen passiven Bonus auf bestimmtem Gelände sowie einen Fraktionsvorteil (+25\,\% Schaden) und einen Fraktionsnachteil ($-25$\,\% Schaden) gegenüber je einer anderen Fraktion.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l l r r r r r}
+\toprule
+\textbf{Fraktion} & \textbf{Einheit} & \textbf{LP} & \textbf{ATK} & \textbf{DEF} & \textbf{MOV} & \textbf{RNG} \\
+\midrule
+\multirow{3}{*}{Feuer}
+ & Inferno-Krieger      & 100 & 15 &  5 & 3 & 1 \\
+ & Flammen-Bogenschütze &  70 & 12 &  3 & 4 & 3 \\
+ & Phönix               &  80 & 10 &  4 & 5 & 1 \\
+\midrule
+\multirow{3}{*}{Wasser}
+ & Gezeiten-Wächter & 120 & 10 &  8 & 2 & 1 \\
+ & Frost-Magier     &  60 & 13 &  4 & 3 & 4 \\
+ & Wellen-Reiter    &  90 & 11 &  6 & 4 & 1 \\
+\midrule
+\multirow{3}{*}{Erde}
+ & Stein-Golem      & 150 &  8 & 10 & 2 & 1 \\
+ & Terra-Schamane   &  75 & 11 &  5 & 3 & 2 \\
+ & Erdbeben-Titan   & 130 & 14 &  7 & 2 & 1 \\
+\midrule
+\multirow{3}{*}{Luft}
+ & Wind-Tänzer      &  70 & 12 &  3 & 6 & 1 \\
+ & Sturm-Rufer      &  65 & 14 &  2 & 4 & 3 \\
+ & Himmels-Wächter  &  85 & 10 &  5 & 5 & 2 \\
+\bottomrule
+\end{tabular}
+\caption{Einheitenübersicht aller vier Fraktionen}
+\label{tab:einheiten}
+\end{table}
+
+\subsubsection{Geländearten}
+\label{subsec:gelaendearten}
+
+Das 10$\times$10-Spielfeld wird aus fünf Geländearten zusammengesetzt, die Bewegungskosten, Verteidigungsboni und fraktionsspezifische Effekte besitzen.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l l l p{5.5cm}}
+\toprule
+\textbf{Gelände} & \textbf{Bew.-Kosten} & \textbf{DEF-Bonus} & \textbf{Fraktions-Effekte} \\
+\midrule
+Lava  & Normal: 2, Feuer: 1, Wasser: 3 & 0 & Feuer: +2 ATK; Wasser: $-5$ LP/Runde \\
+Eis   & Normal: 3, Wasser: 1, Feuer: 2 & +1 & Wasser: +3 DEF, +5 LP/Runde; Feuer: +1 DEF, schmilzt zu Wüste \\
+Wald  & Normal: 2 & +2 & Blockiert Fernkampf-Sichtlinie \\
+Wüste & Normal: 1 & 0 & Neutral, keine Boni \\
+Stein & Normal: 3, Erde: 2 & 0 & Erde: +2 DEF \\
+\bottomrule
+\end{tabular}
+\caption{Geländearten mit Bewegungskosten und Effekten}
+\label{tab:gelaende}
+\end{table}
+
+\subsubsection{Kern-Spielmechaniken}
+\label{subsec:kern-spielmechaniken}
+
+Jede Einheit kann pro Runde maximal zwei Aktionen ausführen: einmal Bewegen und einmal Angreifen.
+Bewegungen kosten je nach Gelände und Fraktion unterschiedlich viele Bewegungspunkte; fliegende Einheiten (Luft-Fraktion sowie Phönix) ignorieren Geländekosten.
+Angriffe unterscheiden sich in Nahkampf (Reichweite~1) und Fernkampf (Reichweite~2--4), wobei Wald-Gelände die Sichtlinie für Fernkämpfer blockieren kann.
+Geländeeffekte werden per Visitor Pattern fraktionsspezifisch berechnet, Fraktionsboni und -mali per Chain of Responsibility in die Schadensberechnung integriert.
+Mit steigender Rundenzahl können zufällige (De-)Buffs auf Einheiten angewendet werden, die über das Decorator Pattern gestapelt werden.
+Alle Aktionen einer Runde sind per Undo/Redo rücknehmbar (Command Pattern).

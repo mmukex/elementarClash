@@ -1,15 +1,73 @@
-\chapter{Architektur}
+\section{Architektur (Christian Stiens & Max Meier)}
 \label{chap:architektur}
 
 % === ZIELUMFANG: ca. 10 Seiten (Hauptteil) ===
 % Pro Pattern: ca. 0.5–1 Seite + UML-Diagramm
 
-% Einleitung: Übersichtstabelle aller 10 Patterns (wie in README)
+ElementarClash setzt 10 GoF-Patterns aus allen drei Kategorien ein.
+Tabelle~\ref{tab:pattern-uebersicht} gibt einen Überblick über die gewählten Patterns, ihren konkreten Anwendungsfall im Spiel und die Begründung für die Wahl.
+Die anschließenden Abschnitte beschreiben jedes Pattern im Detail.
+In den zugehörigen UML-Diagrammen wurde zugunsten der Übersichtlichkeit auf die Darstellung von Packages verzichtet.
 
-\section{Erzeugungsmuster}
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{r l l p{3.5cm} p{4.5cm}}
+\toprule
+\textbf{\#} & \textbf{Pattern} & \textbf{Kat.} & \textbf{Anwendungsfall} & \textbf{Begründung} \\
+\midrule
+1 & Factory Method & Erz. & Fraktionsspezifische Einheiten-Erzeugung & 4 Fraktionen $\times$ 3 Typen; erweiterbar ohne Core-Änderungen \\
+2 & Builder & Erz. & Schrittweise Spielfeld-Erstellung & 100 Zellen, Geländeverteilung, Spawn-Positionen -- zu komplex für einen Konstruktor \\
+3 & Composite & Str. & Battlefield $\to$ Region $\to$ Cell & Einheitliche Operationen auf Einzelzellen und ganzen Regionen \\
+4 & Decorator & Str. & Temporäre (De-)Buffs & Stapelbare Laufzeit-Erweiterungen ohne Unterklassen \\
+5 & Strategy & Verh. & Bewegung (Boden/Fliegend), Angriff (Nah-/Fernkampf) & Austauschbare Algorithmen pro Einheit \\
+6 & State & Verh. & Spielphasen und Einheitenzustände & Zustandsabhängiges Verhalten ohne \texttt{if}-Kaskaden \\
+7 & Observer & Verh. & Event-System, UI-Entkopplung & Lose Kopplung zwischen Spiellogik und Darstellung \\
+8 & Command & Verh. & MoveCommand, AttackCommand + Undo/Redo & Aktionen als Objekte mit Rollback-Fähigkeit \\
+9 & Chain of Resp. & Verh. & Schadensberechnungs-Pipeline & Modulare Handler-Kette für Modifikatoren \\
+10 & Visitor & Verh. & Gelände-Effekte auf Einheiten & Double Dispatch für 5 Gelände $\times$ 4 Fraktionen \\
+\bottomrule
+\end{tabular}
+\caption{Übersicht der eingesetzten Design Patterns}
+\label{tab:pattern-uebersicht}
+\end{table}
+
+\subsection{Programmentwurf (Max Meier)}
+\label{sec:programmentwurf}
+
+Die Codebasis ist in fünf Hauptpakete gegliedert, die jeweils eine fachliche Verantwortung kapseln:
+
+\begin{description}
+	\item[\texttt{battlefield}]
+	Spielfeld-Modell (Composite Pattern): \texttt{Cell}, \texttt{Region}, \texttt{Battlefield} sowie das Unter\-paket \texttt{terraineffect} mit dem Visitor Pattern (\texttt{TerrainVisitor}, fünf konkrete Visitor, \texttt{TerrainVisitorFactory}).
+
+	\item[\texttt{units}]
+	Einheiten-Modell: Basisklasse \texttt{Unit}, Fraktions-Enum und die Unter\-pakete \texttt{types} (12~konkrete Einheiten in je einem Fraktionspaket), \texttt{strategy} (Movement-/Attack\-Strategy), \texttt{state} (Unit\-States) sowie \texttt{bonus} mit \texttt{temporary} (Decorator Pattern für Buffs/Debuffs).
+
+	\item[\texttt{game}]
+	Spiellogik: \texttt{Game}, \texttt{GameBuilder} (Builder Pattern), \texttt{RoundManager} sowie die Unter\-pakete \texttt{phase} (State Pattern für Spielphasen), \texttt{command} (Command Pattern mit \texttt{CommandExecutor} und \texttt{CommandHistory}), \texttt{combat} mit \texttt{handler} (Chain of Responsibility) und \texttt{event} mit \texttt{observer} (Observer Pattern).
+
+	\item[\texttt{ui}]
+	ASCII-Konsolenoberfläche: Rendering des Spielfelds und Verarbeitung der Spielereingaben.
+
+	\item[\texttt{util}]
+	Hilfsklassen, u.\,a. \texttt{Position} für Koordinatenberechnungen.
+\end{description}
+
+Diese Paketstruktur spiegelt die Trennung von Datenmodell (\texttt{battlefield}, \texttt{units}), Spiellogik (\texttt{game}) und Darstellung (\texttt{ui}) wider.
+Jedes der 10~Design Patterns ist in dem Paket verortet, das seine fachliche Domäne repräsentiert -- beispielsweise liegt das Strategy Pattern unter \texttt{units.strategy}, das Visitor Pattern unter \texttt{battlefield.terraineffect} und das Command Pattern unter \texttt{game.command}.
+
+Die Patterns greifen zur Laufzeit eng ineinander.
+Der \texttt{GameBuilder} (Builder) erzeugt das \texttt{Battlefield}, dessen Composite-Struktur aus \texttt{Cell}, \texttt{Region} und \texttt{Battlefield} besteht.
+Geländeeffekte auf Einheiten werden über den Visitor ermittelt: Der \texttt{TerrainEffectHandler} in der Schadensberechnungs-Pipeline (Chain of Responsibility) dispatcht für Angreifer und Verteidiger je einen \texttt{TerrainVisitor} auf der aktuellen Zelle des Composite-Spielfelds.
+Spieleraktionen -- Bewegen und Angreifen -- werden als \texttt{MoveCommand} bzw. \texttt{AttackCommand} (Command Pattern) gekapselt; beide delegieren ihre Validierung an die jeweilige Strategy der Einheit (\texttt{MovementStrategy} bzw. \texttt{AttackStrategy}).
+Der \texttt{AttackCommand} löst dabei die gesamte Handler-Kette des \texttt{DamageCalculator} aus, die ihrerseits Visitor, Decorator und Fraktionsmatrix integriert.
+Zustandsübergänge zwischen Spielphasen (State) und UI-Benachrichtigungen (Observer) rahmen diesen Ablauf ein und sorgen für eine lose Kopplung zwischen Spiellogik und Darstellung.
+
+\subsection{Erzeugungsmuster}
 \label{sec:erzeugungsmuster}
 
-\subsection{Factory Method (Christian Stiens)}
+\subsubsection{Factory Method (Christian Stiens)}
 \label{subsec:factory-method}
 % Anwendung: Fraktionsspezifische Einheiten-Erzeugung
 % Begründung: 4 Fraktionen × 3 Einheiten, erweiterbar ohne Core-Änderungen
@@ -26,24 +84,49 @@ Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu er
 	\label{fig:factory-method}
 \end{figure}
 
-\subsection{Builder (Max Meier)}
+\subsubsection{Builder (Max Meier)}
 \label{subsec:builder}
-% Anwendung: Spielfeld-Erstellung (100 Zellen, Geländeverteilung, Startpositionen)
-% Begründung: Komplexes Objekt schrittweise konfigurieren
-% UML-Diagramm + Code-Beispiel
 % Verantwortlich: @mmukex
+Das 10$\times$10-Spielfeld umfasst 100 Zellen mit anteiliger Geländeverteilung (30\,\% Wüste, 20\,\% Wald, 20\,\% Stein, 15\,\% Lava, 15\,\% Eis), Startpositionen für zwei Fraktionen\footnote{Der \texttt{GameBuilder} validiert 2--4 Fraktionen; aktuell werden jedoch nur zwei Spawn-Ecken genutzt.} und eine beliebige Anzahl von Einheiten pro Fraktion.
+Diese Komplexität der Spielerstellung macht einen einzigen Konstruktoraufruf unpraktikabel.
+Das Builder Pattern nach GoF kapselt die schrittweise Konstruktion komplexer Objekte hinter einer fließenden Schnittstelle, sodass der Konstruktionsprozess unabhängig von der Repräsentation des erzeugten Objekts bleibt (vgl. \cite{gof}).
 
-\section{Strukturmuster}
+Die Klasse \texttt{GameBuilder} stellt eine Fluent-API bereit, über die Fraktionen (\texttt{withFactions()}), eine optionale benutzerdefinierte Geländeverteilung (\texttt{withCustomTerrain()}) und ein Zufalls-Seed (\texttt{withRandomSeed()}) konfiguriert werden.
+Anschließend werden Einheiten per \texttt{addUnit()} einer registrierten Fraktion zugewiesen.
+Die \texttt{build()}-Methode validiert die Konfiguration (mindestens 2 Fraktionen vorhanden, jede Fraktion besitzt Einheiten), erzeugt das \texttt{Battlefield}, verteilt die Geländetypen nach der konfigurierten Prozentverteilung und platziert die Einheiten in zwei gegenüberliegenden Ecken-Spawn-Zonen à 3$\times$3~Felder (vgl. \texttt{GameBuilder.java Z.\,87ff}).
+Durch die Trennung von Konfiguration und Konstruktion lassen sich unterschiedliche Spielkonfigurationen (z.\,B. reine Lava-Karte für Tests, symmetrische Wettkampfkarte) mit derselben Builder-Klasse erzeugen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Builder_Pattern___ElementarClash}
+	\caption{Builder Pattern für die Spielerstellung}
+	\label{fig:builder-pattern}
+\end{figure}
+
+\subsection{Strukturmuster}
 \label{sec:strukturmuster}
 
-\subsection{Composite (Max Meier)}
+\subsubsection{Composite (Max Meier)}
 \label{subsec:composite}
-% Anwendung: Battlefield → Regionen → Zellen
-% Begründung: Einheitliche Operationen auf Teil und Ganzem
-% UML-Diagramm
 % Verantwortlich: @mmukex
+Das Spielfeld besteht aus 100 einzelnen Zellen, die in Zeilen und beliebigen Teilregionen organisiert sind.
+Geländeeffekte und dynamische Ereignisse (z.\,B. Waldbrand, Erdbeben, Geysir) sollen sowohl auf einzelne Zellen als auch auf ganze Regionen einheitlich angewendet werden können.
+Das Composite Pattern nach GoF definiert eine gemeinsame Schnittstelle für Einzel- und Gruppenobjekte, sodass Clients beide transparent gleich behandeln können (vgl. \cite{gof}).
 
-\subsection{Decorator (Christian Stiens)}
+Das Interface \texttt{BattlefieldComponent} deklariert die Methoden \texttt{cells()}, \texttt{getCell(int)} und \texttt{applyEffect(Consumer<Cell>)}.
+Die Klasse \texttt{Cell} (Leaf) implementiert \texttt{cells()} als Einelementliste, die sich selbst enthält.
+Der Record \texttt{Region} (Composite) aggregiert eine Liste von Zellen und delegiert \texttt{applyEffect()} an alle enthaltenen Zellen.
+Die Klasse \texttt{Battlefield} (Root-Composite) organisiert 10~Regionen (Zeilen) à 10~Zellen und stellt zusätzlich die Methode \texttt{getRegion(x1,\,y1,\,x2,\,y2)} bereit, um dynamisch beliebige Teilbereiche für Flächeneffekte zu extrahieren (vgl. \texttt{Battlefield.java Z.\,119ff}).
+Durch diese Hierarchie können Events der \texttt{EventPhase} ihre Effekte über \texttt{applyEffect()} auf eine einzelne Zelle, eine 3$\times$3-Region oder das gesamte Spielfeld anwenden, ohne die Logik duplizieren zu müssen.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Composite_Pattern___ElementarClash}
+	\caption{Composite Pattern für die Spielfeld-Hierarchie}
+	\label{fig:composite-pattern}
+\end{figure}
+
+\subsubsection{Decorator (Christian Stiens)}
 \label{subsec:decorator}
 % Anwendung: Temporäre Buffs/Debuffs stapeln
 % Begründung: Dynamische Erweiterung zur Laufzeit
@@ -60,17 +143,32 @@ Im UI werden diese (De-)Buffs in geschweiften Klammern angezeigt.
 	\label{fig:decorator-pattern}
 \end{figure}
 
-\section{Verhaltensmuster}
+\subsection{Verhaltensmuster}
 \label{sec:verhaltensmuster}
 
-\subsection{Strategy (Max Meier)}
+\subsubsection{Strategy (Max Meier)}
 \label{subsec:strategy}
-% Anwendung: Bewegung (Boden/Fliegend), Angriff (Nahkampf/Fernkampf)
-% Begründung: Austauschbare Algorithmen pro Fraktion
-% UML-Diagramm
 % Verantwortlich: @mmukex
+Einheiten unterschiedlicher Fraktionen besitzen verschiedene Bewegungs- und Angriffsregeln: Luft-Einheiten fliegen über Gelände hinweg, Feuer-Einheiten bewegen sich auf Lava günstiger, Fernkämpfer prüfen Sichtlinien.
+Würden diese Regeln direkt in der \texttt{Unit}-Klasse kodiert, entstünde eine unübersichtliche Verschachtelung von Fallunterscheidungen.
+Das Strategy Pattern nach GoF kapselt austauschbare Algorithmen in eigene Klassen hinter einem gemeinsamen Interface (vgl. \cite{gof}).
 
-\subsection{State (Christian Stiens)}
+Für Bewegung definiert das Interface \texttt{MovementStrategy} die Methoden \texttt{calculateMovementCost(Terrain)} und \texttt{canMoveTo()}.
+Die Implementierung \texttt{GroundMovementStrategy} berücksichtigt fraktionsspezifische Geländemodifikatoren (z.\,B. Feuer auf Lava: Kosten~1, Wasser auf Lava: Kosten~3), während \texttt{FlyingMovementStrategy} alle Geländekosten pauschal auf~1 setzt und damit das Gelände ignoriert.
+Für den Angriff definiert \texttt{AttackStrategy} die Methoden \texttt{canAttack()}, \texttt{calculateBaseDamage()} und \texttt{getAttackRange()}.
+\texttt{MeleeAttackStrategy} prüft lediglich die Manhattan-Distanz, \texttt{RangedAttackStrategy} validiert zusätzlich die Sichtlinie und blockiert Angriffe durch Wald-Gelände -- es sei denn, die Einheit besitzt die Eigenschaft \texttt{ignoresForestDefense} (vgl. \texttt{RangedAttackStrategy.java Z.\,52ff}).
+Jede \texttt{Unit} hält Referenzen auf beide Strategien.
+Alle 12 konkreten Einheiten setzen ihre Strategien explizit im Konstruktor: 4~Einheiten erhalten \texttt{FlyingMovementStrategy} (alle Luft-Einheiten und Phönix), 5~Einheiten erhalten \texttt{RangedAttackStrategy} (Flammen-Bogenschütze, Frost-Magier, Sturm-Rufer, Himmels-Wächter, Terra-Schamane).
+Die Getter in der Basisklasse \texttt{Unit} enthalten einen Fallback-Default als Sicherheitsnetz (vgl. \texttt{Unit.java Z.\,142ff}).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Strategy_Pattern___ElementarClash}
+	\caption{Strategy Pattern für Bewegung und Angriff}
+	\label{fig:strategy-pattern}
+\end{figure}
+
+\subsubsection{State (Christian Stiens)}
 \label{subsec:state}
 % Anwendung: Spielphasen (Setup, Event, InProgress, GameOver)
 % Begründung: Zustandsabhängiges Verhalten
@@ -85,7 +183,7 @@ Spielphasen (SetupPhase, PlayerTurnPhase, EventPhase, GameOverPhase) und UnitSta
 	\label{fig:state-pattern}
 \end{figure}
 
-\subsection{Observer (Christian Stiens)}
+\subsubsection{Observer (Christian Stiens)}
 \label{subsec:observer}
 % Anwendung: Event-System (UI-Updates entkoppeln)
 % Begründung: Lose Kopplung zwischen Spiellogik und Darstellung
@@ -100,14 +198,29 @@ Entkopplung von UI-Updates und dynamische Ereignissen.
 	\label{fig:observer-pattern}
 \end{figure}
 
-\subsection{Command (Max Meier)}
+\subsubsection{Command (Max Meier)}
 \label{subsec:command}
-% Anwendung: MoveCommand, AttackCommand + Undo/Redo
-% Begründung: Aktionen als Objekte, CommandHistory für Rollback
-% UML-Diagramm + Code-Beispiel
 % Verantwortlich: @mmukex
+Pro Runde stehen jeder Einheit zwei Aktionen zur Verfügung: Bewegen und Angreifen.
+Der Spieler soll einzelne Aktionen rückgängig machen können (Undo), um Züge zu überdenken, und diese anschließend wiederholen können (Redo).
+Das Command Pattern nach GoF kapselt Aktionen als Objekte mit \texttt{execute()}- und \texttt{undo()}-Methoden und ermöglicht so die Protokollierung und Umkehrbarkeit von Operationen (vgl. \cite{gof}).
 
-\subsection{Chain of Responsibility (Christian Stiens)}
+Das Interface \texttt{Command} deklariert \texttt{validate(Game)}, \texttt{execute(Game)} und \texttt{undo(Game)}.
+\texttt{MoveCommand} speichert die vorherige Position des Akteurs und stellt sie bei \texttt{undo()} wieder her (vgl. \texttt{MoveCommand.java Z.\,77ff}).
+\texttt{AttackCommand} speichert die Lebenspunkte des Ziels vor dem Angriff, nutzt den \texttt{DamageCalculator} (Chain of Responsibility, vgl. Abschnitt~\ref{subsec:chain}) zur Schadensberechnung und heilt das Ziel bei \texttt{undo()} auf den gespeicherten Wert zurück (vgl. \texttt{AttackCommand.java Z.\,86ff}).
+Die Klasse \texttt{CommandHistory} verwaltet zwei Stacks (\texttt{executedCommands} für Undo, \texttt{undoneCommands} für Redo); ein neuer \texttt{push()} leert den Redo-Stack, da ein neuer Befehl die bisherige Redo-Verzweigung verwirft (vgl. \texttt{CommandHistory.java Z.\,32ff}).
+Der \texttt{CommandExecutor} fungiert als Invoker: Er validiert den Befehl, führt ihn aus und protokolliert ihn in der Historie (vgl. \texttt{CommandExecutor.java Z.\,22ff}).
+Bei Rundenwechsel wird die Historie über \texttt{clearHistory()} geleert, sodass nur Aktionen der laufenden Runde rückgängig gemacht werden können (Per-Turn-Rollback).
+Das Command Pattern interagiert eng mit dem Strategy Pattern (Angriffs- und Bewegungsvalidierung wird an die jeweilige Strategie delegiert) und wird durch das Visitor Pattern (Geländeeffekte innerhalb des \texttt{DamageCalculator}) ergänzt.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Command_Pattern___ElementarClash}
+	\caption{Command Pattern für Undo/Redo}
+	\label{fig:command-pattern}
+\end{figure}
+
+\subsubsection{Chain of Responsibility (Christian Stiens)}
 \label{subsec:chain}
 % Anwendung: Schadensberechnung-Pipeline
 % Begründung: Modulare Handler-Kette für Modifikatoren
@@ -123,14 +236,23 @@ Basisschaden, Fraktionseffekte, Terraineffekte, (temporäre) Effekte auf einer E
 	\label{fig:chain-of-responsibility}
 \end{figure}
 
-\subsection{Visitor (Max Meier)}
+\subsubsection{Visitor (Max Meier)}
 \label{subsec:visitor}
-% Anwendung: Gelände-Effekte auf Einheiten (5 Gelände × 4 Fraktionen)
-% Begründung: Double Dispatch, vermeidet if-Verschachtelung
-% UML-Diagramm
 % Verantwortlich: @mmukex
+Jeder der fünf Geländetypen wirkt sich unterschiedlich auf die vier Fraktionen aus: Feuer-Einheiten erhalten auf Lava +2~Angriff, Wasser-Einheiten erleiden dort $-5$~LP/Runde, während Erde und Luft unberührt bleiben.
+Die direkte Modellierung aller 20~Kombinationen (5~Gelände $\times$ 4~Fraktionen) über verschachtelte \texttt{if}-Anweisungen wäre schwer wartbar und bei neuen Geländetypen fehleranfällig.
+Das Visitor Pattern nach GoF löst dieses Problem durch Double Dispatch: Die besuchte Struktur ruft die passende \texttt{visit()}-Methode auf dem Visitor auf, wodurch beide Dimensionen (Gelände und Fraktion) ohne Fallunterscheidungen aufgelöst werden (vgl. \cite{gof}).
 
-\section{Programmentwurf}
-\label{sec:programmentwurf}
-% Gesamtübersicht: Paketstruktur-Diagramm
-% Optional: Sequenzdiagramm Angriff
+Das Interface \texttt{TerrainVisitor} deklariert je eine Methode pro Fraktion: \texttt{visitFireUnit()}, \texttt{visitWaterUnit()}, \texttt{visitEarthUnit()} und \texttt{visitAirUnit()}.
+Die abstrakte Basisklasse \texttt{AbstractTerrainVisitor} liefert für alle Methoden die Standard-Rückgabe \texttt{TerrainEffectResult.NEUTRAL} und stellt Hilfsmethoden (\texttt{createAttackBonus()}, \texttt{createDefenseBonus()} etc.) bereit.
+Fünf konkrete Visitor -- \texttt{LavaTerrainVisitor}, \texttt{IceTerrainVisitor}, \texttt{ForestTerrainVisitor}, \texttt{StoneTerrainVisitor} und \texttt{DesertTerrainVisitor} -- überschreiben jeweils nur die Methoden, für die tatsächlich Effekte gelten.
+Der Double Dispatch wird in \texttt{Unit.accept(TerrainVisitor)} realisiert: Ein \texttt{switch}-Ausdruck über die Fraktion der Einheit ruft die passende \texttt{visit()}-Methode auf (vgl. \texttt{Unit.java Z.\,168ff}).
+Die \texttt{TerrainVisitorFactory} cached die fünf zustandslosen Visitor-Instanzen in einer \texttt{EnumMap} und liefert sie per \texttt{getVisitor(Terrain)} in $O(1)$ aus (vgl. \texttt{TerrainVisitorFactory.java Z.\,36ff}).
+Das Ergebnis eines Besuchs ist ein unveränderliches \texttt{TerrainEffectResult}-Record mit Angriffs-/Verteidigungsbonus, LP-pro-Runde-Effekt und einer optionalen Geländetransformation (z.\,B. Eis $\to$ Wüste bei Feuer-Einheiten).
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=\textwidth]{images/Visitor_Pattern___ElementarClash}
+	\caption{Visitor Pattern für Geländeeffekte}
+	\label{fig:visitor-pattern}
+\end{figure}

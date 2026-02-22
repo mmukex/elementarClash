@@ -1,12 +1,12 @@
-\chapter{Implementierung}
+\section{Implementierung}
 \label{chap:implementierung}
 
 % === ZIELUMFANG: ca. 4 Seiten ===
 
-\section{Spielobjekte}
+\subsection{Spielobjekte}
 \label{sec:spielobjekte}
 
-\subsection{Einheiten-Erzeugung (Christian Stiens)}
+\subsubsection{Einheiten-Erzeugung (Christian Stiens)}
 \label{subsec:einheiten-erzeugung}
 % - Einheiten-Tabelle (alle 12 Einheiten mit Stats)
 % - Pattern-Bezug: Factory Method
@@ -40,15 +40,124 @@ Jede der vier Fraktionen hat 3 verschiedene Einheitentypen. die in
 	\label{fig:airFaction}
 \end{figure}
 
-\subsection{Spielfeld \& Gelände (Max Meier)}
+\subsubsection{Spielfeld \& Gelände (Max Meier)}
 \label{subsec:spielfeld-gelaende}
-% - Gelände-Tabelle (Bewegungskosten, Boni, Fraktions-Effekte)
 % - Pattern-Bezug: Builder, Composite, Visitor
+Dieser Abschnitt setzt die Anforderungen F1 (Spielfeld) und F2 (Einheiten) um (vgl. Tabelle~\ref{tab:funktionale-anforderungen}): ein 10$\times$10-Raster mit fünf Geländearten, fraktionsspezifischen Effekten und Spawn-Zonen für zwei Fraktionen.\footnote{Der \texttt{GameBuilder} unterstützt architektonisch 2--4 Fraktionen; die aktuelle Spieloberfläche nutzt zwei.}
 
-\section{Spiellogik}
+Die Erzeugung des Spielfelds erfolgt über den \texttt{GameBuilder} (Builder Pattern).
+Über eine Fluent-API werden zunächst Fraktionen registriert, optional eine benutzerdefinierte Geländeverteilung gesetzt und Einheiten hinzugefügt.
+Die \texttt{build()}-Methode validiert die Konfiguration, erzeugt das \texttt{Battlefield} und platziert die Einheiten in den Ecken-Spawn-Zonen.
+
+\begin{lstlisting}[language=Java, caption={GameBuilder -- Fluent-API und Build-Methode}, label={lst:builder-build}]
+public GameBuilder withFactions(Faction... factions) {
+    validateFactionCount(factions.length);
+    this.factions.addAll(Arrays.asList(factions));
+    return this;
+}
+
+public Game build() {
+    validate();
+    Battlefield battlefield = createAndInitializeBattlefield();
+    Game game = new Game(battlefield);
+    placeUnitsOnBattlefield(game);
+    setInitialFaction(game);
+    return game;
+}
+
+private void validate() {
+    validateFactionsPresent();
+    validateEachFactionHasUnits();
+}
+\end{lstlisting}
+
+Listing~\ref{lst:builder-build} zeigt die Fluent-API des \texttt{GameBuilder} sowie die zentrale \texttt{build()}-Methode.
+Die Methode \texttt{withFactions()} validiert die Fraktionsanzahl\footnote{Intern erlaubt: 2--4 Fraktionen (\texttt{MIN\_FACTIONS}=2, \texttt{MAX\_FACTIONS}=4); im Spiel werden aktuell zwei verwendet.} und gibt \texttt{this} zurück, um weitere Konfigurationsschritte zu verketten.
+In \texttt{build()} wird zunächst geprüft, ob Fraktionen vorhanden sind und jede Fraktion mindestens eine Einheit besitzt; anschließend wird das \texttt{Battlefield} mit der Geländeverteilung initialisiert und die Einheiten werden in vier 3$\times$3-Spawn-Regionen an den Ecken des Spielfelds platziert (vgl. \texttt{GameBuilder.java Z.\,164ff}).
+
+Das Spielfeld ist als Composite-Hierarchie aufgebaut: Das Interface \texttt{BattlefieldComponent} wird von \texttt{Cell} (Leaf), \texttt{Region} (Composite) und \texttt{Battlefield} (Root-Composite) implementiert.
+
+\begin{lstlisting}[language=Java, caption={Composite-Hierarchie -- Cell, Region und Battlefield}, label={lst:composite-hierarchy}]
+// BattlefieldComponent.java -- Component-Interface
+public interface BattlefieldComponent {
+    List<Cell> cells();
+    default void applyEffect(Consumer<Cell> effect) {
+        cells().forEach(effect);
+    }
+}
+
+// Cell.java -- Leaf
+public class Cell implements BattlefieldComponent {
+    @Override
+    public List<Cell> cells() { return List.of(this); }
+}
+
+// Region.java -- Composite
+public record Region(List<Cell> cells)
+        implements BattlefieldComponent {
+    @Override
+    public List<Cell> cells() { return new ArrayList<>(cells); }
+}
+
+// Battlefield.java -- Root-Composite
+public class Battlefield implements BattlefieldComponent {
+    private final List<Region> rows;
+    @Override
+    public List<Cell> cells() {
+        return rows.stream()
+            .flatMap(row -> row.cells().stream()).toList();
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:composite-hierarchy} stellt die drei Ebenen der Composite-Hierarchie gegenüber.
+\texttt{Cell} gibt als Leaf stets eine Einelementliste zurück, \texttt{Region} delegiert an ihre enthaltenen Zellen und \texttt{Battlefield} flacht alle Zeilen zu einer Gesamtliste ab.
+Die Methode \texttt{applyEffect(Consumer<Cell>)} im Interface ermöglicht es, denselben Effekt -- beispielsweise das Umwandeln von Wald in Lava bei einem Waldbrand-Event -- auf eine einzelne Zelle, eine 3$\times$3-Region oder das gesamte Spielfeld anzuwenden, ohne die Logik duplizieren zu müssen (vgl. \texttt{BattlefieldComponent.java Z.\,53ff}).
+
+Die Geländeeffekte auf Einheiten werden über das Visitor Pattern abgebildet.
+Jeder Geländetyp besitzt einen eigenen \texttt{TerrainVisitor}, der fraktionsspezifische Boni oder Mali berechnet.
+
+\begin{lstlisting}[language=Java, caption={Visitor -- TerrainVisitor und LavaTerrainVisitor}, label={lst:visitor-lava}]
+// TerrainVisitor.java
+public interface TerrainVisitor {
+    TerrainEffectResult visitFireUnit(Unit unit);
+    TerrainEffectResult visitWaterUnit(Unit unit);
+    TerrainEffectResult visitEarthUnit(Unit unit);
+    TerrainEffectResult visitAirUnit(Unit unit);
+}
+
+// LavaTerrainVisitor.java
+public class LavaTerrainVisitor
+        extends AbstractTerrainVisitor {
+    private static final int FIRE_ATTACK_BONUS = 2;
+    private static final int WATER_HP_DRAIN = -5;
+
+    @Override
+    public TerrainEffectResult visitFireUnit(Unit unit) {
+        return createAttackBonus(FIRE_ATTACK_BONUS,
+            unit.getName() + ": +2 Angriff auf Lava");
+    }
+
+    @Override
+    public TerrainEffectResult visitWaterUnit(Unit unit) {
+        return createPerTurnEffect(WATER_HP_DRAIN,
+            unit.getName() + ": -5 LP/Runde auf Lava");
+    }
+    // visitEarthUnit(), visitAirUnit() -> NEUTRAL (geerbt)
+}
+\end{lstlisting}
+
+Listing~\ref{lst:visitor-lava} zeigt das \texttt{TerrainVisitor}-Interface mit seinen vier fraktionsspezifischen \texttt{visit()}-Methoden sowie den \texttt{LavaTerrainVisitor} als konkreten Visitor.
+Feuer-Einheiten erhalten auf Lava einen Angriffsbonus von~+2, Wasser-Einheiten erleiden $-5$~LP/Runde.
+Für Erde und Luft greift die Standardimplementierung aus \texttt{AbstractTerrainVisitor}, die \texttt{TerrainEffectResult.NEUTRAL} zurückgibt.
+Der Double Dispatch wird in der \texttt{Unit}-Klasse durch einen \texttt{switch}-Ausdruck über die Fraktion realisiert: \texttt{accept(TerrainVisitor)} ruft je nach Fraktion die passende \texttt{visit()}-Methode auf (vgl. \texttt{Unit.java Z.\,168ff}).
+Auf diese Weise werden alle 20~Gelände-Fraktions-Kombinationen typsicher und ohne verschachtelte Fallunterscheidungen abgebildet.
+Die \texttt{TerrainVisitorFactory} hält die fünf zustandslosen Visitor-Instanzen in einer \texttt{EnumMap} vor und liefert sie in $O(1)$ aus (vgl. \texttt{TerrainVisitorFactory.java Z.\,36ff}).
+
+\subsection{Spiellogik}
 \label{sec:spiellogik}
 
-\subsection{Rundenablauf \& Phasen (Christian Stiens)}
+\subsubsection{Rundenablauf \& Phasen (Christian Stiens)}
 \label{subsec:rundenablauf}
 % - Aktionen pro Runde: 1× Bewegen, 1× Angreifen
 % - Zugwechsel zwischen Fraktionen
@@ -64,12 +173,104 @@ Anschließend beginnt eine neue \texttt{PlayerTurnPhase}
 
 
 
-\subsection{Bewegung \& Angriffsstrategie (Max Meier)}
+\subsubsection{Bewegung \& Angriffsstrategie (Max Meier)}
 \label{subsec:bewegung-angriffsstrategie}
-% - Boden-/Flugbewegung, Nahkampf/Fernkampf
 % - Pattern-Bezug: Strategy
+Dieser Abschnitt setzt Anforderung F4 (Aktionen: Bewegen und Angreifen) um (vgl. Tabelle~\ref{tab:funktionale-anforderungen}): geländeabhängige Bewegungskosten sowie Nah- und Fernkampf mit Sichtlinienprüfung.
 
-\subsection{Schadensberechnung (Christian Stiens)}
+Die Bewegungs- und Angriffslogik wird über das Strategy Pattern in zwei getrennten Hierarchien gekapselt.
+Das Interface \texttt{MovementStrategy} definiert die Berechnung von Geländekosten und die Zugvalidierung.
+\texttt{GroundMovementStrategy} berücksichtigt fraktionsspezifische Modifikatoren (z.\,B. Feuer auf Lava: Kosten~1 statt~2, Wasser auf Lava: Kosten~3), während \texttt{FlyingMovementStrategy} alle Geländekosten pauschal auf~1 setzt.
+
+\begin{lstlisting}[language=Java, caption={Strategy Pattern -- MovementStrategy und FlyingMovementStrategy}, label={lst:strategy-movement}]
+// MovementStrategy.java
+public interface MovementStrategy {
+    double calculateMovementCost(Terrain terrain);
+    boolean canMoveTo(Game game, Position current,
+                      Position target, int maxMovement);
+}
+
+// FlyingMovementStrategy.java
+public class FlyingMovementStrategy
+        implements MovementStrategy {
+    private static final double FLYING_TERRAIN_COST = 1.0;
+
+    @Override
+    public double calculateMovementCost(Terrain terrain) {
+        return FLYING_TERRAIN_COST;
+    }
+
+    @Override
+    public boolean canMoveTo(Game game, Position current,
+                             Position target, int maxMov) {
+        if (game.isPositionOccupied(target)) return false;
+        return current.manhattanDistanceTo(target) <= maxMov;
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:strategy-movement} zeigt das \texttt{MovementStrategy}-Interface und die \texttt{FlyingMovementStrategy}.
+Fliegende Einheiten (alle Luft-Einheiten sowie der Phönix der Feuer-Fraktion) erhalten diese Strategie und ignorieren damit sämtliche Geländekosten -- ihre effektive Reichweite entspricht stets dem Basis-Bewegungswert.
+
+Im Gegensatz dazu berücksichtigt die \texttt{GroundMovementStrategy} fraktionsspezifische Geländemodifikatoren.
+Sie erhält im Konstruktor die Fraktion der Einheit und leitet in \texttt{calculateMovementCost()} per \texttt{switch}-Ausdruck an die passende Modifikator-Methode weiter (vgl. \texttt{GroundMovementStrategy.java Z.\,44ff}).
+
+\begin{lstlisting}[language=Java, caption={GroundMovementStrategy -- fraktionsspezifische Geländekosten}, label={lst:strategy-ground}]
+public class GroundMovementStrategy
+        implements MovementStrategy {
+
+    private static final double FIRE_LAVA_COST = 1.0;
+    private static final double FIRE_ICE_COST = 2.0;
+    private static final double WATER_ICE_COST = 1.0;
+    private static final double WATER_LAVA_COST = 3.0;
+
+    private final Faction faction;
+
+    @Override
+    public double calculateMovementCost(Terrain terrain) {
+        double baseCost = terrain.getMovementCost();
+        return switch (faction) {
+            case FIRE  -> applyFireModifiers(terrain, baseCost);
+            case WATER -> applyWaterModifiers(terrain, baseCost);
+            case EARTH -> applyEarthModifiers(terrain, baseCost);
+            default    -> baseCost;
+        };
+    }
+
+    private double applyFireModifiers(Terrain t, double base) {
+        return switch (t) {
+            case LAVA -> FIRE_LAVA_COST;   // Kosten 1 statt 2
+            case ICE  -> FIRE_ICE_COST;    // Kosten 2 statt 3
+            default   -> base;
+        };
+    }
+
+    private double applyWaterModifiers(Terrain t, double base) {
+        return switch (t) {
+            case ICE  -> WATER_ICE_COST;   // Kosten 1 statt 3
+            case LAVA -> WATER_LAVA_COST;  // Kosten 3 statt 2
+            default   -> base;
+        };
+    }
+
+    private double applyEarthModifiers(Terrain t, double base) {
+        return switch (t) {
+            case STONE -> 2.0;             // Kosten 2 statt 3
+            default    -> base;
+        };
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:strategy-ground} zeigt den Kontrast zur \texttt{FlyingMovementStrategy}: Während fliegende Einheiten pauschal Kosten~1 zahlen, variieren die Kosten für Bodeneinheiten je nach Fraktion und Gelände erheblich -- Feuer-Einheiten bewegen sich auf Lava für Kosten~1 statt~2, Wasser-Einheiten auf Eis für Kosten~1 statt~3, dafür auf Lava für Kosten~3 statt~2.
+
+Für den Angriff definiert \texttt{AttackStrategy} die Methoden \texttt{canAttack()}, \texttt{calculateBaseDamage()} und \texttt{getAttackRange()}.
+\texttt{MeleeAttackStrategy} prüft die Manhattan-Distanz gegen die Reichweite der Einheit (typischerweise~1).
+\texttt{RangedAttackStrategy} validiert zusätzlich die Sichtlinie: Wald-Gelände auf dem Pfad zwischen Angreifer und Ziel blockiert den Angriff, sofern die Einheit nicht über die Eigenschaft \texttt{ignoresForestDefense} verfügt -- wie etwa der Flammen-Bogenschütze (vgl. \texttt{RangedAttackStrategy.java Z.\,52ff}).
+Alle 12 konkreten Einheiten setzen ihre Strategien explizit im Konstruktor: 4~Einheiten erhalten \texttt{FlyingMovementStrategy} (Phoenix, WindDancer, StormCaller, SkyGuardian), 5~Einheiten \texttt{RangedAttackStrategy} -- davon der Flammen-Bogenschütze mit \texttt{ignoresForestDefense=true}, die übrigen mit \texttt{false}.
+Die Getter in \texttt{Unit} (Z.\,142ff) enthalten \texttt{GroundMovementStrategy} bzw. \texttt{MeleeAttackStrategy} als Fallback-Default.
+
+\subsubsection{Schadensberechnung (Christian Stiens)}
 \label{subsec:schadensberechnung}
 % - Schadensformel
 % - Gelände-Modifikatoren
@@ -96,7 +297,7 @@ Der \texttt{SynergyBonusHandler} greift auf die aktiven Dekoratoren der angreife
 Als terminaler Handler berechnet der \texttt{DefenseCalculationHandler} schließlich den Endschaden nach der Formel $\text{finalDamage} = \max(1,\ \text{totalAttack} - \text{totalDefense})$ und schreibt das Ergebnis in den Kontext (vgl. \texttt{DefenseCalculationHandler.java Z. 15ff}).
 Der fertige Kontext wird anschließend in ein unveränderliches \texttt{DamageResult}-Record umgewandelt und vom \texttt{AttackCommand} genutzt, um den Schaden auf die Zieleinheit anzuwenden und die Observer zu benachrichtigen (vgl. \texttt{DamageContext.java Z. 90ff}, \texttt{AttackCommand.java Z. 91ff}).
 
-\subsection{Buffs/Debuffs (Christian Stiens)}
+\subsubsection{Buffs/Debuffs (Christian Stiens)}
 \label{subsec:buffs-debuffs}
 % - Temporäre (De-)Buffs zur Laufzeit
 % - Pattern-Bezug: Decorator
@@ -104,13 +305,111 @@ Der fertige Kontext wird anschließend in ein unveränderliches \texttt{DamageRe
 Im Verlauf des Spiels wird mit rundenweise steigender Wahrscheinlichkeit (max. 60\%) zu Beginn eines jeden Spielzugs einer von 6 Effekten (3 Buffs, 3 Debuffs) auf eine zufällig ausgewählte, nicht tote Einheit der aktiven Fraktion angewendet (vgl. \texttt{BuffDebuffManager.java Z. 41ff}).
 Dieser Effekt wird als Decorator an die Unit Klasse angefügt.
 
-\subsection{Undo/Redo (Max Meier)}
+\subsubsection{Undo/Redo (Max Meier)}
 \label{subsec:undo-redo}
-% - Per-Turn Rollback
-% - CommandHistory mit zwei Stacks
 % - Pattern-Bezug: Command
+Dieser Abschnitt setzt Anforderung F4 (Aktionen: Undo/Redo) um (vgl. Tabelle~\ref{tab:funktionale-anforderungen}): vollständige Rücknahme aller Aktionen innerhalb einer Runde.
 
-\section{Benutzeroberfläche (Christian Stiens)}
+Das Undo/Redo-System basiert auf dem Command Pattern.
+Jede Spieleraktion wird als \texttt{Command}-Objekt mit eigener Validierungs-, Ausführungs- und Rücknahmelogik gekapselt.
+Der \texttt{CommandExecutor} validiert ein Command, führt es aus und übergibt es an die \texttt{CommandHistory}.
+
+\begin{lstlisting}[language=Java, caption={CommandHistory -- Undo/Redo mit zwei Stacks}, label={lst:command-history}]
+public class CommandHistory {
+    private final Deque<Command> executedCommands;
+    private final Deque<Command> undoneCommands;
+
+    public void push(Command command) {
+        executedCommands.push(command);
+        undoneCommands.clear(); // Neuer Befehl verwirft Redo
+    }
+
+    public Command popForUndo() {
+        if (executedCommands.isEmpty()) return null;
+        Command cmd = executedCommands.pop();
+        undoneCommands.push(cmd);
+        return cmd;
+    }
+
+    public Command popForRedo() {
+        if (undoneCommands.isEmpty()) return null;
+        Command cmd = undoneCommands.pop();
+        executedCommands.push(cmd);
+        return cmd;
+    }
+
+    public void clear() {
+        executedCommands.clear();
+        undoneCommands.clear();
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:command-history} zeigt die \texttt{CommandHistory} mit ihren zwei Stacks.
+Der \texttt{executedCommands}-Stack enthält alle ausgeführten Befehle der aktuellen Runde; bei einem Undo wird der oberste Befehl auf den \texttt{undoneCommands}-Stack verschoben und seine \texttt{undo()}-Methode aufgerufen.
+Ein Redo entnimmt umgekehrt vom \texttt{undoneCommands}-Stack und führt den Befehl erneut aus.
+Sobald ein neuer Befehl per \texttt{push()} hinzugefügt wird, wird der Redo-Stack geleert, da der neue Befehl eine Verzweigung der bisherigen Aktionsfolge darstellt.
+Bei Rundenwechsel leert \texttt{clear()} beide Stacks, sodass der Spieler nur Aktionen der laufenden Runde rückgängig machen kann (Per-Turn-Rollback).
+
+\texttt{MoveCommand} speichert im Feld \texttt{previousPosition} die Ausgangsposition der Einheit und setzt diese bei \texttt{undo()} zurück (vgl. \texttt{MoveCommand.java Z.\,77ff}).
+\texttt{AttackCommand} speichert die Lebenspunkte des Ziels vor dem Angriff (\texttt{targetPreviousHealth}) und heilt das Ziel bei \texttt{undo()} um die Differenz (vgl. \texttt{AttackCommand.java Z.\,86ff}).
+Beide Commands dekrementieren bei Undo den Aktionszähler der Einheit, sodass die Aktion erneut zur Verfügung steht.
+
+\begin{lstlisting}[language=Java, caption={AttackCommand -- execute() und undo()}, label={lst:attack-command}]
+public class AttackCommand implements Command {
+
+    private final Unit actor;
+    private final Unit target;
+
+    private int targetPreviousHealth;
+    private int damageDealt;
+    private boolean wasExecuted;
+
+    @Override
+    public void execute(Game game) {
+        this.targetPreviousHealth = target.getCurrentHealth();
+
+        DamageCalculator calculator = new DamageCalculator();
+        DamageResult result =
+            calculator.calculateDamage(actor, target, game);
+
+        this.damageDealt = result.totalDamage();
+        target.takeDamage(result.totalDamage());
+        actor.incrementActionsThisTurn();
+        actor.startAttacking();
+
+        game.notifyObservers(
+            new UnitAttackedEvent(actor, target, result));
+
+        if (!target.isAlive()) {
+            game.handleUnitDeath(target);
+        }
+        this.wasExecuted = true;
+    }
+
+    @Override
+    public void undo(Game game) {
+        if (!wasExecuted) {
+            throw new IllegalStateException(
+                "Cannot undo command that wasn't executed");
+        }
+        int healthToRestore =
+            targetPreviousHealth - target.getCurrentHealth();
+        if (healthToRestore > 0) {
+            target.heal(healthToRestore);
+        }
+        actor.decrementActionsThisTurn();
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:attack-command} zeigt den \texttt{AttackCommand} im Detail.
+In \texttt{execute()} wird zunächst der aktuelle Gesundheitswert des Ziels in \texttt{targetPreviousHealth} gesichert.
+Anschließend berechnet der \texttt{DamageCalculator} über seine Handler-Kette (Chain of Responsibility) den Gesamtschaden, der auf das Ziel angewendet wird.
+Der Aktionszähler des Angreifers wird inkrementiert und die Observer über ein \texttt{UnitAttackedEvent} benachrichtigt.
+Bei \texttt{undo()} wird die Differenz zwischen gespeichertem und aktuellem Gesundheitswert per \texttt{heal()} wiederhergestellt und der Aktionszähler dekrementiert, sodass die Aktion erneut zur Verfügung steht.
+
+\subsection{Benutzeroberfläche (Christian Stiens)}
 \label{sec:ui}
 
 % - ASCII-Darstellung des Spielfelds
