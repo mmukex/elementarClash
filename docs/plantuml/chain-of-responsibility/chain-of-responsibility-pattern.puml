@@ -18,88 +18,82 @@ skinparam class {
 
 title Chain of Responsibility Pattern - ElementarClash Damage Pipeline\nGoF #9: Decoupled Request Processing Through Handler Chain
 
-package "org.elementarclash.game.combat.handler" {
-
-    ' ===== Abstract Handler =====
-    ABSTRACT_CLASS DamageHandler <<Handler>> {
-        - next: DamageHandler
-        __
-        + setNext(next: DamageHandler): DamageHandler
-        + handle(context: DamageContext): void
-    }
-
-    ' ===== Concrete Handlers =====
-    class BaseDamageHandler <<ConcreteHandler>> {
-        + handle(context: DamageContext): void
-    }
-
-    class FactionAdvantageHandler <<ConcreteHandler>> {
-        - {static} ADVANTAGE_MATRIX: Map<Faction, Map<Faction, Double>>
-        __
-        + handle(context: DamageContext): void
-    }
-
-    class TerrainEffectHandler <<ConcreteHandler>> {
-        + handle(context: DamageContext): void
-    }
-
-    class SynergyBonusHandler <<ConcreteHandler>> {
-        + handle(context: DamageContext): void
-    }
-
-    class DefenseCalculationHandler <<ConcreteHandler>> {
-        + handle(context: DamageContext): void
-    }
+' ===== Abstract Handler =====
+ABSTRACT_CLASS DamageHandler <<Handler>> {
+    - next: DamageHandler
+    __
+    + setNext(next: DamageHandler): DamageHandler
+    + handle(context: DamageContext): void
 }
 
-package "org.elementarclash.game.combat" {
+' ===== Concrete Handlers =====
+class BaseDamageHandler <<ConcreteHandler>> {
+    + handle(context: DamageContext): void
+}
 
-    ' ===== Chain Builder / Client =====
-    class DamageCalculator <<Context>> {
-        - handlerChain: DamageHandler
-        __
-        + DamageCalculator()
-        + calculateDamage(attacker: Unit, target: Unit, game: Game): DamageResult
-    }
+class FactionAdvantageHandler <<ConcreteHandler>> {
+    - {static} ADVANTAGE_MATRIX: Map<Faction, Map<Faction, Double>>
+    __
+    + handle(context: DamageContext): void
+}
 
-    ' ===== Shared State =====
-    class DamageContext <<Context>> {
-        - attacker: Unit
-        - target: Unit
-        - game: Game
-        - calculationSteps: List<String>
-        __
-        - baseDamage: int = 0
-        - factionMultiplier: double = 1.0
-        - terrainAttackBonus: int = 0
-        - terrainDefenseBonus: int = 0
-        - synergyBonus: int = 0
-        - totalDefense: int = 0
-        - finalDamage: int = 0
-        __
-        + DamageContext(attacker, target, game)
-        + setBaseDamage(baseDamage: int): void
-        + applyFactionMultiplier(multiplier: double): void
-        + addTerrainAttackBonus(bonus: int): void
-        + addTerrainDefenseBonus(bonus: int): void
-        + addSynergyBonus(bonus: int): void
-        + setTotalDefense(defense: int): void
-        + setFinalDamage(damage: int): void
-        + getTotalAttack(): int
-        + toResult(): DamageResult
-    }
+class TerrainEffectHandler <<ConcreteHandler>> {
+    + handle(context: DamageContext): void
+}
 
-    ' ===== Immutable Result =====
-    class "DamageResult\n<<record>>" as DamageResult <<ValueObject>> {
-        + totalDamage: int
-        + baseDamage: int
-        + factionMultiplier: double
-        + terrainAttackBonus: int
-        + terrainDefenseBonus: int
-        + synergyBonus: int
-        + totalDefense: int
-        + calculationSteps: List<String>
-    }
+class SynergyBonusHandler <<ConcreteHandler>> {
+    + handle(context: DamageContext): void
+}
+
+class DefenseCalculationHandler <<ConcreteHandler>> {
+    + handle(context: DamageContext): void
+}
+
+' ===== Chain Builder / Client =====
+class DamageCalculator <<Context>> {
+    - handlerChain: DamageHandler
+    __
+    + DamageCalculator()
+    + calculateDamage(attacker: Unit, target: Unit, game: Game): DamageResult
+}
+
+' ===== Shared State =====
+class DamageContext <<Context>> {
+    - attacker: Unit
+    - target: Unit
+    - game: Game
+    - calculationSteps: List<String>
+    __
+    - baseDamage: int = 0
+    - factionMultiplier: double = 1.0
+    - terrainAttackBonus: int = 0
+    - terrainDefenseBonus: int = 0
+    - synergyBonus: int = 0
+    - totalDefense: int = 0
+    - finalDamage: int = 0
+    __
+    + DamageContext(attacker, target, game)
+    + setBaseDamage(baseDamage: int): void
+    + applyFactionMultiplier(multiplier: double): void
+    + addTerrainAttackBonus(bonus: int): void
+    + addTerrainDefenseBonus(bonus: int): void
+    + addSynergyBonus(bonus: int): void
+    + setTotalDefense(defense: int): void
+    + setFinalDamage(damage: int): void
+    + getTotalAttack(): int
+    + toResult(): DamageResult
+}
+
+' ===== Immutable Result =====
+class "DamageResult\n<<record>>" as DamageResult <<ValueObject>> {
+    + totalDamage: int
+    + baseDamage: int
+    + factionMultiplier: double
+    + terrainAttackBonus: int
+    + terrainDefenseBonus: int
+    + synergyBonus: int
+    + totalDefense: int
+    + calculationSteps: List<String>
 }
 
 ' ===== Chain Inheritance =====

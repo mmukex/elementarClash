@@ -12,96 +12,89 @@ skinparam class {
     BorderColor<<Concrete>> DarkBlue
 }
 
-package "org.elementarclash.faction" {
-    enum Faction {
-        FIRE
-        WATER
-        EARTH
-        AIR
-    }
+enum Faction {
+    FIRE
+    WATER
+    EARTH
+    AIR
 }
 
-package "org.elementarclash.units" {
-
-    ' ===== Creator (Abstract Factory) =====
-    ABSTRACT_CLASS UnitFactory <<Abstract>> {
-        - faction: Faction
-        - unitCounter: int
-        __
-        # UnitFactory(faction: Faction)
-        __
-        + {final} createUnit(type: UnitType): Unit
-        # {abstract} createUnitInternal(id: String, type: UnitType): Unit
-        # {abstract} isValidTypeForFaction(type: UnitType): boolean
-        - generateUnitId(type: UnitType): String
-        + getFaction(): Faction
-    }
-
-    ' ===== Product (Abstract Product) =====
-    ABSTRACT_CLASS Unit <<Abstract>> {
-        - id: String
-        - name: String
-        - faction: Faction
-        - type: UnitType
-        - baseStats: UnitStats
-        - currentHealth: int
-        - position: Position
-        - acted: boolean
-        __
-        # Unit(id, name, faction, type, stats)
-        __
-        + isAlive(): boolean
-        + takeDamage(damage: int): void
-        + heal(amount: int): void
-        + resetTurn(): void
-        + markAsActed(): void
-        + {abstract} getSpecialAbility(): String
-        + getTerrainAttackBonus(): int
-        + getTerrainDefenseBonus(): int
-    }
-
-    ' ===== Enum =====
-    enum UnitType {
-        INFERNO_WARRIOR
-        FLAME_ARCHER
-        PHOENIX
-        TIDE_GUARDIAN
-        FROST_MAGE
-        WAVE_RIDER
-        STONE_GOLEM
-        TERRA_SHAMAN
-        EARTHQUAKE_TITAN
-        WIND_DANCER
-        STORM_CALLER
-        SKY_GUARDIAN
-    }
-
-    class UnitStats {
-        + maxHealth: int
-        + attack: int
-        + defense: int
-        + movement: int
-        + range: int
-    }
+' ===== Creator (Abstract Factory) =====
+ABSTRACT_CLASS UnitFactory <<Abstract>> {
+    - faction: Faction
+    - unitCounter: int
+    __
+    # UnitFactory(faction: Faction)
+    __
+    + {final} createUnit(type: UnitType): Unit
+    # {abstract} createUnitInternal(id: String, type: UnitType): Unit
+    # {abstract} isValidTypeForFaction(type: UnitType): boolean
+    - generateUnitId(type: UnitType): String
+    + getFaction(): Faction
 }
 
-package "org.elementarclash.units.fire" {
-    ' ===== Concrete Factory =====
-    class FireUnitFactory <<Concrete>> {
-        + FireUnitFactory()
-        __
-        # createUnitInternal(id: String, type: UnitType): Unit
-        # isValidTypeForFaction(type: UnitType): boolean
-    }
+' ===== Product (Abstract Product) =====
+ABSTRACT_CLASS Unit <<Abstract>> {
+    - id: String
+    - name: String
+    - faction: Faction
+    - type: UnitType
+    - baseStats: UnitStats
+    - currentHealth: int
+    - position: Position
+    - acted: boolean
+    __
+    # Unit(id, name, faction, type, stats)
+    __
+    + isAlive(): boolean
+    + takeDamage(damage: int): void
+    + heal(amount: int): void
+    + resetTurn(): void
+    + markAsActed(): void
+    + {abstract} getSpecialAbility(): String
+    + getTerrainAttackBonus(): int
+    + getTerrainDefenseBonus(): int
+}
 
-    ' ===== Concrete Units (package-private) =====
-    class InfernoWarrior <<Concrete>> <<package-private>> {
-        - {static} LAVA_ATTACK_BONUS: int = 2
-        __
-        ~ InfernoWarrior(id: String, stats: UnitStats)
-        + getSpecialAbility(): String
-        + getTerrainAttackBonus(): int
-    }
+' ===== Enum =====
+enum UnitType {
+    INFERNO_WARRIOR
+    FLAME_ARCHER
+    PHOENIX
+    TIDE_GUARDIAN
+    FROST_MAGE
+    WAVE_RIDER
+    STONE_GOLEM
+    TERRA_SHAMAN
+    EARTHQUAKE_TITAN
+    WIND_DANCER
+    STORM_CALLER
+    SKY_GUARDIAN
+}
+
+class UnitStats {
+    + maxHealth: int
+    + attack: int
+    + defense: int
+    + movement: int
+    + range: int
+}
+
+' ===== Concrete Factory =====
+class FireUnitFactory <<Concrete>> {
+    + FireUnitFactory()
+    __
+    # createUnitInternal(id: String, type: UnitType): Unit
+    # isValidTypeForFaction(type: UnitType): boolean
+}
+
+' ===== Concrete Units (package-private) =====
+class InfernoWarrior <<Concrete>> <<package-private>> {
+    - {static} LAVA_ATTACK_BONUS: int = 2
+    __
+    ~ InfernoWarrior(id: String, stats: UnitStats)
+    + getSpecialAbility(): String
+    + getTerrainAttackBonus(): int
 }
 
 ' ===== Inheritance Relationships =====

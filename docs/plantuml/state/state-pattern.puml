@@ -16,108 +16,102 @@ skinparam class {
 
 title State Pattern - ElementarClash Game Phases\nGoF #6: Object Behavior Changes Based on Internal State
 
-package "org.elementarclash.game.phase" {
-
-    ' ===== State Interface =====
-    INTERFACE GamePhaseState <<State>> {
-        + canExecuteCommand(game: Game, command: Command): boolean
-        + onEnter(game: Game): void
-        + onExit(game: Game): void
-        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
-        + transitionToEventPhase(game: Game): GamePhaseState
-        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
-        + getPhaseName(): String
-    }
-
-    ' ===== Concrete States =====
-    class SetupPhase <<ConcreteState>> {
-        - {static} INSTANCE: SetupPhase
-        __
-        - SetupPhase()
-        + {static} getInstance(): SetupPhase
-        __
-        + canExecuteCommand(game: Game, command: Command): boolean
-        + onEnter(game: Game): void
-        + onExit(game: Game): void
-        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
-        + transitionToEventPhase(game: Game): GamePhaseState
-        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
-        + getPhaseName(): String
-    }
-
-    class "PlayerTurnPhase\n<<record>>" as PlayerTurnPhase <<ConcreteState>> {
-        + activeFaction: Faction
-        __
-        + PlayerTurnPhase(activeFaction: Faction)
-        __
-        + canExecuteCommand(game: Game, command: Command): boolean
-        + onEnter(game: Game): void
-        + onExit(game: Game): void
-        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
-        + transitionToEventPhase(game: Game): GamePhaseState
-        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
-        + getPhaseName(): String
-    }
-
-    class EventPhase <<ConcreteState>> {
-        - {static} INSTANCE: EventPhase
-        - {static} RANDOM: Random
-        __
-        - EventPhase()
-        + {static} getInstance(): EventPhase
-        __
-        + canExecuteCommand(game: Game, command: Command): boolean
-        + onEnter(game: Game): void
-        + onExit(game: Game): void
-        - executeRandomEvent(game: Game): void
-        - executeForestFire(game: Game): void
-        - executeGeyser(game: Game): void
-        - executeEarthquake(game: Game): void
-        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
-        + transitionToEventPhase(game: Game): GamePhaseState
-        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
-        + getPhaseName(): String
-    }
-
-    class "GameOverPhase\n<<record>>" as GameOverPhase <<ConcreteState>> {
-        + winner: Faction
-        __
-        + GameOverPhase(winner: Faction)
-        __
-        + canExecuteCommand(game: Game, command: Command): boolean
-        + onEnter(game: Game): void
-        + onExit(game: Game): void
-        + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
-        + transitionToEventPhase(game: Game): GamePhaseState
-        + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
-        + getPhaseName(): String
-    }
+' ===== State Interface =====
+INTERFACE GamePhaseState <<State>> {
+    + canExecuteCommand(game: Game, command: Command): boolean
+    + onEnter(game: Game): void
+    + onExit(game: Game): void
+    + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+    + transitionToEventPhase(game: Game): GamePhaseState
+    + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+    + getPhaseName(): String
 }
 
-package "org.elementarclash.game" {
+' ===== Concrete States =====
+class SetupPhase <<ConcreteState>> {
+    - {static} INSTANCE: SetupPhase
+    __
+    - SetupPhase()
+    + {static} getInstance(): SetupPhase
+    __
+    + canExecuteCommand(game: Game, command: Command): boolean
+    + onEnter(game: Game): void
+    + onExit(game: Game): void
+    + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+    + transitionToEventPhase(game: Game): GamePhaseState
+    + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+    + getPhaseName(): String
+}
 
-    ' ===== Context =====
-    class Game <<Context>> {
-        - currentPhase: GamePhaseState
-        - activeFaction: Faction
-        - roundManager: RoundManager
-        __
-        + startGame(): void
-        + endTurn(): void
-        + executeCommand(command: Command): ValidationResult
-        - transitionToPhase(newPhase: GamePhaseState): void
-        - checkVictoryCondition(): boolean
-        - determineFirstFaction(): Faction
-        - getNextFaction(): Faction
-    }
+class "PlayerTurnPhase\n<<record>>" as PlayerTurnPhase <<ConcreteState>> {
+    + activeFaction: Faction
+    __
+    + PlayerTurnPhase(activeFaction: Faction)
+    __
+    + canExecuteCommand(game: Game, command: Command): boolean
+    + onEnter(game: Game): void
+    + onExit(game: Game): void
+    + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+    + transitionToEventPhase(game: Game): GamePhaseState
+    + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+    + getPhaseName(): String
+}
 
-    class RoundManager {
-        - roundNumber: int
-        __
-        + startGame(): void
-        + incrementRound(): void
-        + getRoundNumber(): int
-    }
+class EventPhase <<ConcreteState>> {
+    - {static} INSTANCE: EventPhase
+    - {static} RANDOM: Random
+    __
+    - EventPhase()
+    + {static} getInstance(): EventPhase
+    __
+    + canExecuteCommand(game: Game, command: Command): boolean
+    + onEnter(game: Game): void
+    + onExit(game: Game): void
+    - executeRandomEvent(game: Game): void
+    - executeForestFire(game: Game): void
+    - executeGeyser(game: Game): void
+    - executeEarthquake(game: Game): void
+    + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+    + transitionToEventPhase(game: Game): GamePhaseState
+    + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+    + getPhaseName(): String
+}
+
+class "GameOverPhase\n<<record>>" as GameOverPhase <<ConcreteState>> {
+    + winner: Faction
+    __
+    + GameOverPhase(winner: Faction)
+    __
+    + canExecuteCommand(game: Game, command: Command): boolean
+    + onEnter(game: Game): void
+    + onExit(game: Game): void
+    + transitionToPlayerTurn(game: Game, faction: Faction): GamePhaseState
+    + transitionToEventPhase(game: Game): GamePhaseState
+    + transitionToGameOver(game: Game, winner: Faction): GamePhaseState
+    + getPhaseName(): String
+}
+
+' ===== Context =====
+class Game <<Context>> {
+    - currentPhase: GamePhaseState
+    - activeFaction: Faction
+    - roundManager: RoundManager
+    __
+    + startGame(): void
+    + endTurn(): void
+    + executeCommand(command: Command): ValidationResult
+    - transitionToPhase(newPhase: GamePhaseState): void
+    - checkVictoryCondition(): boolean
+    - determineFirstFaction(): Faction
+    - getNextFaction(): Faction
+}
+
+class RoundManager {
+    - roundNumber: int
+    __
+    + startGame(): void
+    + incrementRound(): void
+    + getRoundNumber(): int
 }
 
 ' ===== Inheritance =====
