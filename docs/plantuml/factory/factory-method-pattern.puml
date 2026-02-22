@@ -1,7 +1,6 @@
 @startuml Factory Method Pattern - ElementarClash
 
 !define ABSTRACT_CLASS abstract class
-!define INTERFACE interface
 
 skinparam classAttributeIconSize 0
 skinparam shadowing false
@@ -11,6 +10,8 @@ skinparam class {
     BackgroundColor<<Concrete>> LightBlue
     BorderColor<<Concrete>> DarkBlue
 }
+
+title Factory Method Pattern - ElementarClash\nGoF #1: Define an Interface for Creating an Object
 
 enum Faction {
     FIRE
@@ -80,7 +81,7 @@ class UnitStats {
     + range: int
 }
 
-' ===== Concrete Factory =====
+' ===== Concrete Factory (exemplarisch: Feuer) =====
 class FireUnitFactory <<Concrete>> {
     + FireUnitFactory()
     __
@@ -88,8 +89,8 @@ class FireUnitFactory <<Concrete>> {
     # isValidTypeForFaction(type: UnitType): boolean
 }
 
-' ===== Concrete Units (package-private) =====
-class InfernoWarrior <<Concrete>> <<package-private>> {
+' ===== Concrete Unit (exemplarisch: Feuer) =====
+class InfernoWarrior <<Concrete>> {
     - {static} LAVA_ATTACK_BONUS: int = 2
     __
     ~ InfernoWarrior(id: String, stats: UnitStats)
@@ -99,7 +100,6 @@ class InfernoWarrior <<Concrete>> <<package-private>> {
 
 ' ===== Inheritance Relationships =====
 UnitFactory <|-- FireUnitFactory
-
 Unit <|-- InfernoWarrior
 
 ' ===== Dependencies =====
@@ -111,49 +111,5 @@ UnitFactory o-- Faction
 Unit o-- UnitStats
 Unit ..> Faction : <<uses>>
 Unit ..> UnitType : <<uses>>
-
-' ===== Notes =====
-note right of UnitFactory
-  **Factory Method Pattern**
-
-  Template Method: createUnit()
-  - Validates unit type
-  - Generates unique ID
-  - Delegates to factory method
-
-  Factory Method: createUnitInternal()
-  - Implemented by concrete factories
-  - Creates faction-specific units
-end note
-
-note bottom of Unit
-  **Unit Hierarchy**
-
-  Abstract unit with:
-  - Common attributes & behavior
-  - Abstract factory method
-  - Hook methods for subclasses
-end note
-
-note bottom of InfernoWarrior
-  **Package Structure & Encapsulation**
-
-  All concrete Unit classes are package-private.
-  They can ONLY be instantiated via their Factory.
-
-  Package organization:
-  • org.elementarclash.units - Abstract classes & enums
-  • org.elementarclash.units.fire - FireUnitFactory + 3 units
-  • org.elementarclash.units.water - WaterUnitFactory + 3 units
-  • org.elementarclash.units.air - AirUnitFactory + 3 units
-  • org.elementarclash.units.earth - EarthUnitFactory + 3 units
-
-  Each faction package contains:
-  - 1 public Factory (FireUnitFactory, WaterUnitFactory, ...)
-  - 3 package-private Units (InfernoWarrior, FlameArcher, Phoenix, ...)
-
-  (Diagram shows fire faction as example)
-end note
-
 
 @enduml

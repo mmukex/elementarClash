@@ -1,7 +1,6 @@
 @startuml Chain of Responsibility Pattern - ElementarClash
 
 !define ABSTRACT_CLASS abstract class
-!define INTERFACE interface
 
 skinparam classAttributeIconSize 0
 skinparam shadowing false
@@ -26,26 +25,8 @@ ABSTRACT_CLASS DamageHandler <<Handler>> {
     + handle(context: DamageContext): void
 }
 
-' ===== Concrete Handlers =====
+' ===== Concrete Handler (exemplarisch) =====
 class BaseDamageHandler <<ConcreteHandler>> {
-    + handle(context: DamageContext): void
-}
-
-class FactionAdvantageHandler <<ConcreteHandler>> {
-    - {static} ADVANTAGE_MATRIX: Map<Faction, Map<Faction, Double>>
-    __
-    + handle(context: DamageContext): void
-}
-
-class TerrainEffectHandler <<ConcreteHandler>> {
-    + handle(context: DamageContext): void
-}
-
-class SynergyBonusHandler <<ConcreteHandler>> {
-    + handle(context: DamageContext): void
-}
-
-class DefenseCalculationHandler <<ConcreteHandler>> {
     + handle(context: DamageContext): void
 }
 
@@ -96,12 +77,8 @@ class "DamageResult\n<<record>>" as DamageResult <<ValueObject>> {
     + calculationSteps: List<String>
 }
 
-' ===== Chain Inheritance =====
+' ===== Inheritance =====
 DamageHandler <|-- BaseDamageHandler
-DamageHandler <|-- FactionAdvantageHandler
-DamageHandler <|-- TerrainEffectHandler
-DamageHandler <|-- SynergyBonusHandler
-DamageHandler <|-- DefenseCalculationHandler
 
 ' ===== Chain Links =====
 DamageHandler o-right-> DamageHandler : next
@@ -111,177 +88,5 @@ DamageCalculator *-down-> DamageHandler : handlerChain
 DamageCalculator ..> DamageContext : <<creates>>
 DamageContext ..> DamageResult : toResult()
 DamageHandler ..> DamageContext : <<modifies>>
-
-' ===== Notes =====
-note right of DamageHandler
-  **Chain of Responsibility (GoF #9)**
-
-  **Purpose:**
-  Modular damage calculation pipeline.
-  Each handler processes one aspect,
-  then passes to the next.
-
-  **Fluent Chain Construction:**
-  handlerChain
-    .setNext(handler2)
-    .setNext(handler3)
-    ...
-
-  **Template:**
-  Subclasses add their logic, then
-  call super.handle(context) to
-  pass to next handler in chain.
-  Null-safe termination at end.
-end note
-
-note bottom of BaseDamageHandler
-  **Handler #1: Base Damage**
-
-  **Integration: Strategy Pattern**
-
-  int baseDamage = attacker
-    .getAttackStrategy()
-    .calculateBaseDamage(attacker, target);
-
-  context.setBaseDamage(baseDamage);
-
-  Uses AttackStrategy from the unit
-  (MeleeAttackStrategy or RangedAttackStrategy).
-end note
-
-note bottom of FactionAdvantageHandler
-  **Handler #2: Faction Multiplier**
-
-  Applies rock-paper-scissors multipliers:
-
-  | Attacker | Defender | Multiplier |
-  |----------|----------|------------|
-  | Fire     | Earth    | x1.25      |
-  | Fire     | Water    | x0.75      |
-  | Water    | Fire     | x1.25      |
-  | Water    | Earth    | x0.75      |
-  | Earth    | Water    | x1.25      |
-  | Earth    | Air      | x0.75      |
-  | Air      | Earth    | x1.25      |
-  | Air      | Fire     | x0.75      |
-
-  Neutral matchups: x1.0 (no change)
-end note
-
-note bottom of TerrainEffectHandler
-  **Handler #3: Terrain Effects**
-
-  **Integration: Visitor Pattern**
-
-  Applies bonuses for both sides:
-
-  **Attacker's terrain:**
-  visitor = TerrainVisitorFactory.getVisitor(terrain)
-  effect = attacker.accept(visitor)
-  -> adds attackBonus (e.g. Fire on Lava: +2)
-
-  **Defender's terrain:**
-  visitor = TerrainVisitorFactory.getVisitor(terrain)
-  effect = target.accept(visitor)
-  -> adds defenseBonus (e.g. Forest: +2)
-end note
-
-note bottom of SynergyBonusHandler
-  **Handler #4: Synergy & Decorator Bonuses**
-
-  **Integration: Decorator Pattern**
-
-  Sums attack bonuses from all active decorators:
-
-  int synergyBonus = attacker.getDecorators()
-    .stream()
-    .filter(d -> !d.isExpired())
-    .mapToInt(d -> d.getAttackBonus(attacker))
-    .sum();
-
-  Includes: SynergyBonus, AttackBuffDecorator,
-  AttackDebuffDecorator, etc.
-end note
-
-note bottom of DefenseCalculationHandler
-  **Handler #5: Final Calculation (Terminal)**
-
-  **Formula:**
-  totalAttack = base + terrainATK + synergy
-  totalDefense = target.getDefense()
-    (includes decorator DEF bonuses)
-  finalDamage = max(1, totalAttack - totalDefense)
-
-  **Minimum Damage:** Always at least 1.
-  Ensures every attack has some effect.
-end note
-
-note left of DamageCalculator
-  **Chain Construction (Order Matters!)**
-
-  public DamageCalculator() {
-      handlerChain = new BaseDamageHandler();
-      handlerChain
-        .setNext(new FactionAdvantageHandler())
-        .setNext(new TerrainEffectHandler())
-        .setNext(new SynergyBonusHandler())
-        .setNext(new DefenseCalculationHandler());
-  }
-
-  **Usage (from AttackCommand):**
-  DamageCalculator calc = new DamageCalculator();
-  DamageResult result =
-      calc.calculateDamage(attacker, target, game);
-  target.takeDamage(result.totalDamage());
-
-  **Extensibility:**
-  Adding new modifier (e.g. WeatherEffectHandler)
-  = insert one new handler in chain.
-  No existing code changes needed.
-end note
-
-note right of DamageContext
-  **Shared Mutable State**
-
-  Passed through the entire chain.
-  Each handler reads/writes relevant fields.
-
-  **Automatic Logging:**
-  Each setter logs a calculation step:
-  "Base Damage: 15"
-  "Faction Advantage: x1.25 (15 -> 19)"
-  "Terrain Attack Bonus: +2"
-
-  **getTotalAttack():**
-  Returns baseDamage + terrainAttackBonus
-  + synergyBonus
-end note
-
-note as PipelineFlow
-  **Damage Calculation Pipeline**
-
-  BaseDamageHandler
-       | baseDamage = attackStrategy.calculate()
-       v
-  FactionAdvantageHandler
-       | baseDamage *= factionMultiplier
-       v
-  TerrainEffectHandler
-       | + terrainAttackBonus (attacker terrain)
-       | + terrainDefenseBonus (defender terrain)
-       v
-  SynergyBonusHandler
-       | + synergyBonus (all decorator ATK bonuses)
-       v
-  DefenseCalculationHandler
-       | totalAttack = base + terrain + synergy
-       | finalDamage = max(1, totalAttack - defense)
-       v
-  DamageResult (immutable)
-
-  **Example:** Fire unit on Lava attacks Water unit
-  Base: 15 -> Faction: x0.75 = 11 -> Terrain: +2
-  -> Synergy: +1 -> Total ATK: 14 - DEF: 8 = 6
-end note
 
 @enduml

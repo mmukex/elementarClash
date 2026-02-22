@@ -46,7 +46,7 @@ enum EventType {
     GAME_OVER
 }
 
-' ===== Concrete Events =====
+' ===== Concrete Event (exemplarisch) =====
 class UnitMovedEvent <<Event>> {
     - unit: Unit
     - from: Position
@@ -57,73 +57,7 @@ class UnitMovedEvent <<Event>> {
     + getDescription(): String
 }
 
-class UnitAttackedEvent <<Event>> {
-    - attacker: Unit
-    - target: Unit
-    - damageResult: DamageResult
-    __
-    + UnitAttackedEvent(attacker, target, damageResult)
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-class UnitDeathEvent <<Event>> {
-    - unit: Unit
-    __
-    + UnitDeathEvent(unit)
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-class TerrainChangedEvent <<Event>> {
-    - position: Position
-    - oldTerrain: Terrain
-    - newTerrain: Terrain
-    __
-    + TerrainChangedEvent(position, oldTerrain, newTerrain)
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-class TurnStartedEvent <<Event>> {
-    - faction: Faction
-    __
-    + TurnStartedEvent(faction)
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-class TurnEndedEvent <<Event>> {
-    - faction: Faction
-    __
-    + TurnEndedEvent(faction)
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-class GameStartedEvent <<Event>> {
-    + GameStartedEvent()
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-class GameOverEvent <<Event>> {
-    - winner: Faction
-    __
-    + GameOverEvent(winner)
-    + getEventType(): EventType
-    + getDescription(): String
-}
-
-' ===== Concrete Observer: Event Log =====
-class EventLogObserver <<ConcreteObserver>> {
-    - eventLog: List<GameEvent>
-    __
-    + onEvent(event: GameEvent): void
-    + printLog(): void
-}
-
-' ===== Concrete Observer: Console Renderer =====
+' ===== Concrete Observer (exemplarisch) =====
 class ConsoleGameRenderer <<ConcreteObserver>> {
     __
     + onEvent(event: GameEvent): void
@@ -149,124 +83,11 @@ class Game <<Subject>> {
 
 ' ===== Inheritance =====
 GameEvent <|-- UnitMovedEvent
-GameEvent <|-- UnitAttackedEvent
-GameEvent <|-- UnitDeathEvent
-GameEvent <|-- TerrainChangedEvent
-GameEvent <|-- TurnStartedEvent
-GameEvent <|-- TurnEndedEvent
-GameEvent <|-- GameStartedEvent
-GameEvent <|-- GameOverEvent
-
 GameObserver <|.. ConsoleGameRenderer
-GameObserver <|.. EventLogObserver
-
 GameEvent ..> EventType : <<uses>>
 
 ' ===== Associations =====
 Game o-right-> "0..*" GameObserver : observers
 Game ..> GameEvent : <<creates & dispatches>>
-
-' ===== Notes =====
-note right of GameObserver
-  **Observer Pattern (GoF #7)**
-
-  **Purpose:**
-  Decouple game logic from UI updates,
-  logging, and other side effects.
-
-  **Single Method:**
-  onEvent(GameEvent) receives all event types.
-  Observers use switch/instanceof to filter.
-
-  **Key Benefit:**
-  Game class doesn't know about UI or logging.
-  New observers can be added without modifying Game.
-end note
-
-note bottom of ConsoleGameRenderer
-  **Concrete Observer: Real-Time UI**
-
-  Implements both GameRenderer and GameObserver.
-
-  **Event Handling (switch on EventType):**
-  - UNIT_MOVED: prints "[Move] ..."
-  - UNIT_ATTACKED: prints "[Attack] ..." with
-    full damage breakdown (base, faction,
-    terrain, synergy, defense, total)
-  - UNIT_DIED: prints "[Death] ..." with emoji
-  - TERRAIN_CHANGED: prints "[Terrain] ..."
-  - TURN_STARTED/ENDED: prints separator lines
-  - GAME_STARTED/OVER: prints banner messages
-end note
-
-note bottom of EventLogObserver
-  **Concrete Observer: Event Recording**
-
-  Records all events for replay/debugging.
-
-  **printLog():**
-  Outputs numbered event list:
-  1. [UNIT_MOVED] Wind-Taenzer moved...
-  2. [UNIT_ATTACKED] Inferno-Krieger attacked...
-  3. [UNIT_DIED] Frost-Magier has died
-end note
-
-note left of Game
-  **Subject - Observer Management**
-
-  **Registration (GameController constructor):**
-  game.addObserver(renderer);
-  game.addObserver(eventLog);
-
-  **Notification:**
-  public void notifyObservers(GameEvent event) {
-      for (GameObserver observer : observers) {
-          observer.onEvent(event);
-      }
-  }
-
-  **Dispatch Points:**
-  - startGame()      -> GameStartedEvent
-  - endTurn()        -> TurnEndedEvent, TurnStartedEvent
-  - moveUnitInternal -> UnitMovedEvent
-  - handleUnitDeath  -> UnitDeathEvent
-  - AttackCommand    -> UnitAttackedEvent
-  - Battlefield      -> TerrainChangedEvent
-    (via notifyTerrainChanged helper)
-end note
-
-note bottom of UnitAttackedEvent
-  **Rich Event Data**
-
-  Contains full DamageResult from
-  Chain of Responsibility pattern:
-  - baseDamage
-  - factionMultiplier
-  - terrainAttackBonus
-  - synergyBonus
-  - totalDefense
-  - totalDamage
-
-  Allows ConsoleGameRenderer to print
-  detailed damage breakdown.
-end note
-
-note as EventFlow
-  **Event Dispatch Flow**
-
-  1. Game state changes (move, attack, turn)
-  2. Game creates appropriate GameEvent
-  3. Game calls notifyObservers(event)
-  4. Each registered observer receives event
-  5. Observers handle event independently
-
-  **Example: Attack Flow**
-  AttackCommand.execute()
-    -> game.notifyObservers(UnitAttackedEvent)
-      -> ConsoleGameRenderer.onEvent()
-          -> handleUnitAttacked(): prints damage
-      -> EventLogObserver.onEvent()
-          -> eventLog.add(event): records for replay
-end note
 
 @enduml
