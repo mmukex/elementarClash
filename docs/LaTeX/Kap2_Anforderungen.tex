@@ -15,7 +15,7 @@ Die funktionalen Anforderungen orientieren sich an der Aufgabenstellung und wurd
 \textbf{ID} & \textbf{Anforderung} & \textbf{Beschreibung} \\
 \midrule
 F1 & Spielfeld & 2D-Raster (10$\times$10) mit unterschiedlichen Geländearten. Umgesetzt als 5 Geländetypen (Lava, Eis, Wald, Wüste, Stein) mit fester Verteilung: 30\,\% Wüste, 20\,\% Wald, 20\,\% Stein, 15\,\% Lava, 15\,\% Eis. \\
-F2 & Einheiten & Verschiedene Einheitentypen, die sich bewegen und handeln können. Umgesetzt als 4 Fraktionen (Feuer, Wasser, Erde, Luft) mit je 3 Einheitentypen und individuellen Werten für LP, Angriff, Verteidigung, Bewegung und Reichweite. \\
+F2 & Einheiten & Verschiedene Einheitentypen, die sich bewegen und handeln können. Umgesetzt als 4 Fraktionen (Feuer, Wasser, Erde, Luft) mit je 3 Einheitentypen und individuellen Werten für LP (Lebenspunkte), Angriff, Verteidigung, Bewegung und Reichweite. \\
 F3 & Rundenlogik & Spieler führen abwechselnd Züge aus; nach jeder Runde werden Ereignisse ausgewertet. Umgesetzt als Phasensystem (Setup, Spielerzug, Event, Spielende) mit 2 Aktionen pro Einheit und Runde. \\
 F4 & Aktionen & Mindestens drei Aktionstypen. Umgesetzt als Bewegen (geländeabhängige Kosten), Angreifen (Nah-/Fernkampf) und Undo/Redo (Rücknahme aller Aktionen innerhalb einer Runde). \\
 F5 & Siegbedingung & Das Spiel endet, wenn ein Spieler alle gegnerischen Einheiten besiegt hat. \\

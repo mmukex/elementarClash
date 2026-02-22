@@ -4,23 +4,43 @@
 % === ZIELUMFANG: ca. 1 Seite ===
 \subsection{Fazit}
 \label{sec:fazit}
-% Fazit:
-% - 10 GoF-Patterns erfolgreich eingesetzt
-% - Modulare, erweiterbare Architektur erreicht
-% - Spielbare Version mit Undo/Redo
 
-Das Ziel, ein lauffähiges Programm (Spiel) unter Berücksichtigung von 10 selbstgewählten Design Pattern nach GoF zu erstellen wurde erreicht.
-Durch die erfolgreiche Implementierung der Design Pattern ist eine modulare, erweiterbare Architektur geschaffen worden.
-Die eingereichte Version ist im Sinne der geplanten Implementierung vollständig und lauffähig.
+Ziel des Projekts war die Entwicklung eines lauffähigen rundenbasierten Strategiespiels unter konsequentem Einsatz von mindestens acht (tatsächlich: 10) GoF-Design Patterns.
+Sowohl die funktionalen als auch die nicht-funktionalen Anforderungen aus Kapitel~\ref{chap:anforderungen} wurden vollständig erfüllt.
 
-% Ausblick (kurz):
-% - Neue Fraktionen/Einheiten ohne Core-Änderungen möglich
-% - Potentielle Erweiterungen: KI-Gegner, grafische UI
+\paragraph{Funktionale Anforderungen.}
+Tabelle~\ref{tab:funktionale-anforderungen} definierte sechs funktionale Anforderungen (F1--F6), die wie folgt umgesetzt wurden:
+
+\textbf{F1 – Spielfeld:} Das 10$\times$10-Raster wird durch den \texttt{GameBuilder} (Builder Pattern) erzeugt und als Composite-Hierarchie aus \texttt{Cell}, \texttt{Region} und \texttt{Battlefield} verwaltet.
+Alle fünf Geländetypen (Lava, Eis, Wald, Wüste, Stein) sind implementiert und werden gemäß der vorgesehenen Prozentverteilung platziert.
+
+\textbf{F2 – Einheiten:} Vier Fraktionen mit je drei Einheitentypen und individuellen Werten für LP, ATK, DEF, MOV und RNG sind über das Factory Method Pattern realisiert.
+Jede Einheit besitzt eine fraktions- und typspezifische Bewegungs- und Angriffsstrategie (Strategy Pattern).
+
+\textbf{F3 – Rundenlogik:} Das Phasensystem (Setup, Spielerzug, Ereignis, Spielende) wird durch das State Pattern abgebildet.
+Jede Einheit kann pro Zug bis zu zwei Aktionen von Bewegen oder Angreifen ausführen; am Ende jedes Spielerzugs wechselt die aktive Fraktion, worauf die EventPhase ein zufälliges Geländeereignis auslöst.
+
+\textbf{F4 – Aktionen:} Bewegen (geländeabhängige Kosten, Strategy Pattern), Angreifen (Nah-/Fernkampf, Strategy Pattern) und Undo/Redo (Command Pattern) sind vollständig implementiert.
+Alle Aktionen einer Runde können in beliebiger Reihenfolge rückgängig gemacht und wiederholt werden; bei Rundenwechsel wird die History geleert.
+
+\textbf{F5 – Siegbedingung:} Das Spiel endet automatisch, sobald alle Einheiten einer Fraktion besiegt wurden.
+\texttt{Game.checkVictoryCondition()} prüft dies nach jeder Aktion und leitet bei Erfüllung den Übergang in die \texttt{GameOverPhase} ein.
+
+\textbf{F6 – Oberfläche:} Das Spielfeld wird als ASCII-Raster mit Einheitenpositionen, Geländetypen, aktuellen Statuswerten und aktiven Dekoratoren in der Konsole dargestellt.
+Spielereingaben erfolgen über ein buchstabenbasiertes Menü (\texttt{[B]}, \texttt{[A]}, \texttt{[U]}, \texttt{[R]}, \texttt{[Z]}, \texttt{[Q]}).
+
+\paragraph{Nicht-funktionale Anforderungen.}
+Das Projekt wurde in Java~21 mit Gradle~8.14 umgesetzt und übertrifft die geforderte Mindestanzahl von acht GoF-Patterns: Insgesamt zehn Patterns aus allen drei Kategorien (Erzeugung, Struktur, Verhalten) wurden sinnvoll integriert (vgl. Tabelle~\ref{tab:pattern-uebersicht}).
+Die Paketstruktur trennt Datenmodell, Spiellogik und Darstellung klar voneinander; neue Fraktionen, Geländetypen oder Dekoratoren lassen sich hinzufügen, ohne bestehende Klassen zu verändern.
+Für alle zehn Design Patterns wurden JUnit-5-Tests erstellt, die die korrekte Funktionsweise der Pattern-Mechanismen sicherstellen.
+Die Architekturdokumentation umfasst PlantUML-Diagramme für alle Patterns sowie diese schriftliche Ausarbeitung in \LaTeX.
+
 \subsection{Ausblick}
 \label{sec:ausblick}
-Wie bereits erwähnt sind Erweiterungen ohne Core Änderungen möglich.
-Erweiterungen können zum Beispiel weitere Einheiten je Fraktion oder zusätzliche (De-)Buffs sein, welche zu Beginn eines Spielzugs angewendet werden (vgl. Kapitel 3.2.2. Decorator Pattern).
-Weitere denkbare Erweiterungen könnten zum Beispiel KI Gegner oder eine echte grafische UI sein.
+
+Die gewählte Architektur legt eine solide Grundlage für zukünftige Erweiterungen, die ohne Änderungen am bestehenden Core-Code realisierbar wären.
+Neue Fraktionen erfordern lediglich ein neues Fabrik-Paket (Factory Method); zusätzliche Buff-/Debuff-Effekte sind durch Ableitung von \texttt{UnitDecorator} ergänzbar (Decorator Pattern); neue Geländetypen werden durch einen weiteren \texttt{TerrainVisitor} und einen Eintrag in der \texttt{TerrainVisitorFactory} abgedeckt (Visitor Pattern).
+Darüber hinaus wären folgende Erweiterungen denkbar: ein KI-Gegner als weiterer \texttt{GameObserver} (Observer Pattern), der Spielzüge automatisch plant; eine grafische Oberfläche, die dasselbe Observer-Interface implementiert und die Konsolenausgabe ersetzt; sowie ein Netzwerkmodus, bei dem Befehle als serialisierte \texttt{Command}-Objekte übertragen werden (Command Pattern).
 
 % ============================================
 % Literaturverzeichnis
