@@ -10,7 +10,51 @@
 \label{subsec:einheiten-erzeugung}
 % - Einheiten-Tabelle (alle 12 Einheiten mit Stats)
 % - Pattern-Bezug: Factory Method
-Jede der vier Fraktionen hat 3 verschiedene Einheitentypen (vgl. Kapitel 2.3.1, Tabelle 3)
+Jede der vier Fraktionen verfügt über drei Einheitentypen (vgl. Kapitel~2.3.1, Tabelle~\ref{tab:einheiten}).
+Die Erzeugung erfolgt ausschließlich über die jeweilige \texttt{UnitFactory}-Subklasse (Factory Method Pattern), da alle konkreten Einheitenklassen package-private sind.
+
+\begin{lstlisting}[language=Java, caption={UnitFactory -- Template Method und FireUnitFactory -- Factory Method}, label={lst:factory-method}]
+// UnitFactory.java -- Abstract Creator
+public abstract class UnitFactory {
+    private final Faction faction;
+    private int unitCounter = 0;
+
+    public final Unit createUnit(UnitType type) {
+        if (!isValidTypeForFaction(type)) {
+            throw new IllegalArgumentException(
+                "Unit type " + type + " not valid for " + faction);
+        }
+        String id = faction.name().substring(0, 1) + (++unitCounter);
+        return createUnitInternal(id, type);   // Factory Method
+    }
+
+    protected abstract Unit createUnitInternal(String id, UnitType type);
+    protected abstract boolean isValidTypeForFaction(UnitType type);
+}
+
+// FireUnitFactory.java -- Concrete Creator
+public class FireUnitFactory extends UnitFactory {
+    public FireUnitFactory() { super(Faction.FIRE); }
+
+    @Override
+    protected Unit createUnitInternal(String id, UnitType type) {
+        return switch (type) {
+            case INFERNO_WARRIOR -> new InfernoWarrior(id,
+                    new UnitStats(100, 15, 5, 3, 1));
+            case FLAME_ARCHER    -> new FlameArcher(id,
+                    new UnitStats(70, 12, 3, 4, 3));
+            case PHOENIX         -> new Phoenix(id,
+                    new UnitStats(80, 10, 4, 5, 1));
+            default -> throw new IllegalArgumentException(type.toString());
+        };
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:factory-method} zeigt das zweistufige Muster.
+\texttt{createUnit()} in \texttt{UnitFactory} ist die finale Template-Method: Sie validiert den \texttt{UnitType} per \texttt{isValidTypeForFaction()}, generiert eine eindeutige ID (z.\,B. \texttt{"F1"} für die erste Feuer-Einheit, \texttt{"W2"} für die zweite Wasser-Einheit) und delegiert die eigentliche Instanziierung an die abstrakte Factory Method \texttt{createUnitInternal()}.
+\texttt{FireUnitFactory} implementiert diese per \texttt{switch}-Ausdruck und übergibt die fraktionsspezifischen Stat-Werte als \texttt{UnitStats}-Record direkt an den Konstruktor der konkreten, package-privaten Einheitenklasse.
+Der \texttt{GameBuilder} hält ausschließlich Referenzen auf die abstrakte \texttt{UnitFactory} und \texttt{Unit}; konkrete Klassen sind für ihn nicht sichtbar.
 
 \subsubsection{Spielfeld \& Gelände (Max Meier)}
 \label{subsec:spielfeld-gelaende}
@@ -131,13 +175,52 @@ Die \texttt{TerrainVisitorFactory} hält die fünf zustandslosen Visitor-Instanz
 % - Zugwechsel zwischen Fraktionen
 % - Pattern-Bezug: State / Decorator
 
-Das Spiel ist in vier Phasen gegliedert, die über das State Pattern abgebildet werden.
-Die erste Phase ist die \texttt{SetupPhase}, in welcher grundlegende Initialisierungen vorgenommen werden, etwa die Festlegung des startenden Spielers sowie die Instanziierung des \texttt{RoundManager} (vgl. Game.java Z. 59ff, 78ff).
-Die \texttt{SetupPhase} geht über in die \texttt{PlayerTurnPhase}, in der zunächst mit rundenweise steigender Wahrscheinlichkeit ein zufällig gewählter (De-)Buff aus einem Pool von sechs Effekten auf eine zufällige Einheit des aktiven Spielers angewendet wird (vgl. \texttt{PlayerTurnPhase.java Z. 26ff} bzw. \texttt{BuffDebuffManager.java}).
-Anschließend werden die Einheiten der aktiven Fraktion für den Spielzug vorbereitet, indem jede Einheit ihre maximale Aktionsanzahl (2) sowie die entsprechende Bewegungsreichweite zurückerhält.
-Die \texttt{PlayerTurnPhase} wird durch Spielereingabe beendet und geht entweder in die \texttt{GameOverPhase} (falls der gegnerische Spieler besiegt wurde) oder die \texttt{EventPhase} über.
-In der \texttt{EventPhase} wird eines von drei Events gefeuert, welches Einfluss auf die Geländebeschaffenheit haben kann.
-Anschließend beginnt eine neue \texttt{PlayerTurnPhase}
+Der Spielablauf ist als Zustandsautomat über das State Pattern realisiert (Anforderung F3, vgl. Tabelle~\ref{tab:funktionale-anforderungen}).
+Alle Phasenwechsel laufen über \texttt{Game.transitionToPhase()}, die \texttt{onExit()} der alten und \texttt{onEnter()} der neuen Phase aufruft -- der Mechanismus ist damit an genau einer Stelle konzentriert.
+
+\begin{lstlisting}[language=Java, caption={State Pattern -- transitionToPhase() und PlayerTurnPhase}, label={lst:state-transition}]
+// Game.java -- Context
+private void transitionToPhase(GamePhaseState newPhase) {
+    currentPhase.onExit(this);
+    this.currentPhase = newPhase;
+    newPhase.onEnter(this);
+}
+
+// PlayerTurnPhase.java -- Concrete State (Record)
+public record PlayerTurnPhase(Faction activeFaction)
+        implements GamePhaseState {
+
+    @Override
+    public void onEnter(Game game) {
+        // Decorator Pattern: (De-)Buff mit steigender Wahrscheinlichkeit
+        new BuffDebuffManager()
+            .tryApplyRandomEffect(game, game.getRoundNumber());
+        // Aktionszaehler aller Einheiten der Fraktion zuruecksetzen
+        game.getUnitsOfFaction(activeFaction).forEach(Unit::resetTurn);
+    }
+
+    @Override
+    public boolean canExecuteCommand(Game game, Command command) {
+        return command.validate(game).isValid();
+    }
+
+    @Override
+    public GamePhaseState transitionToEventPhase(Game game) {
+        return EventPhase.getInstance();
+    }
+
+    @Override
+    public GamePhaseState transitionToGameOver(Game game, Faction winner) {
+        return new GameOverPhase(winner);
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:state-transition} zeigt den Phasenwechsel-Mechanismus und die zentrale \texttt{PlayerTurnPhase}.
+Da \texttt{PlayerTurnPhase} ein Java-Record ist, enthält sie die aktive Fraktion unveränderlich als Komponente -- ein Wechsel der Fraktion erzeugt eine neue Instanz (\texttt{transitionToPlayerTurn()} gibt \texttt{new PlayerTurnPhase(faction)} zurück).
+In \texttt{onEnter()} werden zwei Aufgaben erledigt: der \texttt{BuffDebuffManager} versucht, einen Dekorator auf eine Einheit anzuwenden (Decorator Pattern), und anschließend werden alle Einheiten der aktiven Fraktion für den neuen Zug zurückgesetzt -- konkret setzt \texttt{Unit.resetTurn()} den Aktionszähler auf~0 und wechselt den \texttt{UnitState} per State Pattern nach \texttt{IdleState}.
+\texttt{canExecuteCommand()} delegiert vollständig an \texttt{command.validate(game)}, sodass die Phasenklasse keine Kenntnis der einzelnen Command-Typen benötigt.
+Die \texttt{EventPhase} blockiert alle Befehle, feuert in \texttt{onEnter()} ein zufälliges Geländeereignis (Waldbrand, Geysir oder Erdbeben über \texttt{applyEffect()} des Composite-Spielfelds) und geht danach automatisch in die nächste \texttt{PlayerTurnPhase} über.
 
 
 
@@ -246,17 +329,37 @@ Die Getter in \texttt{Unit} (Z.\,142ff) enthalten \texttt{GroundMovementStrategy
 Die Schadensberechnung wird über das Chain of Responsibility Pattern abgebildet.
 Jeder Angriff durchläuft dabei eine fest definierte Kette von fünf Handlern, die gemeinsam auf dem \texttt{DamageContext}-Objekt arbeiten und dieses schrittweise anreichern.
 
-Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den jeweils nächsten Handler und leitet den Kontext nach getaner Arbeit via \texttt{super.handle()} weiter (vgl. \texttt{DamageHandler.java Z. 22, 40ff}).
-Die Kette wird im Konstruktor von \texttt{DamageCalculator} über fluente \texttt{setNext()}-Aufrufe zusammengestellt und durch \texttt{handlerChain.handle(context)} gestartet (vgl. \texttt{DamageCalculator.java Z. 25ff, 44}).
-Der erste Handler, \texttt{BaseDamageHandler}, liest den Grundschaden über das Strategy Pattern aus und schreibt ihn in den Kontext (vgl. \texttt{BaseDamageHandler.java Z. 14ff}).
-Der \texttt{FactionAdvantageHandler} wendet anschließend einen Multiplikator aus einer statischen Fraktionsmatrix an, etwa $\times 1{,}25$ bei Vorteil oder $\times 0{,}75$ bei Nachteil (vgl. \texttt{FactionAdvantageHandler.java Z. 25ff}).
+\begin{lstlisting}[language=Java, caption={DamageCalculator -- Aufbau und Start der Handler-Kette}, label={lst:damage-calculator}]
+// DamageCalculator.java
+public class DamageCalculator {
+    private final DamageHandler handlerChain;
 
-\begin{figure}[H]
-	\centering
-	\includegraphics[scale=0.5]{images/Fraktions_Korrelationsmatrix}
-	\caption{Fraktions-Korrelationsmatrix zur Berechnung von Angriffsvorteilen}
-	\label{fig:fraktions-korrelationsmatrix}
-\end{figure}
+    public DamageCalculator() {
+        // Kette in fester Reihenfolge aufbauen (Reihenfolge entscheidend)
+        this.handlerChain = new BaseDamageHandler();
+        handlerChain
+            .setNext(new FactionAdvantageHandler())
+            .setNext(new TerrainEffectHandler())     // Visitor Pattern
+            .setNext(new SynergyBonusHandler())      // Decorator Pattern
+            .setNext(new DefenseCalculationHandler());
+    }
+
+    public DamageResult calculateDamage(Unit attacker,
+                                        Unit target, Game game) {
+        DamageContext context =
+            new DamageContext(attacker, target, game);
+        handlerChain.handle(context);   // Kette starten
+        return context.toResult();      // unveraendl. Record
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:damage-calculator} zeigt, wie \texttt{DamageCalculator} die Kette einmalig im Konstruktor über fluente \texttt{setNext()}-Aufrufe aufbaut.
+\texttt{calculateDamage()} erstellt einen frischen \texttt{DamageContext} für jeden Angriff, startet die Kette mit \texttt{handlerChain.handle(context)} und wandelt das fertige Kontextobjekt in ein unveränderliches \texttt{DamageResult}-Record um.
+
+Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den jeweils nächsten Handler und leitet den Kontext nach getaner Arbeit via \texttt{super.handle()} weiter (vgl. \texttt{DamageHandler.java Z.\,22, 40ff}).
+Der erste Handler, \texttt{BaseDamageHandler}, liest den Grundschaden über das Strategy Pattern aus (\texttt{attacker.getAttackStrategy().calculateBaseDamage()}) und schreibt ihn in den Kontext (vgl. \texttt{BaseDamageHandler.java Z.\,14ff}).
+Der \texttt{FactionAdvantageHandler} wendet anschließend einen Multiplikator aus einer statischen Fraktionsmatrix an, etwa $\times 1{,}25$ bei Vorteil oder $\times 0{,}75$ bei Nachteil (vgl. \texttt{FactionAdvantageHandler.java Z.\,25ff}, Tabelle~\ref{tab:fraktions-korrelationsmatrix}).
 
 Der \texttt{TerrainEffectHandler} integriert das Visitor Pattern: Für Angreifer und Verteidiger wird je ein \texttt{TerrainVisitor} dispatcht, dessen Boni in den Kontext einfließen (vgl. \texttt{TerrainEffectHandler.java Z. 21ff}).
 Der \texttt{SynergyBonusHandler} greift auf die aktiven Dekoratoren der angreifenden Einheit zu und summiert deren Angriffsboni, womit das Decorator Pattern in die Kette eingebunden wird (vgl. \texttt{SynergyBonusHandler.java Z. 16ff}).
@@ -268,8 +371,46 @@ Der fertige Kontext wird anschließend in ein unveränderliches \texttt{DamageRe
 % - Temporäre (De-)Buffs zur Laufzeit
 % - Pattern-Bezug: Decorator
 
-Im Verlauf des Spiels wird mit rundenweise steigender Wahrscheinlichkeit (max. 60\%) zu Beginn eines jeden Spielzugs einer von 6 Effekten (3 Buffs, 3 Debuffs) auf eine zufällig ausgewählte, nicht tote Einheit der aktiven Fraktion angewendet (vgl. \texttt{BuffDebuffManager.java Z. 41ff}).
-Dieser Effekt wird als Decorator an die Unit Klasse angefügt.
+Im Verlauf des Spiels wird mit rundenweise steigender Wahrscheinlichkeit (max. 60\,\%) zu Beginn jedes Spielerzugs einer von sechs Effekten auf eine zufällig ausgewählte, lebende Einheit der aktiven Fraktion angewendet (Decorator Pattern, vgl. \texttt{BuffDebuffManager.java Z.\,41ff}).
+
+\begin{lstlisting}[language=Java, caption={Decorator Pattern -- Unit.getAttack() und AttackBuffDecorator}, label={lst:decorator-unit}]
+// Unit.java -- Dekoratoren transparent integriert
+public int getAttack() {
+    int attack = baseStats.attack();
+    for (UnitDecorator decorator : decorators) {
+        if (!decorator.isExpired()) {
+            attack += decorator.getAttackBonus(this);
+        }
+    }
+    return attack;
+}
+
+public void removeExpiredDecorators() {
+    decorators.removeIf(UnitDecorator::isExpired);
+}
+
+// AttackBuffDecorator.java -- Konkrete Decorator-Implementierung
+public class AttackBuffDecorator extends UnitDecorator {
+    private static final int BONUS = 2;
+    private static final int DURATION = 2;
+    private int remainingRounds = DURATION;
+
+    @Override public int getAttackBonus(Unit unit) { return BONUS; }
+    @Override public int getDefenseBonus(Unit unit) { return 0; }
+    @Override public int getMovementBonus(Unit unit) { return 0; }
+    @Override public boolean isExpired() { return remainingRounds <= 0; }
+    @Override public void tick() { remainingRounds--; }
+    @Override public String getDescription() {
+        return "+2 Attack (" + remainingRounds + " rounds left)";
+    }
+}
+\end{lstlisting}
+
+Listing~\ref{lst:decorator-unit} zeigt die Integration des Decorator Patterns in \texttt{Unit}.
+\texttt{getAttack()} iteriert über alle Dekoratoren, filtert abgelaufene per \texttt{isExpired()} und akkumuliert deren \texttt{getAttackBonus(this)} auf den Basiswert aus \texttt{baseStats}; \texttt{getDefense()} und \texttt{getMovement()} folgen demselben Muster.
+\texttt{AttackBuffDecorator} gewährt +2~ATK für zwei Runden: \texttt{tick()} dekrementiert \texttt{remainingRounds} am Ende jedes Spielerzugs, \texttt{isExpired()} signalisiert bei \texttt{remainingRounds\,$\leq$\,0} das Ende der Wirkdauer.
+\texttt{removeExpiredDecorators()} entfernt alle abgelaufenen Einträge in einem einzigen \texttt{removeIf()}-Aufruf (vgl. \texttt{Unit.java Z.\,210ff}).
+Die aktiven Effekte sind im UI in geschweiften Klammern hinter dem Einheitennamen sichtbar, z.\,B. \texttt{\{+2 Attack (1 rounds left)\}}.
 
 \subsubsection{Undo/Redo (Max Meier)}
 \label{subsec:undo-redo}
@@ -378,14 +519,64 @@ Listing~\ref{lst:attack-command} zeigt den \texttt{AttackCommand}.
 % - Eingabe-Aktionen: [B]ewegen, [A]ngreifen, [U]ndo, [R]edo, [Z]ug beenden
 % - Ggf. Screenshot
 % - Pattern-Bezug: Observer
-Das 10x10 Spielfeld wird als ASCII in der Konsole gerendert.
-Eine echte grafische Oberfläche hätte nach Ansicht der Autoren den zeitlichen Rahmen des Projektes gesprengt.
-Über Konsoleneingaben ([B]ewegen, [A]ngreifen, [U]ndo, [R]edo, [Z]ug beenden) gibt der Spieler seinen Zug an.
+Das 10$\times$10-Spielfeld wird als ASCII-Raster in der Konsole gerendert (Anforderung F6, vgl. Tabelle~\ref{tab:funktionale-anforderungen}).
+Eine grafische Oberfläche hätte den zeitlichen Rahmen des Projektes gesprengt; die Konsolenausgabe ist vollständig funktional und zeigt alle spielrelevanten Informationen.
+
+\begin{lstlisting}[language=Java, caption={Observer Pattern -- ConsoleGameRenderer.onEvent() und GameController}, label={lst:observer-ui}]
+// ConsoleGameRenderer.java -- Concrete Observer
+public class ConsoleGameRenderer
+        implements GameRenderer, GameObserver {
+
+    @Override
+    public void onEvent(GameEvent event) {
+        switch (event.getEventType()) {
+            case UNIT_MOVED    -> handleUnitMoved(
+                                    (UnitMovedEvent) event);
+            case UNIT_ATTACKED -> handleUnitAttacked(
+                                    (UnitAttackedEvent) event);
+            case UNIT_DIED     -> handleUnitDeath(
+                                    (UnitDeathEvent) event);
+            case TERRAIN_CHANGED -> handleTerrainChanged(
+                                    (TerrainChangedEvent) event);
+            case TURN_STARTED,
+                 TURN_ENDED    -> { /* Separator-Ausgabe */ }
+            case GAME_OVER     -> handleGameOver(
+                                    (GameOverEvent) event);
+            default            -> { }
+        }
+    }
+
+    private void handleUnitAttacked(UnitAttackedEvent event) {
+        DamageResult r = event.getDamageResult();
+        System.out.println("[Attack] " + event.getDescription());
+        System.out.println("  Base: " + r.baseDamage()
+            + ", Faction: x" + r.factionMultiplier()
+            + ", Terrain: +"  + r.terrainAttackBonus()
+            + ", Synergy: +"  + r.synergyBonus()
+            + ", Defense: -"  + r.totalDefense()
+            + " = "           + r.totalDamage() + " total");
+    }
+}
+
+// GameController.java -- Observer-Registrierung
+public GameController(Game game) {
+    this.renderer = new ConsoleGameRenderer();
+    this.eventLog = new EventLogObserver();
+    game.addObserver((ConsoleGameRenderer) renderer);
+    game.addObserver(eventLog);            // 2. Observer
+}
+\end{lstlisting}
+
+Listing~\ref{lst:observer-ui} zeigt die Observer-Kopplung zwischen Spiellogik und Darstellung.
+\texttt{ConsoleGameRenderer} implementiert gleichzeitig \texttt{GameRenderer} (für den direkten \texttt{render(game)}-Aufruf nach jeder Eingabe) und \texttt{GameObserver} (für ereignisgetriebene Ausgaben während der Ausführung).
+In \texttt{onEvent()} werden alle acht \texttt{EventType}-Werte per \texttt{switch} auf private Handler-Methoden verteilt; \texttt{handleUnitAttacked()} gibt dabei die vollständige Schadensaufschlüsselung aus dem \texttt{DamageResult}-Record aus, das die Chain of Responsibility befüllt hat.
+Im \texttt{GameController}-Konstruktor werden beide Observer per \texttt{game.addObserver()} registriert: \texttt{ConsoleGameRenderer} für die Echtzeit-Konsolenausgabe und \texttt{EventLogObserver} zum Aufzeichnen aller Ereignisse.
+Der \texttt{GameController} liest Spielereingaben über \texttt{ConsoleUI} aus und verteilt sie per \texttt{switch} auf die entsprechenden Command-Objekte (\texttt{MoveCommand}, \texttt{AttackCommand}), die über \texttt{game.executeCommand()} ausgeführt und in der \texttt{CommandHistory} protokolliert werden (vgl. \texttt{GameController.java Z.\,63ff}).
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/UI}
-    \caption{Game UI}
+    \caption{Beispielhafte Konsolenausgabe eines Spielfeldes}
     \label{fig:ui}
 \end{figure}
 

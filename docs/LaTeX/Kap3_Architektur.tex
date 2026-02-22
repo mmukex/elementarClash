@@ -73,9 +73,16 @@ State Pattern und Observer Pattern rahmen den Ablauf ein: Spielphasen steuern de
 % Begründung: 4 Fraktionen × 3 Einheiten, erweiterbar ohne Core-Änderungen
 % UML-Diagramm + Code-Beispiel
 % Verantwortlich: @crstmkt
-Jede der vier Fraktion hat einen Basisstamm von drei Einheitentypen.
-Jeder Einheitentyp hat einen Bassissatz an Stats (Lebenspunkte, Angriffspunkte, Verteidigungspunkte etc.).
-Um eventuelle zukünftige Erweiterungen ohne Änderungen an der Core Logik zu ermöglichen und um nicht für jeden Einheitentypen den speziellen Kontruktor aufrufen zu müssen wir Factory Method verwedent.
+ElementarClash umfasst 12 konkrete Einheitenklassen in vier Fraktionen mit je eigenen Stat-Werten (vgl. Kapitel 2.3.1).
+Ohne ein Erzeugungsmuster müsste der Aufrufer jeden konkreten Konstruktor kennen und die passenden Stat-Werte selbst übergeben -- eine Kopplung, die bei einer neuen Fraktion Änderungen an mehreren Stellen im Code erfordern würde.
+
+Das Factory Method Pattern löst dieses Problem durch eine zweistufige Hierarchie.
+Die abstrakte Klasse \texttt{UnitFactory} definiert \texttt{createUnit(UnitType)} als finalen Template-Method-Einstiegspunkt: Sie validiert, ob der angeforderte \texttt{UnitType} zur Fraktion gehört, generiert eine eindeutige Einheiten-ID im Format \texttt{F1}, \texttt{W2} usw. (Anfangsbuchstabe der Fraktion + laufender Zähler) und delegiert die eigentliche Objekterzeugung an die abstrakte Factory Method \texttt{createUnitInternal(id, type)}.
+Jede der vier konkreten Fabriken -- \texttt{FireUnitFactory}, \texttt{WaterUnitFactory}, \texttt{EarthUnitFactory} und \texttt{AirUnitFactory} -- implementiert \texttt{createUnitInternal()} als \texttt{switch}-Ausdruck über den \texttt{UnitType} und instanziiert die zugehörige Einheitenklasse mit den hart codierten Stat-Werten (vgl. \texttt{FireUnitFactory.java}).
+Die konkreten Einheitenklassen sind package-private, sodass sie ausschließlich über ihre Fabrik instanziiert werden können -- eine durch die Paketstruktur erzwungene Kapselung. (vgl. \cite{entwurfsmuster})
+
+Das Ergebnis: Das Hinzufügen einer neuen Fraktion erfordert lediglich eine neue Fabrik und die zugehörigen Einheitenklassen im gleichen Paket.
+Die restliche Spiellogik -- \texttt{GameBuilder}, \texttt{Game}, \texttt{DamageCalculator} -- bleibt unverändert und arbeitet ausschließlich gegen die abstrakte \texttt{UnitFactory} und \texttt{Unit}.
 
 \begin{figure}[H]
 	\centering
@@ -131,9 +138,17 @@ Events der \texttt{EventPhase} wenden ihre Effekte per \texttt{applyEffect()} au
 % Begründung: Dynamische Erweiterung zur Laufzeit
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Im Spielverlauf wir mit steigender Rundenzahl die Wahrscheinlichkeit erhöhte, dass während der Eventphase eine zufällig ausgewählte Einheit der aktiven Fraktion einen (von sechs fest definierten) zufällig ausgewählten (De-)Buff erhält.
-Dieser (De-)Buff wird per Decorator Pattern an die Unit angeklebt.
-Im UI werden diese (De-)Buffs in geschweiften Klammern angezeigt.
+Einheiten können zur Laufzeit eine beliebige Kombination aus Angriffs-, Verteidigungs- und Bewegungsboni erhalten, die aus unterschiedlichen Quellen stammen: dem Geländeeffekt des Feldes, dem Fraktions-Synergiebonus sowie zufälligen Ereignissen.
+Eine Vererbungshierarchie für alle denkbaren Kombinationen wäre kombinatorisch nicht handhabbar.
+Das Decorator Pattern ermöglicht es stattdessen, Boni und Mali zur Laufzeit dynamisch zu stapeln, ohne die \texttt{Unit}-Klasse zu verändern (vgl. \cite{entwurfsmuster}).
+
+Die abstrakte Klasse \texttt{UnitDecorator} definiert die Methoden \texttt{getAttackBonus()}, \texttt{getDefenseBonus()} und \texttt{getMovementBonus()}, die jeweils die \texttt{Unit}-Instanz erhalten, sowie \texttt{tick()} für den Rundenablauf und \texttt{isExpired()} zur Lebenszeit-Überprüfung.
+\texttt{Unit} hält eine \texttt{List\allowbreak<UnitDecorator>} und integriert die Boni transparent in seine Getter: \texttt{getAttack()} summiert \texttt{baseStats.attack()} mit dem \texttt{getAttackBonus()} aller nicht abgelaufenen Dekoratoren; analog für Verteidigung und Bewegung (Minimum~1).
+
+Es gibt zwei Decorator-Arten: \texttt{SynergyBonus} ist permanent (isExpired() gibt stets \texttt{false} zurück) und berechnet den Bonus dynamisch anhand benachbarter Verbündeter -- beim Bewegen wird er entfernt und neu hinzugefügt.
+Die sechs temporären Dekoratoren laufen nach zwei Runden ab: \texttt{AttackBuffDecorator} (+2~ATK), \texttt{AttackDebuffDecorator} ($-2$~ATK), \texttt{DefenseBuffDecorator} (+2~DEF), \texttt{DefenseDebuffDecorator} ($-2$~DEF), \texttt{HastenedDecorator} (+1~MOV) und \texttt{SlowedDecorator} ($-1$~MOV).
+Der \texttt{BuffDebuffManager} wählt zu Beginn jedes Spielerzugs per Zufall eine lebende Einheit der aktiven Fraktion aus und wendet mit rundenweise steigender Wahrscheinlichkeit (Formel: $p = \min(0{,}60,\ 0{,}03 + (r-1) \cdot 0{,}06)$) einen zufälligen Effekt aus dem Buff- oder Debuff-Pool an.
+Im UI werden aktive Effekte in geschweiften Klammern hinter dem Einheitennamen angezeigt.
 
 \begin{figure}[H]
 	\centering
@@ -171,7 +186,21 @@ Die Getter in \texttt{Unit} liefern \texttt{GroundMovementStrategy} bzw. \texttt
 % Begründung: Zustandsabhängiges Verhalten
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Spielphasen (SetupPhase, PlayerTurnPhase, EventPhase, GameOverPhase) und UnitStates (Attacking, Moving, Stunned, Idle, Dead) werden über das State Pattern implementiert.
+ElementarClash besitzt einen klar definierten Spielablauf aus vier Phasen, in denen jeweils unterschiedliche Aktionen erlaubt sind.
+Ohne ein Zustandsmuster müsste die \texttt{Game}-Klasse bei jedem \texttt{executeCommand()}-Aufruf prüfen, welche Phase gerade aktiv ist -- was zu langen \texttt{if}-Kaskaden führt, die bei jeder neuen Phase erweitert werden müssen.
+Das State Pattern verlagert das phasenspezifische Verhalten in separate Klassen und hält \texttt{Game} schlank (vgl. \cite{entwurfsmuster}).
+
+Das Interface \texttt{GamePhaseState} deklariert \texttt{canExecuteCommand()}, \texttt{onEnter()}, \texttt{onExit()} sowie drei \texttt{transitionTo...()}-Methoden.
+\texttt{Game.transitionToPhase(newPhase)} ruft \texttt{currentPhase.onExit(this)}, setzt die neue Phase und ruft \texttt{newPhase.onEnter(this)} auf -- der Phasenwechsel ist damit zuverlässig in einer einzigen Methode gekapselt.
+
+Die vier konkreten Phasen sind:
+\texttt{SetupPhase} (Singleton) blockiert alle Befehle und wird während der Spielaufbauphase im \texttt{GameBuilder} durchlaufen;
+\texttt{PlayerTurnPhase} (Record mit \texttt{activeFaction}) aktiviert in \texttt{onEnter()} den \texttt{BuffDebuffManager} und setzt die Aktionszähler aller Einheiten der aktiven Fraktion zurück -- \texttt{canExecuteCommand()} delegiert die Validierung an \texttt{command.validate(game)};
+\texttt{EventPhase} (Singleton) blockiert Befehle und feuert in \texttt{onEnter()} ein zufälliges Ereignis (Waldbrand, Geysir oder Erdbeben), bevor automatisch in die nächste \texttt{PlayerTurnPhase} gewechselt wird;
+\texttt{GameOverPhase} (Record mit \texttt{winner}) ist der Terminalzustand -- alle Übergangsmethoden geben \texttt{this} zurück.
+
+Zusätzlich modelliert das State Pattern die Einheitenzustände: \texttt{UnitState} mit den konkreten Zuständen \texttt{IdleState}, \texttt{MovingState}, \texttt{AttackingState}, \texttt{StunnedState} und \texttt{DeadState}.
+Diese steuern, welche Aktionen eine Einheit innerhalb eines Spielerzugs noch ausführen darf.
 
 \begin{figure}[H]
 	\centering
@@ -186,7 +215,16 @@ Spielphasen (SetupPhase, PlayerTurnPhase, EventPhase, GameOverPhase) und UnitSta
 % Begründung: Lose Kopplung zwischen Spiellogik und Darstellung
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Entkopplung von UI-Updates und dynamische Ereignissen.
+Die Spiellogik in \texttt{Game} erzeugt Ereignisse -- Einheiten bewegen sich, greifen an, sterben, Gelände verändert sich -- die sofort in der Konsole dargestellt und gleichzeitig für eine spätere Protokollausgabe aufgezeichnet werden sollen.
+Eine direkte Kopplung von \texttt{Game} an den \texttt{ConsoleGameRenderer} würde bedeuten, dass jede neue Ausgabeart (z.\,B. eine grafische Oberfläche oder ein Netzwerk-Log) Änderungen in der Spiellogik erfordert.
+Das Observer Pattern löst dies durch eine lose Kopplung: \texttt{Game} kennt nur das Interface \texttt{GameObserver}, nicht seine konkreten Implementierungen (vgl. \cite{gof}).
+
+\texttt{GameObserver} deklariert eine einzige Methode \texttt{onEvent(GameEvent)}.
+\texttt{GameEvent} ist eine abstrakte Klasse mit \texttt{getEventType()} und \texttt{getDescription()}; acht konkrete Ereignisklassen decken alle spielrelevanten Übergänge ab: \texttt{GameStartedEvent}, \texttt{TurnStartedEvent}, \texttt{TurnEndedEvent}, \texttt{UnitMovedEvent}, \texttt{UnitAttackedEvent} (mit vollständigem \texttt{DamageResult}), \texttt{UnitDeathEvent}, \texttt{TerrainChangedEvent} und \texttt{GameOverEvent}.
+
+\texttt{Game} hält eine \texttt{List\allowbreak<GameObserver>} und benachrichtigt alle registrierten Observer per \texttt{notifyObservers(event)} an klar definierten Punkten: in \texttt{startGame()}, \texttt{endTurn()}, \texttt{moveUnitInternal()}, \texttt{handleUnitDeath()} sowie im \texttt{AttackCommand} und im \texttt{Battlefield} bei Geländeänderungen.
+Zwei konkrete Observer sind registriert: \texttt{ConsoleGameRenderer} verarbeitet jedes Ereignis in einer \texttt{switch}-Verzweigung und gibt es formatiert auf der Konsole aus; \texttt{EventLogObserver} sammelt alle Ereignisse in einer Liste, die am Spielende auf Wunsch vollständig ausgegeben werden kann.
+Beide Observer werden im \texttt{GameController}-Konstruktor per \texttt{game.addObserver()} registriert, ohne dass \texttt{Game} dafür angepasst werden muss.
 
 \begin{figure}[H]
 	\centering
@@ -222,12 +260,26 @@ Bei Rundenwechsel leert \texttt{clearHistory()} beide Stacks (Per-Turn-Rollback)
 % Begründung: Modulare Handler-Kette für Modifikatoren
 % UML-Diagramm
 % Verantwortlich: @crstmkt
-Basisschaden, Fraktionseffekte, Terraineffekte, (temporäre) Effekte auf einer Einheit addieren sich zu einem Gesamtschaden, den die Einheit erleidet.
+Jeder Angriff in ElementarClash berücksichtigt mehrere unabhängige Schadensmodifikatoren: den strategiespezifischen Grundschaden, fraktionsbasierte Stärke- und Schwächerelationen, Geländeboni für Angreifer und Verteidiger sowie aktive Dekoratoren der angreifenden Einheit.
+Diese Modifikatoren in einer einzelnen Methode zu berechnen würde eine enge Kopplung aller beteiligten Systeme erzeugen; jeder neue Modifikator (z.\,B. ein Wettereffekt) würde Änderungen an zentralem Code erfordern.
+Das Chain of Responsibility Pattern kapselt jeden Modifikator in einem eigenen Handler und ermöglicht so eine erweiterbare, modulare Pipeline (vgl. \cite{entwurfsmuster}).
+
+Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den nächsten Handler und implementiert \texttt{handle()} so, dass Subklassen ihre Logik ausführen und dann \texttt{super.handle(context)} aufrufen, um die Kette fortzuführen.
+Alle Handler lesen und schreiben auf einem gemeinsamen \texttt{DamageContext}-Objekt, das Angreifer, Verteidiger, Spielzustand und alle Zwischenergebnisse kapselt.
+Die Kette wird einmalig im Konstruktor von \texttt{DamageCalculator} über fluente \texttt{setNext()}-Aufrufe aufgebaut und mit \texttt{handlerChain.handle(context)} gestartet.
+
+Die fünf Handler in ihrer festen Reihenfolge:
+\textbf{(1)} \texttt{BaseDamageHandler} liest den Grundschaden über das Strategy Pattern (\texttt{attacker.getAttackStrategy().calculateBaseDamage()}) aus.
+\textbf{(2)} \texttt{FactionAdvantageHandler} schlägt Angreifer- und Verteidigerfraktion in einer statischen Korrelationsmatrix nach und multipliziert den Schaden mit $\times 1{,}25$ (Vorteil), $\times 0{,}75$ (Nachteil) oder $\times 1{,}0$ (neutral) (vgl. Tabelle 4).
+\textbf{(3)} \texttt{TerrainEffectHandler} integriert das Visitor Pattern: Für Angreifer und Verteidiger wird je ein \texttt{TerrainVisitor} auf der aktuellen Zelle dispatcht und die Boni in den Kontext geschrieben.
+\textbf{(4)} \texttt{SynergyBonusHandler} integriert das Decorator Pattern: er summiert \texttt{getAttackBonus()} aller nicht abgelaufenen Dekoratoren der angreifenden Einheit.
+\textbf{(5)} \texttt{DefenseCalculationHandler} ist der terminale Handler und berechnet den Endschaden nach $\text{finalDamage} = \max(1,\ \text{totalAttack} - \text{totalDefense})$ -- ein Minimalschaden von~1 ist garantiert.
+Das fertige Ergebnis wird als unveränderliches \texttt{DamageResult}-Record an den \texttt{AttackCommand} zurückgegeben.
 
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=\textwidth]{images/Chain_of_Responsibility_Pattern___ElementarClash-Chain_of_Responsibility_Pattern___ElementarClash_Damage_Pipeline__GoF__9__Decoupled_Request_Processing_Through_Handler_Chain}
+	\includegraphics[scale=0.5]{images/Chain_of_Responsibility_Pattern___ElementarClash-Chain_of_Responsibility_Pattern___ElementarClash_Damage_Pipeline__GoF__9__Decoupled_Request_Processing_Through_Handler_Chain}
 	\caption{Chain of Responsibility Pattern für modulare Schadensberechnung}
 	\label{fig:chain-of-responsibility}
 \end{figure}
