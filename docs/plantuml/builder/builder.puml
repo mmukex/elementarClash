@@ -36,7 +36,6 @@ class "UnitPlacement" as UP <<record>> {
     + faction: Faction
 }
 
-' ===== Product =====
 class Game <<Product>> {
     - battlefield: Battlefield
     - units: List<Unit>
@@ -82,7 +81,6 @@ enum Faction <<Enum>> {
     AIR
 }
 
-' ===== Relationships =====
 GameBuilder ..> Game : <<creates>>
 GameBuilder ..> Battlefield : <<creates>>
 GameBuilder +-- UP
@@ -95,21 +93,5 @@ GameBuilder ..> Faction : <<configures>>
 GameBuilder ..> Terrain : <<configures>>
 
 Battlefield o-- "100" Terrain : grid cells
-
-note right of GameBuilder
-  **Builder Pattern**
-  Schrittweise Erstellung:
-  1. Fraktionen konfigurieren (2-4)
-  2. Gelande-Verteilung setzen
-  3. Einheiten hinzufuegen
-  4. build() -> Validierung + Konstruktion
-
-  Fluent API (Konfiguration):
-  GameBuilder builder = new GameBuilder()
-    .withFactions(FIRE, WATER)
-    .withCustomTerrain(...);
-  builder.addUnit(warrior, FIRE);
-  Game game = builder.build();
-end note
 
 @enduml

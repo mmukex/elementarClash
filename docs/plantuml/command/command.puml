@@ -34,7 +34,6 @@ class ValidationResult <<record>> {
     + {static} failure(message: String): ValidationResult
 }
 
-' ===== Concrete Commands =====
 class MoveCommand <<ConcreteCommand>> {
     - actor: Unit
     - targetPosition: Position
@@ -63,7 +62,6 @@ class AttackCommand <<ConcreteCommand>> {
     + getType(): CommandType
 }
 
-' ===== Invoker =====
 class CommandExecutor <<Invoker>> {
     - history: CommandHistory
     __
@@ -73,7 +71,6 @@ class CommandExecutor <<Invoker>> {
     + clearHistory(): void
 }
 
-' ===== History =====
 class CommandHistory <<History>> {
     - executedCommands: Deque<Command>
     - undoneCommands: Deque<Command>
@@ -87,7 +84,6 @@ class CommandHistory <<History>> {
     + canRedo(): boolean
 }
 
-' ===== Relationships =====
 Command <|.. MoveCommand
 Command <|.. AttackCommand
 Command ..> ValidationResult : <<returns>>
@@ -99,22 +95,5 @@ CommandHistory o-- "0..*" Command : manages
 
 MoveCommand ..> Unit : modifies position
 AttackCommand ..> Unit : modifies health
-
-note right of Command
-  **Command Pattern**
-  Jeder Spielzug als Objekt:
-  1. validate() - Vorbedingungen pruefen
-  2. execute() - Zustand aendern
-  3. undo() - Rollback ausfuehren
-end note
-
-note bottom of CommandHistory
-  **Two-Stack Undo/Redo**
-  execute -> push(executedCommands)
-  undo -> pop(executed) + push(undone)
-  redo -> pop(undone) + push(executed)
-
-  Per-Turn Scope: clear() bei Rundenwechsel.
-end note
 
 @enduml

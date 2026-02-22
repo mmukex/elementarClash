@@ -11,7 +11,6 @@ skinparam class {
     BorderColor<<Context>> #558B2F
 }
 
-' ===== Context =====
 abstract class Unit <<Context>> {
     - movementStrategy: MovementStrategy
     - attackStrategy: AttackStrategy
@@ -22,7 +21,6 @@ abstract class Unit <<Context>> {
     # setAttackStrategy(strategy: AttackStrategy): void
 }
 
-' ===== Movement Strategy =====
 interface MovementStrategy <<Strategy>> {
     + calculateMovementCost(terrain: Terrain): double
     + canMoveTo(game: Game, current: Position, target: Position, maxMovement: int): boolean
@@ -39,7 +37,6 @@ class GroundMovementStrategy <<ConcreteStrategy>> {
     - applyEarthModifiers(terrain: Terrain, baseCost: double): double
 }
 
-' ===== Attack Strategy =====
 interface AttackStrategy <<Strategy>> {
     + canAttack(game: Game, attacker: Unit, target: Unit): boolean
     + {default} calculateBaseDamage(attacker: Unit, target: Unit): int
@@ -55,12 +52,10 @@ class RangedAttackStrategy <<ConcreteStrategy>> {
     - hasLineOfSight(game: Game, from: Position, to: Position): boolean
 }
 
-' ===== Example Concrete Unit =====
 class FlameArcher <<Context>> {
     + FlameArcher(id: String, stats: UnitStats)
 }
 
-' ===== Relationships =====
 MovementStrategy <|.. GroundMovementStrategy
 
 AttackStrategy <|.. RangedAttackStrategy
@@ -72,30 +67,5 @@ Unit <|-- FlameArcher
 
 FlameArcher ..> GroundMovementStrategy : <<creates>>
 FlameArcher ..> RangedAttackStrategy : <<creates>>
-
-note right of MovementStrategy
-  **Strategy Pattern - Bewegung**
-  Beispiel: GroundMovementStrategy
-  Fraktionsspezifische Gelaendekosten:
-  - Feuer auf Lava: 1.0 (schnell)
-  - Wasser auf Eis: 1.0 (schnell)
-  Weitere Strategie: FlyingMovementStrategy
-  (Luft-Fraktion, immer Kosten 1.0)
-end note
-
-note right of AttackStrategy
-  **Strategy Pattern - Angriff**
-  Beispiel: RangedAttackStrategy
-  Reichweite 3-4, Sichtlinie durch
-  Wald blockierbar (ausser ignoresForest)
-  Weitere Strategie: MeleeAttackStrategy
-  (Reichweite 1, keine Sichtlinie)
-end note
-
-note bottom of FlameArcher
-  **Beispiel: Flammen-Bogenschuetze**
-  movement = GroundMovement(FIRE)
-  attack = RangedAttack(ignoresForest=true)
-end note
 
 @enduml

@@ -11,14 +11,12 @@ skinparam class {
     BorderColor<<Composite>> #1565C0
 }
 
-' ===== Component Interface =====
 interface BattlefieldComponent <<Component>> {
     + cells(): List<Cell>
     + {default} applyEffect(effect: Consumer<Cell>): void
     + {default} getCell(index: int): Cell
 }
 
-' ===== Leaf =====
 class Cell <<Leaf>> {
     - position: Position
     - terrain: Terrain
@@ -30,7 +28,6 @@ class Cell <<Leaf>> {
     + getPosition(): Position
 }
 
-' ===== Composite =====
 class Region <<Composite>> <<record>> {
     - cells: List<Cell>
     __
@@ -51,7 +48,6 @@ class Battlefield <<Composite>> {
     + getRegion(x1: int, y1: int, x2: int, y2: int): Region
 }
 
-' ===== Supporting Types =====
 class Position <<record>> {
     + x: int
     + y: int
@@ -66,7 +62,6 @@ enum Terrain {
     STONE
 }
 
-' ===== Composite Relationships =====
 BattlefieldComponent <|.. Cell
 BattlefieldComponent <|.. Region
 BattlefieldComponent <|.. Battlefield
@@ -75,25 +70,5 @@ Battlefield *-- "10" Region : rows
 Region *-- "10" Cell : cells
 Cell --> "1" Position
 Cell --> "1" Terrain
-
-note right of BattlefieldComponent
-  **Composite Pattern**
-  Einheitliche Schnittstelle fuer:
-  - Einzelne Zelle (Leaf)
-  - Region (Composite)
-  - Gesamtes Schlachtfeld (Root)
-
-  applyEffect() propagiert
-  rekursiv ueber cells().
-end note
-
-note bottom of Battlefield
-  **Root Composite**
-  Hierarchie:
-  Battlefield -> 10 Regions -> 100 Cells
-
-  getRegion() erstellt dynamische
-  Regionen fuer Flaecheneffekte.
-end note
 
 @enduml

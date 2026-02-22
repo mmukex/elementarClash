@@ -43,9 +43,7 @@ Jede der vier Fraktionen hat 3 verschiedene Einheitentypen. die in
 \subsubsection{Spielfeld \& Gelände (Max Meier)}
 \label{subsec:spielfeld-gelaende}
 % - Pattern-Bezug: Builder, Composite, Visitor
-Dieser Abschnitt setzt die Anforderungen F1 (Spielfeld) und F2 (Einheiten) um (vgl. Tabelle~\ref{tab:funktionale-anforderungen}): ein 10$\times$10-Raster mit fünf Geländearten, fraktionsspezifischen Effekten und Spawn-Zonen für zwei Fraktionen.\footnote{Der \texttt{GameBuilder} unterstützt architektonisch 2--4 Fraktionen; die aktuelle Spieloberfläche nutzt zwei.}
-
-Die Erzeugung des Spielfelds erfolgt über den \texttt{GameBuilder} (Builder Pattern).
+Die Erzeugung des Spielfelds (Anforderung F1, vgl. Tabelle~\ref{tab:funktionale-anforderungen}) erfolgt über den \texttt{GameBuilder} (Builder Pattern).
 Über eine Fluent-API werden zunächst Fraktionen registriert, optional eine benutzerdefinierte Geländeverteilung gesetzt und Einheiten hinzugefügt.
 Die \texttt{build()}-Methode validiert die Konfiguration, erzeugt das \texttt{Battlefield} und platziert die Einheiten in den Ecken-Spawn-Zonen.
 
@@ -71,9 +69,9 @@ private void validate() {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:builder-build} zeigt die Fluent-API des \texttt{GameBuilder} sowie die zentrale \texttt{build()}-Methode.
-Die Methode \texttt{withFactions()} validiert die Fraktionsanzahl\footnote{Intern erlaubt: 2--4 Fraktionen (\texttt{MIN\_FACTIONS}=2, \texttt{MAX\_FACTIONS}=4); im Spiel werden aktuell zwei verwendet.} und gibt \texttt{this} zurück, um weitere Konfigurationsschritte zu verketten.
-In \texttt{build()} wird zunächst geprüft, ob Fraktionen vorhanden sind und jede Fraktion mindestens eine Einheit besitzt; anschließend wird das \texttt{Battlefield} mit der Geländeverteilung initialisiert und die Einheiten werden in vier 3$\times$3-Spawn-Regionen an den Ecken des Spielfelds platziert (vgl. \texttt{GameBuilder.java Z.\,164ff}).
+Listing~\ref{lst:builder-build} zeigt die Fluent-API und die \texttt{build()}-Methode.
+\texttt{withFactions()} validiert die Fraktionsanzahl und gibt \texttt{this} zurück.
+\texttt{build()} prüft, ob jede Fraktion Einheiten besitzt, initialisiert das \texttt{Battlefield} mit der Geländeverteilung und platziert die Einheiten in 3$\times$3-Spawn-Regionen an den Ecken (vgl. \texttt{GameBuilder.java Z.\,164ff}).
 
 Das Spielfeld ist als Composite-Hierarchie aufgebaut: Das Interface \texttt{BattlefieldComponent} wird von \texttt{Cell} (Leaf), \texttt{Region} (Composite) und \texttt{Battlefield} (Root-Composite) implementiert.
 
@@ -110,9 +108,9 @@ public class Battlefield implements BattlefieldComponent {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:composite-hierarchy} stellt die drei Ebenen der Composite-Hierarchie gegenüber.
-\texttt{Cell} gibt als Leaf stets eine Einelementliste zurück, \texttt{Region} delegiert an ihre enthaltenen Zellen und \texttt{Battlefield} flacht alle Zeilen zu einer Gesamtliste ab.
-Die Methode \texttt{applyEffect(Consumer<Cell>)} im Interface ermöglicht es, denselben Effekt -- beispielsweise das Umwandeln von Wald in Lava bei einem Waldbrand-Event -- auf eine einzelne Zelle, eine 3$\times$3-Region oder das gesamte Spielfeld anzuwenden, ohne die Logik duplizieren zu müssen (vgl. \texttt{BattlefieldComponent.java Z.\,53ff}).
+Listing~\ref{lst:composite-hierarchy} zeigt die drei Ebenen der Composite-Hierarchie.
+\texttt{Cell} gibt als Leaf eine Einelementliste zurück, \texttt{Region} delegiert an ihre Zellen, \texttt{Battlefield} flacht alle Zeilen ab.
+\texttt{applyEffect(Consumer<Cell>)} wendet denselben Effekt -- etwa Wald zu Lava bei einem Waldbrand-Event -- auf eine einzelne Zelle, eine 3$\times$3-Region oder das gesamte Spielfeld an (vgl. \texttt{BattlefieldComponent.java Z.\,53ff}).
 
 Die Geländeeffekte auf Einheiten werden über das Visitor Pattern abgebildet.
 Jeder Geländetyp besitzt einen eigenen \texttt{TerrainVisitor}, der fraktionsspezifische Boni oder Mali berechnet.
@@ -147,12 +145,10 @@ public class LavaTerrainVisitor
 }
 \end{lstlisting}
 
-Listing~\ref{lst:visitor-lava} zeigt das \texttt{TerrainVisitor}-Interface mit seinen vier fraktionsspezifischen \texttt{visit()}-Methoden sowie den \texttt{LavaTerrainVisitor} als konkreten Visitor.
-Feuer-Einheiten erhalten auf Lava einen Angriffsbonus von~+2, Wasser-Einheiten erleiden $-5$~LP/Runde.
-Für Erde und Luft greift die Standardimplementierung aus \texttt{AbstractTerrainVisitor}, die \texttt{TerrainEffectResult.NEUTRAL} zurückgibt.
-Der Double Dispatch wird in der \texttt{Unit}-Klasse durch einen \texttt{switch}-Ausdruck über die Fraktion realisiert: \texttt{accept(TerrainVisitor)} ruft je nach Fraktion die passende \texttt{visit()}-Methode auf (vgl. \texttt{Unit.java Z.\,168ff}).
-Auf diese Weise werden alle 20~Gelände-Fraktions-Kombinationen typsicher und ohne verschachtelte Fallunterscheidungen abgebildet.
-Die \texttt{TerrainVisitorFactory} hält die fünf zustandslosen Visitor-Instanzen in einer \texttt{EnumMap} vor und liefert sie in $O(1)$ aus (vgl. \texttt{TerrainVisitorFactory.java Z.\,36ff}).
+Listing~\ref{lst:visitor-lava} zeigt das \texttt{TerrainVisitor}-Interface und den \texttt{LavaTerrainVisitor}.
+Feuer-Einheiten erhalten +2~Angriff, Wasser-Einheiten $-5$~LP/Runde; Erde und Luft erben \texttt{NEUTRAL} aus \texttt{AbstractTerrainVisitor}.
+\texttt{Unit.accept(TerrainVisitor)} realisiert den Double Dispatch per \texttt{switch} über die Fraktion (vgl. \texttt{Unit.java Z.\,168ff}).
+Die \texttt{TerrainVisitorFactory} hält die fünf zustandslosen Visitor-Instanzen in einer \texttt{EnumMap} und liefert sie in $O(1)$ aus (vgl. \texttt{TerrainVisitorFactory.java Z.\,36ff}).
 
 \subsection{Spiellogik}
 \label{sec:spiellogik}
@@ -176,9 +172,7 @@ Anschließend beginnt eine neue \texttt{PlayerTurnPhase}
 \subsubsection{Bewegung \& Angriffsstrategie (Max Meier)}
 \label{subsec:bewegung-angriffsstrategie}
 % - Pattern-Bezug: Strategy
-Dieser Abschnitt setzt Anforderung F4 (Aktionen: Bewegen und Angreifen) um (vgl. Tabelle~\ref{tab:funktionale-anforderungen}): geländeabhängige Bewegungskosten sowie Nah- und Fernkampf mit Sichtlinienprüfung.
-
-Die Bewegungs- und Angriffslogik wird über das Strategy Pattern in zwei getrennten Hierarchien gekapselt.
+Die Bewegungs- und Angriffslogik (Anforderung F4, vgl. Tabelle~\ref{tab:funktionale-anforderungen}) wird über das Strategy Pattern in zwei Hierarchien gekapselt.
 Das Interface \texttt{MovementStrategy} definiert die Berechnung von Geländekosten und die Zugvalidierung.
 \texttt{GroundMovementStrategy} berücksichtigt fraktionsspezifische Modifikatoren (z.\,B. Feuer auf Lava: Kosten~1 statt~2, Wasser auf Lava: Kosten~3), während \texttt{FlyingMovementStrategy} alle Geländekosten pauschal auf~1 setzt.
 
@@ -212,8 +206,7 @@ public class FlyingMovementStrategy
 Listing~\ref{lst:strategy-movement} zeigt das \texttt{MovementStrategy}-Interface und die \texttt{FlyingMovementStrategy}.
 Fliegende Einheiten (alle Luft-Einheiten sowie der Phönix der Feuer-Fraktion) erhalten diese Strategie und ignorieren damit sämtliche Geländekosten -- ihre effektive Reichweite entspricht stets dem Basis-Bewegungswert.
 
-Im Gegensatz dazu berücksichtigt die \texttt{GroundMovementStrategy} fraktionsspezifische Geländemodifikatoren.
-Sie erhält im Konstruktor die Fraktion der Einheit und leitet in \texttt{calculateMovementCost()} per \texttt{switch}-Ausdruck an die passende Modifikator-Methode weiter (vgl. \texttt{GroundMovementStrategy.java Z.\,44ff}).
+Listing~\ref{lst:strategy-ground} zeigt die \texttt{GroundMovementStrategy} mit fraktionsspezifischen Geländemodifikatoren (vgl. \texttt{GroundMovementStrategy.java Z.\,44ff}).
 
 \begin{lstlisting}[language=Java, caption={GroundMovementStrategy -- fraktionsspezifische Geländekosten}, label={lst:strategy-ground}]
 public class GroundMovementStrategy
@@ -262,9 +255,10 @@ public class GroundMovementStrategy
 }
 \end{lstlisting}
 
-Listing~\ref{lst:strategy-ground} zeigt den Kontrast zur \texttt{FlyingMovementStrategy}: Während fliegende Einheiten pauschal Kosten~1 zahlen, variieren die Kosten für Bodeneinheiten je nach Fraktion und Gelände erheblich -- Feuer-Einheiten bewegen sich auf Lava für Kosten~1 statt~2, Wasser-Einheiten auf Eis für Kosten~1 statt~3, dafür auf Lava für Kosten~3 statt~2.
+Die Kosten variieren je nach Fraktion und Gelände: Feuer auf Lava~1 statt~2, Wasser auf Eis~1 statt~3, dafür auf Lava~3 statt~2, Erde auf Stein~2 statt~3.
+Fliegende Einheiten zahlen pauschal~1.
 
-Für den Angriff definiert \texttt{AttackStrategy} die Methoden \texttt{canAttack()}, \texttt{calculateBaseDamage()} und \texttt{getAttackRange()}.
+\texttt{AttackStrategy} definiert die Methoden \texttt{canAttack()}, \texttt{calculateBaseDamage()} und \texttt{getAttackRange()}.
 \texttt{MeleeAttackStrategy} prüft die Manhattan-Distanz gegen die Reichweite der Einheit (typischerweise~1).
 \texttt{RangedAttackStrategy} validiert zusätzlich die Sichtlinie: Wald-Gelände auf dem Pfad zwischen Angreifer und Ziel blockiert den Angriff, sofern die Einheit nicht über die Eigenschaft \texttt{ignoresForestDefense} verfügt -- wie etwa der Flammen-Bogenschütze (vgl. \texttt{RangedAttackStrategy.java Z.\,52ff}).
 Alle 12 konkreten Einheiten setzen ihre Strategien explizit im Konstruktor: 4~Einheiten erhalten \texttt{FlyingMovementStrategy} (Phoenix, WindDancer, StormCaller, SkyGuardian), 5~Einheiten \texttt{RangedAttackStrategy} -- davon der Flammen-Bogenschütze mit \texttt{ignoresForestDefense=true}, die übrigen mit \texttt{false}.
@@ -308,9 +302,7 @@ Dieser Effekt wird als Decorator an die Unit Klasse angefügt.
 \subsubsection{Undo/Redo (Max Meier)}
 \label{subsec:undo-redo}
 % - Pattern-Bezug: Command
-Dieser Abschnitt setzt Anforderung F4 (Aktionen: Undo/Redo) um (vgl. Tabelle~\ref{tab:funktionale-anforderungen}): vollständige Rücknahme aller Aktionen innerhalb einer Runde.
-
-Das Undo/Redo-System basiert auf dem Command Pattern.
+Das Undo/Redo-System (Anforderung F4, vgl. Tabelle~\ref{tab:funktionale-anforderungen}) basiert auf dem Command Pattern.
 Jede Spieleraktion wird als \texttt{Command}-Objekt mit eigener Validierungs-, Ausführungs- und Rücknahmelogik gekapselt.
 Der \texttt{CommandExecutor} validiert ein Command, führt es aus und übergibt es an die \texttt{CommandHistory}.
 
@@ -403,11 +395,9 @@ public class AttackCommand implements Command {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:attack-command} zeigt den \texttt{AttackCommand} im Detail.
-In \texttt{execute()} wird zunächst der aktuelle Gesundheitswert des Ziels in \texttt{targetPreviousHealth} gesichert.
-Anschließend berechnet der \texttt{DamageCalculator} über seine Handler-Kette (Chain of Responsibility) den Gesamtschaden, der auf das Ziel angewendet wird.
-Der Aktionszähler des Angreifers wird inkrementiert und die Observer über ein \texttt{UnitAttackedEvent} benachrichtigt.
-Bei \texttt{undo()} wird die Differenz zwischen gespeichertem und aktuellem Gesundheitswert per \texttt{heal()} wiederhergestellt und der Aktionszähler dekrementiert, sodass die Aktion erneut zur Verfügung steht.
+Listing~\ref{lst:attack-command} zeigt den \texttt{AttackCommand}.
+\texttt{execute()} sichert \texttt{targetPreviousHealth}, berechnet den Schaden über den \texttt{DamageCalculator} (Chain of Responsibility) und benachrichtigt die Observer per \texttt{UnitAttackedEvent}.
+\texttt{undo()} heilt das Ziel um die Differenz und dekrementiert den Aktionszähler.
 
 \subsection{Benutzeroberfläche (Christian Stiens)}
 \label{sec:ui}

@@ -13,7 +13,6 @@ skinparam class {
     BorderColor<<ValueObject>> #616161
 }
 
-' ===== Visitor Interface =====
 interface TerrainVisitor <<Visitor>> {
     + visitFireUnit(unit: Unit): TerrainEffectResult
     + visitWaterUnit(unit: Unit): TerrainEffectResult
@@ -21,7 +20,6 @@ interface TerrainVisitor <<Visitor>> {
     + visitAirUnit(unit: Unit): TerrainEffectResult
 }
 
-' ===== Abstract Base Visitor =====
 abstract class AbstractTerrainVisitor <<Visitor>> {
     - terrainType: Terrain
     __
@@ -36,7 +34,6 @@ abstract class AbstractTerrainVisitor <<Visitor>> {
     # createDefenseAndHpEffect(def: int, hp: int, desc: String): TerrainEffectResult
 }
 
-' ===== Concrete Visitor (Beispiel) =====
 class LavaTerrainVisitor <<ConcreteVisitor>> {
     - {static} FIRE_ATTACK_BONUS: int = 2
     - {static} WATER_HP_DRAIN: int = -5
@@ -46,7 +43,6 @@ class LavaTerrainVisitor <<ConcreteVisitor>> {
     + visitWaterUnit(unit: Unit): TerrainEffectResult
 }
 
-' ===== Element =====
 abstract class Unit <<Element>> {
     - faction: Faction
     - currentHealth: int
@@ -62,7 +58,6 @@ enum Faction {
     AIR
 }
 
-' ===== Value Object =====
 class TerrainEffectResult <<ValueObject>> <<record>> {
     + attackBonus: int
     + defenseBonus: int
@@ -74,14 +69,12 @@ class TerrainEffectResult <<ValueObject>> <<record>> {
     + hasPerTurnEffect(): boolean
 }
 
-' ===== Factory =====
 class TerrainVisitorFactory {
     - {static} VISITORS: EnumMap<Terrain, TerrainVisitor>
     __
     + {static} getVisitor(terrain: Terrain): TerrainVisitor
 }
 
-' ===== Relationships =====
 TerrainVisitor <|.. AbstractTerrainVisitor
 AbstractTerrainVisitor <|-- LavaTerrainVisitor
 
@@ -90,28 +83,5 @@ TerrainVisitorFactory ..> TerrainVisitor : <<provides>>
 
 Unit ..> TerrainVisitor : <<accepts>>
 Unit --> "1" Faction
-
-note right of TerrainVisitor
-  **Visitor Pattern - Double Dispatch**
-  1. unit.accept(visitor)
-  2. switch(faction) -> visitor.visitFireUnit(this)
-  3. Visitor liefert TerrainEffectResult
-
-  5 Gelaende x 4 Fraktionen = 20 Kombinationen
-  ohne verschachtelte if-Statements.
-end note
-
-note bottom of LavaTerrainVisitor
-  **Beispiel: Lava-Gelaende**
-  Feuer-Einheit: +2 Angriff
-  Wasser-Einheit: -5 LP/Runde
-  Erde/Luft: NEUTRAL (geerbt)
-end note
-
-note bottom of TerrainVisitorFactory
-  **Flyweight-Caching**
-  Stateless Visitors werden als
-  Singletons in EnumMap gecacht.
-end note
 
 @enduml
