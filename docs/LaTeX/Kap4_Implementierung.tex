@@ -482,6 +482,15 @@ was die Spielbalance beeinträchtigen würde.
 \texttt{AttackCommand} speichert die Lebenspunkte des Ziels vor dem Angriff (\texttt{targetPreviousHealth}) und heilt das Ziel bei \texttt{undo()} um die Differenz (vgl. \texttt{AttackCommand.java Z.\,86ff}).
 Beide Commands dekrementieren bei Undo den Aktionszähler der Einheit, sodass die Aktion erneut zur Verfügung steht.
 
+Der \texttt{AttackCommand} ist zugleich der Auslöser für die Siegbedingungsprüfung (Anforderung F5): Fällt eine Einheit unter 0~LP,
+ruft er \texttt{game.handleUnitDeath()} auf. Diese Methode entfernt die Einheit, benachrichtigt die Observer und prüft
+anschließend über die Methode \texttt{checkVictoryCondition()}, ob nur noch eine Fraktion lebende Einheiten besitzt. Ist
+dies der Fall, wechselt das Spiel in die \texttt{GameOverPhase} (State Pattern). Die gleiche Prüfung erfolgt auch bei
+jedem Zugendewechsel über \texttt{endTurn()}.
+
+Der \texttt{RoundManager} zählt die Spielrunden mit: Er wird bei Spielstart auf~1 gesetzt und inkrementiert, sobald der Zug
+zur ersten Fraktion zurückkehrt. Die \texttt{CommandHistory} nutzt den Rundenwechsel als Grenze und leert bei jedem neuen Zug beide Stacks.
+
 \begin{lstlisting}[language=Java, caption={AttackCommand -- execute() und undo()}, label={lst:attack-command}]
 public class AttackCommand implements Command {
 
