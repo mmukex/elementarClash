@@ -12,7 +12,7 @@ Jede der vier Fraktionen verfügt über drei Einheitentypen (vgl. Kapitel~2.3.1,
 Die Erzeugung erfolgt ausschließlich über die jeweilige \texttt{UnitFactory}-Subklasse (Factory Method Pattern), da alle konkreten Einheitenklassen package-private sind.
 
 \begin{lstlisting}[language=Java, caption={UnitFactory -- Template Method und FireUnitFactory -- Factory Method}, label={lst:factory-method}]
-// UnitFactory.java -- Abstract Creator
+// Abstract Creator
 public abstract class UnitFactory {
     private final Faction faction;
     private int unitCounter = 0;
@@ -30,7 +30,7 @@ public abstract class UnitFactory {
     protected abstract boolean isValidTypeForFaction(UnitType type);
 }
 
-// FireUnitFactory.java -- Concrete Creator
+// Concrete Creator
 public class FireUnitFactory extends UnitFactory {
     public FireUnitFactory() { super(Faction.FIRE); }
 
@@ -94,7 +94,6 @@ Ecken des Spielfelds, um beiden Fraktionen maximalen Startabstand zu gewähren (
 Das Spielfeld ist als Composite-Hierarchie aufgebaut: Das Interface \texttt{BattlefieldComponent} wird von der
 \texttt{Cell} (Leaf), der \texttt{Region} (Composite) und dem \texttt{Battlefield} (Root-Composite) implementiert.
 
-\newpage
 \begin{lstlisting}[language=Java, caption={Composite-Hierarchie -- Cell, Region und Battlefield}, label={lst:composite-hierarchy}]
 // Component-Interface
 public interface BattlefieldComponent {
@@ -141,9 +140,7 @@ Aus 5~Geländetypen und 4~Fraktionen ergeben sich 20~Kombinationen, die ohne Vis
 implementiert werden müssten.
 Jeder Geländetyp besitzt einen eigenen \texttt{TerrainVisitor}, der fraktionsspezifische Boni oder Mali berechnet.
 
-\newpage
 \begin{lstlisting}[language=Java, caption={Visitor -- TerrainVisitor und LavaTerrainVisitor}, label={lst:visitor-lava}]
-
 public interface TerrainVisitor {
     TerrainEffectResult visitFireUnit(Unit unit);
     TerrainEffectResult visitWaterUnit(Unit unit);
@@ -246,7 +243,6 @@ Das Interface \texttt{MovementStrategy} definiert die Berechnung von Geländekos
 während \texttt{FlyingMovementStrategy} alle Geländekosten pauschal auf~1 setzt.
 
 \begin{lstlisting}[language=Java, caption={Strategy Pattern -- MovementStrategy und FlyingMovementStrategy}, label={lst:strategy-movement}]
-
 public interface MovementStrategy {
     double calculateMovementCost(Terrain terrain);
     boolean canMoveTo(Game game, Position current,
@@ -349,17 +345,15 @@ Die Schadensberechnung wird über das Chain of Responsibility Pattern abgebildet
 Jeder Angriff durchläuft dabei eine fest definierte Kette von fünf Handlern, die gemeinsam auf dem \texttt{DamageContext}-Objekt arbeiten und dieses schrittweise anreichern.
 
 \begin{lstlisting}[language=Java, caption={DamageCalculator -- Aufbau und Start der Handler-Kette}, label={lst:damage-calculator}]
-// DamageCalculator.java
 public class DamageCalculator {
     private final DamageHandler handlerChain;
 
     public DamageCalculator() {
-        // Kette in fester Reihenfolge aufbauen (Reihenfolge entscheidend)
         this.handlerChain = new BaseDamageHandler();
         handlerChain
             .setNext(new FactionAdvantageHandler())
-            .setNext(new TerrainEffectHandler())     // Visitor Pattern
-            .setNext(new SynergyBonusHandler())      // Decorator Pattern
+            .setNext(new TerrainEffectHandler())     // Visitor
+            .setNext(new SynergyBonusHandler())      // Decorator
             .setNext(new DefenseCalculationHandler());
     }
 
@@ -395,11 +389,13 @@ Diese Mechanik wird Anforderung F3 (vgl. Tabelle~\ref{tab:funktionale-anforderun
 // Unit.java -- Dekoratoren transparent integriert
 public int getAttack() {
     int attack = baseStats.attack();
+
     for (UnitDecorator decorator : decorators) {
         if (!decorator.isExpired()) {
             attack += decorator.getAttackBonus(this);
         }
     }
+
     return attack;
 }
 
@@ -407,7 +403,8 @@ public void removeExpiredDecorators() {
     decorators.removeIf(UnitDecorator::isExpired);
 }
 
-// AttackBuffDecorator.java -- Konkrete Decorator-Implementierung
+
+// Konkrete Decorator-Implementierung
 public class AttackBuffDecorator extends UnitDecorator {
     private static final int BONUS = 2;
     private static final int DURATION = 2;
@@ -489,6 +486,7 @@ jedem Zugendewechsel über \texttt{endTurn()}.
 Der \texttt{RoundManager} zählt die Spielrunden mit: Er wird bei Spielstart auf~1 gesetzt und inkrementiert, sobald der Zug
 zur ersten Fraktion zurückkehrt. Die \texttt{CommandHistory} nutzt den Rundenwechsel als Grenze und leert bei jedem neuen Zug beide Stacks.
 
+\newpage
 \begin{lstlisting}[language=Java, caption={AttackCommand -- execute() und undo()}, label={lst:attack-command}]
 public class AttackCommand implements Command {
 
@@ -547,10 +545,9 @@ Das 10$\times$10-Spielfeld wird als ASCII-Raster in der Konsole gerendert (Anfor
 Eine grafische Oberfläche hätte den zeitlichen Rahmen des Projektes gesprengt; die Konsolenausgabe ist vollständig funktional und zeigt alle spielrelevanten Informationen.
 
 \begin{lstlisting}[language=Java, caption={Observer Pattern -- ConsoleGameRenderer.onEvent() und GameController}, label={lst:observer-ui}]
-// ConsoleGameRenderer.java -- Concrete Observer
+// Concrete Observer
 public class ConsoleGameRenderer
         implements GameRenderer, GameObserver {
-
     @Override
     public void onEvent(GameEvent event) {
         switch (event.getEventType()) {
@@ -569,7 +566,6 @@ public class ConsoleGameRenderer
             default            -> { }
         }
     }
-
     private void handleUnitAttacked(UnitAttackedEvent event) {
         DamageResult r = event.getDamageResult();
         System.out.println("[Attack] " + event.getDescription());
@@ -581,8 +577,7 @@ public class ConsoleGameRenderer
             + " = "           + r.totalDamage() + " total");
     }
 }
-
-// GameController.java -- Observer-Registrierung
+// Observer-Registrierung
 public GameController(Game game) {
     this.renderer = new ConsoleGameRenderer();
     this.eventLog = new EventLogObserver();
