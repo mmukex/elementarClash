@@ -49,10 +49,10 @@ public class FireUnitFactory extends UnitFactory {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:factory-method} zeigt das zweistufige Muster.
 \texttt{createUnit()} in \texttt{UnitFactory} ist die finale Template-Method: Sie validiert den \texttt{UnitType} per \texttt{isValidTypeForFaction()}, generiert eine eindeutige ID (z.\,B. \texttt{"F1"} für die erste Feuer-Einheit, \texttt{"W2"} für die zweite Wasser-Einheit) und delegiert die eigentliche Instanziierung an die abstrakte Factory Method \texttt{createUnitInternal()}.
 \texttt{FireUnitFactory} implementiert diese per \texttt{switch}-Ausdruck und übergibt die fraktionsspezifischen Stat-Werte als \texttt{UnitStats}-Record direkt an den Konstruktor der konkreten, package-privaten Einheitenklasse.
 Der \texttt{GameBuilder} hält ausschließlich Referenzen auf die abstrakte \texttt{UnitFactory} und \texttt{Unit}; konkrete Klassen sind für ihn nicht sichtbar.
+Die Implementierung der Einheitengenerierung als Factory Method Pattern deckt somit die Anforderung F2 (vgl. Tabelle~\ref{tab:funktionale-anforderungen}) ab.
 
 \subsubsection{Spielfeld \& Gelände (Max Meier)}
 \label{subsec:spielfeld-gelaende}
@@ -230,7 +230,6 @@ public record PlayerTurnPhase(Faction activeFaction)
 }
 \end{lstlisting}
 
-Listing~\ref{lst:state-transition} zeigt den Phasenwechsel-Mechanismus und die zentrale \texttt{PlayerTurnPhase}.
 Da \texttt{PlayerTurnPhase} ein Java-Record ist, enthält sie die aktive Fraktion unveränderlich als Komponente -- ein Wechsel der Fraktion erzeugt eine neue Instanz (\texttt{transitionToPlayerTurn()} gibt \texttt{new PlayerTurnPhase(faction)} zurück).
 In \texttt{onEnter()} werden zwei Aufgaben erledigt: der \texttt{BuffDebuffManager} versucht, einen Dekorator auf eine Einheit anzuwenden (Decorator Pattern), und anschließend werden alle Einheiten der aktiven Fraktion für den neuen Zug zurückgesetzt -- konkret setzt \texttt{Unit.resetTurn()} den Aktionszähler auf~0 und wechselt den \texttt{UnitState} per State Pattern nach \texttt{IdleState}.
 \texttt{canExecuteCommand()} delegiert vollständig an \texttt{command.validate(game)}, sodass die Phasenklasse keine Kenntnis der einzelnen Command-Typen benötigt.
@@ -346,7 +345,7 @@ Die Getter in \texttt{Unit} (Z.\,142ff) enthalten \texttt{GroundMovementStrategy
 \subsubsection{Schadensberechnung (Christian Stiens)}
 \label{subsec:schadensberechnung}
 
-Die Schadensberechnung wird über das Chain of Responsibility Pattern abgebildet.
+Die Schadensberechnung wird über das Chain of Responsibility Pattern abgebildet und gehört zur Aktion \texttt{Angreifen} aus Anforderung F4 (vgl. Tabelle~\ref{tab:funktionale-anforderungen}).
 Jeder Angriff durchläuft dabei eine fest definierte Kette von fünf Handlern, die gemeinsam auf dem \texttt{DamageContext}-Objekt arbeiten und dieses schrittweise anreichern.
 
 \begin{lstlisting}[language=Java, caption={DamageCalculator -- Aufbau und Start der Handler-Kette}, label={lst:damage-calculator}]
@@ -374,7 +373,6 @@ public class DamageCalculator {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:damage-calculator} zeigt, wie \texttt{DamageCalculator} die Kette einmalig im Konstruktor über fluente \texttt{setNext()}-Aufrufe aufbaut.
 \texttt{calculateDamage()} erstellt einen frischen \texttt{DamageContext} für jeden Angriff, startet die Kette mit \texttt{handlerChain.handle(context)} und wandelt das fertige Kontextobjekt in ein unveränderliches \texttt{DamageResult}-Record um.
 
 Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den jeweils nächsten Handler und leitet den Kontext nach getaner Arbeit via \texttt{super.handle()} weiter (vgl. \texttt{DamageHandler.java Z.\,22, 40ff}).
@@ -390,7 +388,8 @@ Der fertige Kontext wird anschließend in ein unveränderliches \texttt{DamageRe
 \subsubsection{Buffs/Debuffs (Christian Stiens)}
 \label{subsec:buffs-debuffs}
 
-Im Verlauf des Spiels wird mit rundenweise steigender Wahrscheinlichkeit (max. 60\,\%) zu Beginn jedes Spielerzugs einer von sechs Effekten auf eine zufällig ausgewählte, lebende Einheit der aktiven Fraktion angewendet (Decorator Pattern, vgl. \texttt{BuffDebuffManager.java Z.\,41ff}).
+Im Verlauf des Spiels wird mit rundenweise steigender Wahrscheinlichkeit (max. 60\,\%) zu Beginn jedes Spielerzugs einer von sechs Effekten auf eine zufällig ausgewählte, lebende Einheit der aktiven Fraktion angewendet (Decorator Pattern, vgl. \texttt{BuffDebuffManager.java Z.\,41ff}, Kapitel 2.3.3).
+Diese Mechanik wird Anforderung F3 (vgl. Tabelle~\ref{tab:funktionale-anforderungen}) zugerechnet.
 
 \begin{lstlisting}[language=Java, caption={Decorator Pattern -- Unit.getAttack() und AttackBuffDecorator}, label={lst:decorator-unit}]
 // Unit.java -- Dekoratoren transparent integriert
@@ -425,7 +424,6 @@ public class AttackBuffDecorator extends UnitDecorator {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:decorator-unit} zeigt die Integration des Decorator Patterns in \texttt{Unit}.
 \texttt{getAttack()} iteriert über alle Dekoratoren, filtert abgelaufene per \texttt{isExpired()} und akkumuliert deren \texttt{getAttackBonus(this)} auf den Basiswert aus \texttt{baseStats}; \texttt{getDefense()} und \texttt{getMovement()} folgen demselben Muster.
 \texttt{AttackBuffDecorator} gewährt +2~ATK für zwei Runden: \texttt{tick()} dekrementiert \texttt{remainingRounds} am Ende jedes Spielerzugs, \texttt{isExpired()} signalisiert bei \texttt{remainingRounds\,$\leq$\,0} das Ende der Wirkdauer.
 \texttt{removeExpiredDecorators()} entfernt alle abgelaufenen Einträge in einem einzigen \texttt{removeIf()}-Aufruf (vgl. \texttt{Unit.java Z.\,210ff}).
@@ -539,7 +537,6 @@ public class AttackCommand implements Command {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:attack-command} zeigt den \texttt{AttackCommand}.
 \texttt{execute()} sichert \texttt{targetPreviousHealth}, berechnet den Schaden über den \texttt{DamageCalculator} (Chain of Responsibility) und benachrichtigt die Observer per \texttt{UnitAttackedEvent}.
 \texttt{undo()} heilt das Ziel um die Differenz und dekrementiert den Aktionszähler.
 
@@ -594,7 +591,6 @@ public GameController(Game game) {
 }
 \end{lstlisting}
 
-Listing~\ref{lst:observer-ui} zeigt die Observer-Kopplung zwischen Spiellogik und Darstellung.
 \texttt{ConsoleGameRenderer} implementiert gleichzeitig \texttt{GameRenderer} (für den direkten \texttt{render(game)}-Aufruf nach jeder Eingabe) und \texttt{GameObserver} (für ereignisgetriebene Ausgaben während der Ausführung).
 In \texttt{onEvent()} werden alle acht \texttt{EventType}-Werte per \texttt{switch} auf private Handler-Methoden verteilt; \texttt{handleUnitAttacked()} gibt dabei die vollständige Schadensaufschlüsselung aus dem \texttt{DamageResult}-Record aus, das die Chain of Responsibility befüllt hat.
 Im \texttt{GameController}-Konstruktor werden beide Observer per \texttt{game.addObserver()} registriert: \texttt{ConsoleGameRenderer} für die Echtzeit-Konsolenausgabe und \texttt{EventLogObserver} zum Aufzeichnen aller Ereignisse.
