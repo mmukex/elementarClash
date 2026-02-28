@@ -29,7 +29,8 @@ F6 & Oberfläche & Einfache textuelle Darstellung des Spielfelds und der Spielz�
 \subsection{Nicht-funktionale Anforderungen}
 \label{sec:nicht-funktionale-anforderungen}
 
-Die Aufgabenstellung fordert die Verwendung von Java, C\# oder TypeScript, mindestens 8 sinnvoll integrierte GoF-Patterns, Modularität und Erweiterbarkeit sowie UML-Dokumentation.
+Die Aufgabenstellung fordert die Verwendung von Java, C\# oder TypeScript, mindestens 8 sinnvoll integrierte GoF-Patterns,
+Modularität und Erweiterbarkeit sowie UML-Dokumentation.
 
 \begin{table}[H]
 \centering
@@ -42,7 +43,6 @@ Build-System & Gradle 8.14 mit Wrapper \\
 Design Patterns & Gefordert: mindestens 8 GoF-Patterns aus den Kategorien Erzeugung, Struktur und Verhalten. Umgesetzt: 10 Patterns (siehe Kapitel~\ref{chap:architektur}, Tabelle~\ref{tab:pattern-uebersicht}). \\
 Modularität & Erweiterbar ohne Änderungen am Core-Code (z.\,B. neue Fraktionen, Einheiten, Geländearten) durch konsequenten Einsatz von Interfaces und Polymorphie. \\
 Dokumentation & PlantUML-Diagramme für alle Patterns, schriftliche Ausarbeitung in \LaTeX. \\
-Tests & JUnit-5-Tests für alle 10 Design Patterns. \\
 \bottomrule
 \end{tabular}
 \caption{Nicht-funktionale Anforderungen}
@@ -59,7 +59,8 @@ Jede Fraktion verkörpert einen eigenen Spielstil: Feuer (aggressiv), Wasser (de
 \label{subsec:fraktionen-einheiten}
 
 Jede Fraktion verfügt über drei Einheitentypen mit individuellen Werten.
-Zusätzlich besitzt jede Fraktion einen passiven Bonus auf bestimmtem Gelände sowie einen Fraktionsvorteil (+25\,\% Schaden) und einen Fraktionsnachteil ($-25$\,\% Schaden) gegenüber je einer anderen Fraktion.
+Zusätzlich besitzt jede Fraktion einen passiven Bonus auf bestimmtem Gelände sowie einen Fraktionsvorteil (+25\,\% Schaden)
+und einen Fraktionsnachteil ($-25$\,\% Schaden) gegenüber einer anderen Fraktion.
 
 \begin{table}[H]
 \centering
@@ -111,7 +112,8 @@ Luft   & $-25$\,\% &     0 & $+25$\,\% &     0 \\
 \subsubsection{Geländearten}
 \label{subsec:gelaendearten}
 
-Das 10$\times$10-Spielfeld wird aus fünf Geländearten zusammengesetzt, die Bewegungskosten, Verteidigungsboni und fraktionsspezifische Effekte besitzen.
+Das 10$\times$10-Spielfeld wird aus fünf Geländearten zusammengesetzt, die Bewegungskosten, Verteidigungsboni und
+fraktionsspezifische Effekte besitzen. Diese sind in folgender Tabelle dargestellt.
 
 \begin{table}[H]
 \centering
@@ -133,9 +135,13 @@ Stein & Normal: 3, Erde: 2 & 0 & Erde: +2 DEF \\
 \subsubsection{Kern-Spielmechaniken}
 \label{subsec:kern-spielmechaniken}
 
-Jede Einheit kann pro Runde maximal zwei Aktionen ausführen: einmal Bewegen und einmal Angreifen.
-Bewegungen kosten je nach Gelände und Fraktion unterschiedlich viele Bewegungspunkte; fliegende Einheiten (Luft-Fraktion sowie Phönix) ignorieren Geländekosten.
-Angriffe unterscheiden sich in Nahkampf (Reichweite~1) und Fernkampf (Reichweite~2--4), wobei Wald-Gelände die Sichtlinie für Fernkämpfer blockieren kann.
-Geländeeffekte werden per Visitor Pattern fraktionsspezifisch berechnet, Fraktionsboni und -mali per Chain of Responsibility in die Schadensberechnung integriert.
-Mit steigender Rundenzahl können zufällige (De-)Buffs auf Einheiten angewendet werden, die über das Decorator Pattern gestapelt werden.
-Alle Aktionen einer Runde sind per Undo/Redo rücknehmbar (Command Pattern).
+Jede Einheit kann pro Runde maximal zwei Aktionen ausführen. Einheiten können sich Bewegen und Angreifen.
+Die Bewegungen kosten je nach Gelände und Fraktion unterschiedlich viele Bewegungspunkte. Fliegende Einheiten (Luft-Fraktion
+sowie der Phönix) ignorieren Geländekosten.
+Die Angriffe unterscheiden sich in Nahkampf (Reichweite~1) und Fernkampf (Reichweite~2--4), wobei das Wald-Gelände die
+Sichtlinie für Fernkämpfer blockieren kann.
+Geländeeffekte werden per Visitor Pattern fraktionsspezifisch berechnet. Die Fraktionsboni und -mali per Chain of Responsibility
+in die Schadensberechnung integriert.
+Mit steigender Rundenzahl können zufällige (De-)Buffs auf Einheiten angewendet werden, die über das Decorator Pattern
+gestapelt werden.
+Alle Aktionen einer Runde sind per Undo/Redo zurücknehmbar (Command Pattern).

@@ -13,8 +13,6 @@ skinparam class {
     BorderColor<<Manager>> Brown
 }
 
-title Decorator Pattern - ElementarClash Unit Buffs/Debuffs\nGoF #4: Dynamically Attaching Responsibilities
-
 ' ===== Abstract Decorator =====
 ABSTRACT_CLASS UnitDecorator <<Abstract>> {
     + {abstract} getAttackBonus(unit: Unit): int

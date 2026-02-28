@@ -14,7 +14,6 @@ skinparam class {
     BorderColor<<Context>> DarkGreen
 }
 
-title State Pattern - ElementarClash Game Phases\nGoF #6: Object Behavior Changes Based on Internal State
 
 ' ===== State Interface =====
 INTERFACE GamePhaseState <<State>> {

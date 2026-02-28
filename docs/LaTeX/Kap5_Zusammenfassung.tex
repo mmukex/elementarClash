@@ -1,7 +1,6 @@
 \section{Zusammenfassung (Christian Stiens)}
 \label{chap:zusammenfassung}
 
-% === ZIELUMFANG: ca. 1 Seite ===
 \subsection{Fazit}
 \label{sec:fazit}
 
@@ -42,6 +41,7 @@ Die gewählte Architektur legt eine solide Grundlage für zukünftige Erweiterun
 Neue Fraktionen erfordern lediglich ein neues Fabrik-Paket (Factory Method); zusätzliche Buff-/Debuff-Effekte sind durch Ableitung von \texttt{UnitDecorator} ergänzbar (Decorator Pattern); neue Geländetypen werden durch einen weiteren \texttt{TerrainVisitor} und einen Eintrag in der \texttt{TerrainVisitorFactory} abgedeckt (Visitor Pattern).
 Darüber hinaus wären folgende Erweiterungen denkbar: ein KI-Gegner als weiterer \texttt{GameObserver} (Observer Pattern), der Spielzüge automatisch plant; eine grafische Oberfläche, die dasselbe Observer-Interface implementiert und die Konsolenausgabe ersetzt; sowie ein Netzwerkmodus, bei dem Befehle als serialisierte \texttt{Command}-Objekte übertragen werden (Command Pattern).
 
+\newpage
 % ============================================
 % Literaturverzeichnis
 % ============================================
@@ -56,7 +56,5 @@ Addison-Wesley, 1994.
 Matthias Geirhos:
 \textit{Entwurfsmuster Das umfassende Handbuch}
 Rheinwerk Computing, 1. Auflage 2015, 4., korrigierter Nachdruck 2021, ISBN 978-3-8362-2762-9
-
-% Weitere Quellen nach Bedarf
 
 \end{thebibliography}

@@ -15,8 +15,6 @@ skinparam class {
     BorderColor<<ValueObject>> Brown
 }
 
-title Chain of Responsibility Pattern - ElementarClash Damage Pipeline\nGoF #9: Decoupled Request Processing Through Handler Chain
-
 ' ===== Abstract Handler =====
 ABSTRACT_CLASS DamageHandler <<Handler>> {
     - next: DamageHandler

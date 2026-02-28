@@ -11,8 +11,6 @@ skinparam class {
     BorderColor<<Concrete>> DarkBlue
 }
 
-title Factory Method Pattern - ElementarClash\nGoF #1: Define an Interface for Creating an Object
-
 enum Faction {
     FIRE
     WATER

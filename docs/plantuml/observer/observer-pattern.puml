@@ -16,8 +16,6 @@ skinparam class {
     BorderColor<<Subject>> Brown
 }
 
-title Observer Pattern - ElementarClash Event System\nGoF #7: One-to-Many Dependency for Event Notification
-
 ' ===== Observer Interface =====
 INTERFACE GameObserver <<Observer>> {
     + onEvent(event: GameEvent): void
