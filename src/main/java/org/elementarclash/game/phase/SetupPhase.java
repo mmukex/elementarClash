@@ -7,6 +7,8 @@ import org.elementarclash.units.Faction;
 /**
  * Setup phase: Game is being constructed via GameBuilder.
  * No commands allowed.
+ *
+ * @author @crstmk
  */
 public class SetupPhase implements GamePhaseState {
 

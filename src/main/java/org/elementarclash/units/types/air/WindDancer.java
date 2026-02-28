@@ -16,6 +16,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * <p>
  * Tactical: Hit-and-run specialist. Uses superior mobility to flank and escape.
  * Can reach any position on the battlefield quickly.
+ *
+ * @author crstmkt
  */
 class WindDancer extends Unit {
     public WindDancer(String id, UnitStats stats) {

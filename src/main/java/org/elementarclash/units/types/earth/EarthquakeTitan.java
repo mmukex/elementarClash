@@ -14,6 +14,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * <p>
  * Tactical: Frontline tank. High health and defense. Absorbs damage for team.
  * Requires support to maximize value.
+ *
+ * @author crstmkt
  */
 class EarthquakeTitan extends Unit {
     public EarthquakeTitan(String id, UnitStats stats) {

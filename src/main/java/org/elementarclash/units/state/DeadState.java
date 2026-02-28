@@ -5,6 +5,8 @@ import org.elementarclash.units.Unit;
 /**
  * Unit is dead. Cannot perform any actions.
  * Terminal state (no transitions out, except Phoenix revival).
+ *
+ * @author crstmkt
  */
 public class DeadState implements UnitState {
 

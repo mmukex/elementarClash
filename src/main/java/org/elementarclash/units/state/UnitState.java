@@ -12,7 +12,7 @@ import org.elementarclash.units.Unit;
  * - Clear state transitions prevent invalid actions
  * - Avoids complex if-else chains checking multiple boolean flags
  *
- * @author @crstmkt
+ * @author crstmkt
  */
 public interface UnitState {
 

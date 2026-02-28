@@ -3,6 +3,9 @@ package org.elementarclash.units.bonus.temporary;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.bonus.UnitDecorator;
 
+/**
+ * @author crstmkt
+ */
 public class HastenedDecorator extends UnitDecorator {
     private static final int MOVEMENT_PENALTY = -1;
     private static final int DURATION = 2;

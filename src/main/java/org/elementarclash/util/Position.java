@@ -5,6 +5,8 @@ package org.elementarclash.util;
  *
  * @param x X-coordinate (0-9)
  * @param y Y-coordinate (0-9)
+ *
+ * @author crstmkt
  */
 public record Position(int x, int y) {
 

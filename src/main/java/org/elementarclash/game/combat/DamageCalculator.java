@@ -14,7 +14,7 @@ import org.elementarclash.units.Unit;
  * - @mmukex Visitor Pattern: TerrainEffectHandler uses TerrainVisitorFactory
  * - @crstmkt Decorator Pattern: SynergyBonusHandler uses Unit decorators (Week 4)
  *
- * @author @crstmkt (refactored for Chain of Responsibility)
+ * @author crstmkt (refactored for Chain of Responsibility)
  */
 public class DamageCalculator {
 

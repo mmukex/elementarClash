@@ -1,5 +1,8 @@
 package org.elementarclash.game.event;
 
+/**
+ * @author @crstmk
+ */
 public class GameStartedEvent extends GameEvent {
 
     @Override

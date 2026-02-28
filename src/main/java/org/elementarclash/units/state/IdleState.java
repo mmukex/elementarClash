@@ -5,6 +5,8 @@ import org.elementarclash.units.Unit;
 /**
  * Unit is idle and ready to act.
  * Can move, attack, or use abilities.
+ *
+ * @author crstmkt
  */
 public class IdleState implements UnitState {
 

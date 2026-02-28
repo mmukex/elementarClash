@@ -6,6 +6,8 @@ import org.elementarclash.units.Unit;
 /**
  * Unit is stunned (e.g., by Frost Mage ability).
  * Cannot perform any actions for a number of rounds.
+ *
+ * @author crstmkt
  */
 @Getter
 public class StunnedState implements UnitState {

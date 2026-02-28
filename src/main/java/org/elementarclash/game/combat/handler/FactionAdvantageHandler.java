@@ -17,7 +17,9 @@ import java.util.Map;
  * - Earth vs Air: -25% damage
  * - Air vs Earth: +25% damage
  * - Air vs Fire: -25% damage
- * <p>
+ * </p>
+ *
+ * @author @crstmk
  */
 public class FactionAdvantageHandler extends DamageHandler {
 

@@ -4,6 +4,9 @@ import lombok.Getter;
 import org.elementarclash.units.Unit;
 import org.elementarclash.util.Position;
 
+/**
+ * @author @crstmk
+ */
 @Getter
 public class UnitMovedEvent extends GameEvent {
 

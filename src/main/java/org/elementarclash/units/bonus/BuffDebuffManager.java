@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
+/**
+ * @author crstmkt
+ */
 public class BuffDebuffManager {
     private static final Random RANDOM = new Random();
 

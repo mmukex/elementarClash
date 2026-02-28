@@ -12,6 +12,8 @@ import java.util.List;
 /**
  * Parses user input strings into Command objects.
  * Single Responsibility: String parsing and Command creation.
+ *
+ * @author mmukex
  */
 public class CommandParser {
 

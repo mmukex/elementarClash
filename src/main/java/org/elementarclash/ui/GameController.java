@@ -11,6 +11,8 @@ import org.elementarclash.units.Faction;
 /**
  * Controls the main game loop.
  * Single Responsibility: Game flow orchestration.
+ *
+ * @author mmukex crstmkt
  */
 public class GameController {
     private final Game game;

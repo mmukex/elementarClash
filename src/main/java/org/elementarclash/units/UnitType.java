@@ -3,6 +3,8 @@ package org.elementarclash.units;
 /**
  * Defines the three unit types per faction.
  * Used for factory creation and unit identification.
+ *
+ * @author crstmkt
  */
 public enum UnitType {
     // Fire

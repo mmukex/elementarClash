@@ -6,6 +6,7 @@ Die Tabelle~\ref{tab:pattern-uebersicht} gibt einen Überblick über die gewähl
 im Spiel und die Begründung für die Wahl. Die anschließenden Abschnitte beschreiben jedes Pattern im Detail.
 In den zugehörigen UML-Diagrammen wurde zugunsten der Übersichtlichkeit auf die Darstellung von Packages verzichtet.
 Implementieren mehrere konkrete Klassen dasselbe Interface, wird exemplarisch nur eine dargestellt.
+Die Implementierung der Patterns wurde zwischen beiden Autoren aufgeteilt.
 
 \begin{table}[H]
 \centering
@@ -15,13 +16,13 @@ Implementieren mehrere konkrete Klassen dasselbe Interface, wird exemplarisch nu
 \textbf{\#} & \textbf{Pattern} & \textbf{Kat.} & \textbf{Anwendungsfall} & \textbf{Begründung} \\
 \midrule
 1 & Factory Method & Erz. & Fraktionsspezifische Einheiten-Erzeugung & 4 Fraktionen $\times$ 3 Typen; erweiterbar ohne Core-Änderungen \\
-2 & Builder & Erz. & Schrittweise Spielfeld-Erstellung & 100 Zellen, Geländeverteilung, Spawn-Positionen -- zu komplex für einen Konstruktor \\
+2 & Builder & Erz. & Schrittweise Spielfeld-Erstellung & 100 Zellen, Geländeverteilung, Spawn-Positionen \\
 3 & Composite & Str. & Battlefield $\to$ Region $\to$ Cell & Einheitliche Operationen auf Einzelzellen und ganzen Regionen \\
 4 & Decorator & Str. & Temporäre (De-)Buffs & Stapelbare Laufzeit-Erweiterungen ohne Unterklassen \\
 5 & Strategy & Verh. & Bewegung (Boden/Fliegend), Angriff (Nah-/Fernkampf) & Austauschbare Algorithmen pro Einheit \\
-6 & State & Verh. & Spielphasen und Einheitenzustände & Zustandsabhängiges Verhalten ohne \texttt{if}-Kaskaden \\
+6 & State & Verh. & Spielphasen und Einheitenzustände & Zustandsabhängiges Verhalten \\
 7 & Observer & Verh. & Event-System, UI-Entkopplung & Lose Kopplung zwischen Spiellogik und Darstellung \\
-8 & Command & Verh. & MoveCommand, AttackCommand + Undo/Redo & Aktionen als Objekte mit Rollback-Fähigkeit \\
+8 & Command & Verh. & MoveCommand, AttackCommand + Undo/Redo & Aktionen mit Rollback-Fähigkeit \\
 9 & Chain of Resp. & Verh. & Schadensberechnungs-Pipeline & Modulare Handler-Kette für Modifikatoren \\
 10 & Visitor & Verh. & Gelände-Effekte auf Einheiten & Double Dispatch für 5 Gelände $\times$ 4 Fraktionen \\
 \bottomrule
@@ -67,7 +68,7 @@ Der \texttt{TerrainEffectHandler} in der Schadensberechnungs-Pipeline (Chain of 
 und Verteidiger je einen \texttt{TerrainVisitor} auf der aktuellen Zelle des Composite-Spielfelds.
 \texttt{MoveCommand} und \texttt{AttackCommand} (Command Pattern) delegieren ihre Validierung an die jeweilige Strategy der Einheiten.
 Der \texttt{AttackCommand} löst die Handler-Kette des \texttt{DamageCalculator} aus, die den Visitor, den Decorator und die Fraktionsmatrix integriert.
-Das State Pattern und Observer Pattern rahmen den Ablauf ein: Spielphasen steuern den Kontrollfluss, Observer entkoppeln die UI von der Spiellogik.
+Das State Pattern und Observer Pattern beschreiben den Ablauf: Spielphasen steuern den Kontrollfluss, Observer entkoppeln die UI von der Spiellogik.
 
 \subsection{Erzeugungsmuster}
 \label{sec:erzeugungsmuster}
@@ -75,15 +76,16 @@ Das State Pattern und Observer Pattern rahmen den Ablauf ein: Spielphasen steuer
 \subsubsection{Factory Method (Christian Stiens)}
 \label{subsec:factory-method}
 ElementarClash umfasst 12 konkrete Einheitenklassen in vier Fraktionen mit je eigenen Stat-Werten (vgl. Kapitel 2.3.1).
-Ohne ein Erzeugungsmuster müsste der Aufrufer jeden konkreten Konstruktor kennen und die passenden Stat-Werte selbst übergeben -- eine Kopplung, die bei einer neuen Fraktion Änderungen an mehreren Stellen im Code erfordern würde.
+Ohne ein Erzeugungsmuster müsste der Aufrufer jeden konkreten Konstruktor kennen und die passenden Stat-Werte selbst übergeben.
+Dies wäre eine Kopplung, die bei einer neuen Fraktion Änderungen an mehreren Stellen im Code erfordern würde.
 
 Das Factory Method Pattern löst dieses Problem durch eine zweistufige Hierarchie.
 Die abstrakte Klasse \texttt{UnitFactory} definiert \texttt{createUnit(UnitType)} als finalen Template-Method-Einstiegspunkt: Sie validiert, ob der angeforderte \texttt{UnitType} zur Fraktion gehört, generiert eine eindeutige Einheiten-ID im Format \texttt{F1}, \texttt{W2} usw. (Anfangsbuchstabe der Fraktion + laufender Zähler) und delegiert die eigentliche Objekterzeugung an die abstrakte Factory Method \texttt{createUnitInternal(id, type)}.
-Jede der vier konkreten Fabriken -- \texttt{FireUnitFactory}, \texttt{WaterUnitFactory}, \texttt{EarthUnitFactory} und \texttt{AirUnitFactory} -- implementiert \texttt{createUnitInternal()} als \texttt{switch}-Ausdruck über den \texttt{UnitType} und instanziiert die zugehörige Einheitenklasse mit den hart codierten Stat-Werten (vgl. \texttt{FireUnitFactory.java}).
-Die konkreten Einheitenklassen sind package-private, sodass sie ausschließlich über ihre Fabrik instanziiert werden können -- eine durch die Paketstruktur erzwungene Kapselung. (vgl. \cite{entwurfsmuster})
+Jede der vier konkreten Fabriken (\texttt{FireUnitFactory}, \texttt{WaterUnitFactory}, \texttt{EarthUnitFactory} und \texttt{AirUnitFactory}) implementiert \texttt{createUnitInternal()} als \texttt{switch}-Ausdruck über den \texttt{UnitType} und instanziiert die zugehörige Einheitenklasse mit den hart codierten Stat-Werten (vgl. \texttt{FireUnitFactory.java}).
+Die konkreten Einheitenklassen sind package-private, sodass sie ausschließlich über ihre Fabrik instanziiert werden können. (vgl. \cite{entwurfsmuster})
 
 Das Ergebnis: Das Hinzufügen einer neuen Fraktion erfordert lediglich eine neue Fabrik und die zugehörigen Einheitenklassen im gleichen Paket.
-Die restliche Spiellogik -- \texttt{GameBuilder}, \texttt{Game}, \texttt{DamageCalculator} -- bleibt unverändert und arbeitet ausschließlich gegen die abstrakte \texttt{UnitFactory} und \texttt{Unit}.
+Die restliche Spiellogik (\texttt{GameBuilder}, \texttt{Game}, \texttt{DamageCalculator}) bleibt unverändert und arbeitet ausschließlich gegen die abstrakte \texttt{UnitFactory} und \texttt{Unit}.
 
 \begin{figure}[H]
 	\centering
@@ -110,7 +112,7 @@ Die konkreten Methoden und die Platzierungslogiken werden in Abschnitt~\ref{subs
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.8\textwidth]{images/Builder_Pattern___ElementarClash}
+	\includegraphics[width=0.9\textwidth]{images/Builder_Pattern___ElementarClash}
 	\caption{Builder Pattern für die Spielerstellung}
 	\label{fig:builder-pattern}
 \end{figure}
@@ -172,7 +174,6 @@ Im UI werden aktive Effekte in geschweiften Klammern hinter dem Einheitennamen a
 
 \subsubsection{Strategy (Max Meier)}
 \label{subsec:strategy}
-% Verantwortlich: @mmukex
 Einheiten unterschiedlicher Fraktionen besitzen verschiedene Bewegungs- und Angriffsregeln: Luft-Einheiten fliegen über
 das Gelände hinweg, Feuer-Einheiten bewegen sich auf Lava günstiger, Fernkämpfer prüfen Sichtlinien.
 Ohne die Auslagerung der Bewegungs- und Angriffslogik hätte die \texttt{Unit}-Klasse für jeden Sonderfall eigene Bedingungen
@@ -199,17 +200,17 @@ Die konkreten Strategien, Geländekosten und Sichtlinienregeln werden in Abschni
 \subsubsection{State (Christian Stiens)}
 \label{subsec:state}
 ElementarClash besitzt einen klar definierten Spielablauf aus vier Phasen, in denen jeweils unterschiedliche Aktionen erlaubt sind.
-Ohne ein Zustandsmuster müsste die \texttt{Game}-Klasse bei jedem \texttt{executeCommand()}-Aufruf prüfen, welche Phase gerade aktiv ist -- was zu langen \texttt{if}-Kaskaden führt, die bei jeder neuen Phase erweitert werden müssen.
+Ohne ein Zustandsmuster müsste die \texttt{Game}-Klasse bei jedem \texttt{executeCommand()}-Aufruf prüfen, welche Phase gerade aktiv ist, was zu langen \texttt{if}-Kaskaden führt, die bei jeder neuen Phase erweitert werden müssen.
 Das State Pattern verlagert das phasenspezifische Verhalten in separate Klassen und hält \texttt{Game} schlank (vgl. \cite{entwurfsmuster}).
 
 Das Interface \texttt{GamePhaseState} deklariert \texttt{canExecuteCommand()}, \texttt{onEnter()}, \texttt{onExit()} sowie drei \texttt{transitionTo...()}-Methoden.
-\texttt{Game.transitionToPhase(newPhase)} ruft \texttt{currentPhase.onExit(this)}, setzt die neue Phase und ruft \texttt{newPhase.onEnter(this)} auf -- der Phasenwechsel ist damit zuverlässig in einer einzigen Methode gekapselt.
+\texttt{Game.transitionToPhase(newPhase)} ruft \texttt{currentPhase.onExit(this)}, setzt die neue Phase und ruft \texttt{newPhase.onEnter(this)} auf. Der Phasenwechsel ist damit zuverlässig in einer einzigen Methode gekapselt.
 
 Die vier konkreten Phasen sind:
 \texttt{SetupPhase} (Singleton) blockiert alle Befehle und wird während der Spielaufbauphase im \texttt{GameBuilder} durchlaufen;
-\texttt{PlayerTurnPhase} (Record mit \texttt{activeFaction}) aktiviert in \texttt{onEnter()} den \texttt{BuffDebuffManager} und setzt die Aktionszähler aller Einheiten der aktiven Fraktion zurück -- \texttt{canExecuteCommand()} delegiert die Validierung an \texttt{command.validate(game)};
+\texttt{PlayerTurnPhase} (Record mit \texttt{activeFaction}) aktiviert in \texttt{onEnter()} den \texttt{BuffDebuffManager} und setzt die Aktionszähler aller Einheiten der aktiven Fraktion zurück. \texttt{canExecuteCommand()} delegiert die Validierung an \texttt{command.validate(game)};
 \texttt{EventPhase} (Singleton) blockiert Befehle und feuert in \texttt{onEnter()} ein zufälliges Ereignis (Waldbrand, Geysir oder Erdbeben), bevor automatisch in die nächste \texttt{PlayerTurnPhase} gewechselt wird;
-\texttt{GameOverPhase} (Record mit \texttt{winner}) ist der Terminalzustand -- alle Übergangsmethoden geben \texttt{this} zurück.
+\texttt{GameOverPhase} (Record mit \texttt{winner}) ist der Terminalzustand. Alle Übergangsmethoden geben \texttt{this} zurück.
 
 Zusätzlich modelliert das State Pattern die Einheitenzustände: \texttt{UnitState} mit den konkreten Zuständen \texttt{IdleState}, \texttt{MovingState}, \texttt{AttackingState}, \texttt{StunnedState} und \texttt{DeadState}.
 Diese steuern, welche Aktionen eine Einheit innerhalb eines Spielerzugs noch ausführen darf.
@@ -223,7 +224,7 @@ Diese steuern, welche Aktionen eine Einheit innerhalb eines Spielerzugs noch aus
 
 \subsubsection{Observer (Christian Stiens)}
 \label{subsec:observer}
-Die Spiellogik in \texttt{Game} erzeugt Ereignisse -- Einheiten bewegen sich, greifen an, sterben, Gelände verändert sich -- die sofort in der Konsole dargestellt und gleichzeitig für eine spätere Protokollausgabe aufgezeichnet werden sollen.
+Die Spiellogik in \texttt{Game} erzeugt Ereignisse (Einheiten bewegen sich, greifen an, sterben, Gelände verändert sich), die sofort in der Konsole dargestellt und gleichzeitig für eine spätere Protokollausgabe aufgezeichnet werden sollen.
 Eine direkte Kopplung von \texttt{Game} an den \texttt{ConsoleGameRenderer} würde bedeuten, dass jede neue Ausgabeart (z.\,B. eine grafische Oberfläche oder ein Netzwerk-Log) Änderungen in der Spiellogik erfordert.
 Das Observer Pattern löst dies durch eine lose Kopplung: \texttt{Game} kennt nur das Interface \texttt{GameObserver}, nicht seine konkreten Implementierungen (vgl. \cite{gof}).
 
@@ -308,7 +309,7 @@ Die fünf Handler in ihrer festen Reihenfolge:
 \textbf{(2)} \texttt{FactionAdvantageHandler} schlägt Angreifer- und Verteidigerfraktion in einer statischen Korrelationsmatrix nach und multipliziert den Schaden mit $\times 1{,}25$ (Vorteil), $\times 0{,}75$ (Nachteil) oder $\times 1{,}0$ (neutral) (vgl. Tabelle 4).
 \textbf{(3)} \texttt{TerrainEffectHandler} integriert das Visitor Pattern: Für Angreifer und Verteidiger wird je ein \texttt{TerrainVisitor} auf der aktuellen Zelle dispatcht und die Boni in den Kontext geschrieben.
 \textbf{(4)} \texttt{SynergyBonusHandler} integriert das Decorator Pattern: er summiert \texttt{getAttackBonus()} aller nicht abgelaufenen Dekoratoren der angreifenden Einheit.
-\textbf{(5)} \texttt{DefenseCalculationHandler} ist der terminale Handler und berechnet den Endschaden nach $\text{finalDamage} = \max(1,\ \text{totalAttack} - \text{totalDefense})$ -- ein Minimalschaden von~1 ist garantiert.
+\textbf{(5)} \texttt{DefenseCalculationHandler} ist der terminale Handler und berechnet den Endschaden nach $\text{finalDamage} = \max(1,\ \text{totalAttack} - \text{totalDefense})$, damit ein Minimalschaden von~1 garantiert ist.
 Das fertige Ergebnis wird als unveränderliches \texttt{DamageResult}-Record an den \texttt{AttackCommand} zurückgegeben.
 
 

@@ -5,6 +5,8 @@ import org.elementarclash.game.combat.DamageContext;
 /**
  * First handler: Extract base attack from attacker.
  * Uses @mmukex Strategy Pattern (AttackStrategy.calculateBaseDamage).
+ *
+ * @author @crstmk
  */
 public class BaseDamageHandler extends DamageHandler {
 

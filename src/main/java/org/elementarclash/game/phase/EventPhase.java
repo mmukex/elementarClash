@@ -14,6 +14,8 @@ import java.util.Random;
  * No player commands allowed.
  * <p>
  * Integration Point: Uses @mmukex Composite Pattern (battlefield.applyEffect)
+ *
+ * @author @crstmk
  */
 public class EventPhase implements GamePhaseState {
 

@@ -43,6 +43,8 @@ import java.util.stream.Collectors;
  * - Command execution and validation (via Strategy Pattern)
  * - Turn-based game flow (rounds, faction turns, victory conditions)
  * - Game state tracking (SETUP → IN_PROGRESS → GAME_OVER)
+ *
+ * @author mmukex crstmkt
  */
 @Getter
 public class Game {

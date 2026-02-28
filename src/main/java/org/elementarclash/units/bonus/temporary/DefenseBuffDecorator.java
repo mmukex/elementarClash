@@ -3,6 +3,9 @@ package org.elementarclash.units.bonus.temporary;
 import org.elementarclash.units.Unit;
 import org.elementarclash.units.bonus.UnitDecorator;
 
+/**
+ * @author crstmkt
+ */
 public class DefenseBuffDecorator extends UnitDecorator {
     private static final int BONUS = 2;
     private static final int DURATION = 2;

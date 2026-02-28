@@ -8,6 +8,8 @@ import org.elementarclash.units.Unit;
  * Synergy bonus from adjacent allied units.
  * <p>
  * Example (README): "Benachbarte Feuer-Einheiten gewähren einander +1 Angriff"
+ *
+ * @author crstmkt
  */
 public class SynergyBonus extends UnitDecorator {
 

@@ -7,6 +7,8 @@ import org.elementarclash.ui.GameController;
 /**
  * Main entry point for ElementarClash game.
  * Creates a random game setup and starts the interactive game loop.
+ * 
+ * @author mmukex
  */
 public class Main {
 

@@ -10,7 +10,7 @@ package org.elementarclash.game.event;
  * - Multiple observers can listen to same events (UI + logger + AI)
  * - Easy to add new observers without modifying Game class
  *
- * @author @crstmkt
+ * @author crstmkt
  */
 public interface GameObserver {
 

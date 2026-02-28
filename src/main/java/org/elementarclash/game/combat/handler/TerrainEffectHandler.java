@@ -10,6 +10,8 @@ import org.elementarclash.game.combat.DamageContext;
  * Apply terrain effects using @mmukex Visitor Pattern.
  * <p>
  * Integration Point: TerrainVisitorFactory from @mmukex Pattern #10
+ *
+ * @author @crstmk
  */
 public class TerrainEffectHandler extends DamageHandler {
 

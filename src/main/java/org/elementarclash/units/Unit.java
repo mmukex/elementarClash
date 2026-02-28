@@ -22,6 +22,8 @@ import java.util.List;
  * Defines common properties and behavior for all unit types.
  * <p>
  * Design Pattern: Factory Method creates instances of Unit subclasses.
+ *
+ * @author crstmkt mmukex
  */
 @Getter
 @Setter

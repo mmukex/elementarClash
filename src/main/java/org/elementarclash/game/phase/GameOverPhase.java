@@ -7,6 +7,8 @@ import org.elementarclash.units.Faction;
 /**
  * Game over phase: Game has ended.
  * No commands allowed.
+ *
+ * @author @crstmk
  */
 public record GameOverPhase(Faction winner) implements GamePhaseState {
 

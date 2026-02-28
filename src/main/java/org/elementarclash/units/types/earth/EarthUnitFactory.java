@@ -9,6 +9,8 @@ import org.elementarclash.units.UnitFactory;
 /**
  * Concrete factory for creating Earth faction units.
  * Earth faction playstyle: Controlling, high defense, terrain manipulation.
+ *
+ * @author crstmkt
  */
 public class EarthUnitFactory extends UnitFactory {
 

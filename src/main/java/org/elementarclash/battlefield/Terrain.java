@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
  * <p>
  * Why Enum: Finite set of terrain types with associated data and behavior.
  * Provides type-safety and prevents invalid terrain instances.
+ *
+ * @author mmukex
  */
 @Getter
 @RequiredArgsConstructor

@@ -4,6 +4,8 @@ import lombok.Getter;
 
 /**
  * Base class for all game events.
+ *
+ * @author @crstmk
  */
 @Getter
 public abstract class GameEvent {

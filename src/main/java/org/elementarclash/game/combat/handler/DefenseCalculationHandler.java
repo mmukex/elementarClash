@@ -6,6 +6,8 @@ import org.elementarclash.game.combat.DamageContext;
  * Final handler: Calculate total damage after defense.
  * <p>
  * Formula: finalDamage = max(1, totalAttack - totalDefense)
+ *
+ * @author @crstmk
  */
 public class DefenseCalculationHandler extends DamageHandler {
 

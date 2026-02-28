@@ -5,6 +5,8 @@ import org.elementarclash.units.Unit;
 /**
  * Unit is currently attacking or has attacked this turn.
  * Cannot move or attack again.
+ *
+ * @author crstmkt
  */
 public class AttackingState implements UnitState {
 

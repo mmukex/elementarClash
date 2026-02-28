@@ -140,8 +140,8 @@ Die Bewegungen kosten je nach Gelände und Fraktion unterschiedlich viele Bewegu
 sowie der Phönix) ignorieren Geländekosten.
 Die Angriffe unterscheiden sich in Nahkampf (Reichweite~1) und Fernkampf (Reichweite~2--4), wobei das Wald-Gelände die
 Sichtlinie für Fernkämpfer blockieren kann.
-Geländeeffekte werden per Visitor Pattern fraktionsspezifisch berechnet. Die Fraktionsboni und -mali per Chain of Responsibility
-in die Schadensberechnung integriert.
+Die Geländeeffekte werden über das Visitor Pattern fraktionsspezifisch berechnet. Die Fraktionsboni und -mali über die
+Chain of Responsibility in die Schadensberechnung integriert.
 Mit steigender Rundenzahl können zufällige (De-)Buffs auf Einheiten angewendet werden, die über das Decorator Pattern
 gestapelt werden.
 Alle Aktionen einer Runde sind per Undo/Redo zurücknehmbar (Command Pattern).

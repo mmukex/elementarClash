@@ -3,6 +3,9 @@ package org.elementarclash.game.event;
 import lombok.Getter;
 import org.elementarclash.units.Faction;
 
+/**
+ * @author @crstmk
+ */
 @Getter
 public class GameOverEvent extends GameEvent {
 

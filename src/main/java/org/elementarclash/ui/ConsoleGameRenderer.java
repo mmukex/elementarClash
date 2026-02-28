@@ -17,6 +17,8 @@ import java.util.List;
 
 /**
  * Renders game state as ASCII text for console output.
+ *
+ * @author mmukex crstmkt
  */
 public class ConsoleGameRenderer implements GameRenderer, GameObserver {
 

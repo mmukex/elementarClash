@@ -15,6 +15,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * Special: +3 defense on ice terrain.
  * <p>
  * Tactical: Frontline defender. Strongest on ice. Anchors defensive positions.
+ *
+ * @author crstmkt
  */
 class TideGuardian extends Unit {
     public TideGuardian(String id, UnitStats stats) {

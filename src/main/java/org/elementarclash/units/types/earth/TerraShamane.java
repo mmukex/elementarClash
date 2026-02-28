@@ -13,6 +13,8 @@ import org.elementarclash.units.strategy.movement.GroundMovementStrategy;
  * Faction: Earth | Movement: Ground | Attack: Ranged (range: 3)
  * <p>
  * Tactical: Ranged support specialist. Provides backline damage.
+ *
+ * @author crstmkt
  */
 class TerraShamane extends Unit {
     public TerraShamane(String id, UnitStats stats) {

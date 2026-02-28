@@ -5,6 +5,8 @@ import org.elementarclash.units.Unit;
 /**
  * Unit is currently moving.
  * Can still attack or use abilities after moving.
+ *
+ * @author crstmkt
  */
 public class MovingState implements UnitState {
 

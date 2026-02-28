@@ -18,6 +18,8 @@ import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
  * Tactical Use: Long-range damage dealer.
  * High range allows safe positioning. Strong against melee units. Vulnerable when cornered.
  * Requires careful positioning to maintain range advantage.
+ *
+ * @author crstmkt
  */
 class FrostMage extends Unit {
     public FrostMage(String id, UnitStats stats) {

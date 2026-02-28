@@ -5,6 +5,8 @@ import org.elementarclash.game.Game;
 /**
  * Renders game state to various output formats.
  * Separates presentation logic from game logic.
+ *
+ * @author mmukex
  */
 public interface GameRenderer {
     /**

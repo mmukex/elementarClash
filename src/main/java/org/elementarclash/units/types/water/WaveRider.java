@@ -15,6 +15,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * Special: Fast movement on ice terrain (cost 1.0).
  * <p>
  * Tactical: Rapid flanker on ice. High mobility for hit-and-run tactics.
+ *
+ * @author crstmkt
  */
 class WaveRider extends Unit {
     public WaveRider(String id, UnitStats stats) {

@@ -1,5 +1,8 @@
 package org.elementarclash.game.event;
 
+/**
+ * @author @crstmk
+ */
 public enum EventType {
     // Unit events
     // UNIT_CREATED, Maybe future implementation

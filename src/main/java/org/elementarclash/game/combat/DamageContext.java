@@ -11,7 +11,7 @@ import java.util.List;
  * Shared context for Chain of Responsibility damage calculation.
  * Handlers read from and write to this context.
  *
- * @author @crstmkt
+ * @author crstmkt
  */
 @Getter
 public class DamageContext {

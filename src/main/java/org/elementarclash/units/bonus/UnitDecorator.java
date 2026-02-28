@@ -16,7 +16,7 @@ import org.elementarclash.units.Unit;
  * - Decorator allows stacking without modifying Unit class
  * - Clean separation: Unit = base stats, Decorators = modifiers
  *
- * @author @crstmkt
+ * @author crstmkt
  *
  */
 public abstract class UnitDecorator {

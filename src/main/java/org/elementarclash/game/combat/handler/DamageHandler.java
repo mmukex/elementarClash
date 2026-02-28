@@ -15,7 +15,7 @@ import org.elementarclash.game.combat.DamageContext;
  * - Easy to add new modifiers (e.g., weather effects, artifacts)
  * - Clear separation of concerns
  *
- * @author @crstmkt
+ * @author crstmkt
  */
 public abstract class DamageHandler {
 

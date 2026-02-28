@@ -2,6 +2,8 @@ package org.elementarclash.util;
 
 /**
  * Utility for position neighborhood and range operations.
+ * 
+ * @author mmukex
  */
 public final class PositionNeighborhood {
 

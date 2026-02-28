@@ -4,6 +4,9 @@ import lombok.Getter;
 import org.elementarclash.battlefield.Terrain;
 import org.elementarclash.util.Position;
 
+/**
+ * @author @crstmk
+ */
 @Getter
 public class TerrainChangedEvent extends GameEvent {
 

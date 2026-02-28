@@ -4,6 +4,9 @@ import lombok.Getter;
 import org.elementarclash.game.combat.DamageResult;
 import org.elementarclash.units.Unit;
 
+/**
+ * @author @crstmk
+ */
 @Getter
 public class UnitAttackedEvent extends GameEvent {
 

@@ -3,6 +3,9 @@ package org.elementarclash.game.event;
 import lombok.Getter;
 import org.elementarclash.units.Unit;
 
+/**
+ * @author @crstmk
+ */
 @Getter
 public class UnitDeathEvent extends GameEvent {
 

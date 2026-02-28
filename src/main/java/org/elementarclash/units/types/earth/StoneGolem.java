@@ -16,6 +16,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * Stone defense bonus implemented via Visitor Pattern: StoneTerrainVisitor.
  * <p>
  * Tactical: Defensive anchor. Guards key positions. Extremely hard to kill.
+ *
+ * @author crstmkt
  */
 class StoneGolem extends Unit {
     public StoneGolem(String id, UnitStats stats) {

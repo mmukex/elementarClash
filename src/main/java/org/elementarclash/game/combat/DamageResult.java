@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Result of damage calculation with detailed breakdown.
  *
- * @author @crstmkt (extended for Chain of Responsibility)
+ * @author crstmkt (extended for Chain of Responsibility)
  */
 public record DamageResult(
         int totalDamage,

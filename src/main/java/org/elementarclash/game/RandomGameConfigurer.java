@@ -15,6 +15,8 @@ import java.util.*;
 /**
  * Configures random game setups with random factions and terrain distributions.
  * Provides randomized game creation for varied gameplay experiences.
+ *
+ * @author mmukex
  */
 public class RandomGameConfigurer {
 

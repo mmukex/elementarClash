@@ -9,6 +9,8 @@ import org.elementarclash.units.UnitFactory;
 /**
  * Concrete factory for creating Air faction units.
  * Air faction playstyle: Mobile, evasive, high movement and initiative.
+ *
+ * @author crstmkt
  */
 public class AirUnitFactory extends UnitFactory {
 

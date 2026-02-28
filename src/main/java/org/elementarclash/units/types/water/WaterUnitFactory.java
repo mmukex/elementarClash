@@ -9,6 +9,8 @@ import org.elementarclash.units.UnitFactory;
 /**
  * Concrete factory for creating Water faction units.
  * Water faction playstyle: Defensive, crowd control, terrain synergy.
+ *
+ * @author crstmkt
  */
 public class WaterUnitFactory extends UnitFactory {
 

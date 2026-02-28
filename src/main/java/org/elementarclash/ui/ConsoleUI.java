@@ -5,6 +5,8 @@ import java.util.Scanner;
 /**
  * Handles console input and user prompts.
  * Single Responsibility: User interaction via console.
+ *
+ * @author mmukex crstmkt
  */
 public class ConsoleUI {
     private final Scanner scanner;

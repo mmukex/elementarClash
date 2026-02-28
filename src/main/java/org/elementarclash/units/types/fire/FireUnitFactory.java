@@ -9,6 +9,8 @@ import org.elementarclash.units.UnitFactory;
 /**
  * Concrete factory for creating Fire faction units.
  * Fire faction playstyle: Aggressive, high damage, synergy bonuses.
+ *
+ * @author crstmkt
  */
 public class FireUnitFactory extends UnitFactory {
 

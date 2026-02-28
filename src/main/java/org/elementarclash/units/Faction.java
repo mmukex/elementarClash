@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 /**
  * Represents the four elemental factions in ElementarClash.
  * Each faction has unique units, playstyles, and elemental advantages.
+ *
+ * @author crstmkt
  */
 @Getter
 @RequiredArgsConstructor

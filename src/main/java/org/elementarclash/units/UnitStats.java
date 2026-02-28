@@ -3,6 +3,8 @@ package org.elementarclash.units;
 /**
  * Immutable value object holding unit statistics.
  * Used to configure units without exposing setters.
+ *
+ * @author crstmkt
  */
 public record UnitStats(
         int maxHealth,

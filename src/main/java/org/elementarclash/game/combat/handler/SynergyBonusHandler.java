@@ -6,6 +6,7 @@ import org.elementarclash.game.combat.DamageContext;
  * Apply synergy bonuses from adjacent units.
  * Integration Point: Will use @crstmkt Decorator Pattern (Pattern #4)
  *
+ * @author @crstmk
  */
 public class SynergyBonusHandler extends DamageHandler {
 

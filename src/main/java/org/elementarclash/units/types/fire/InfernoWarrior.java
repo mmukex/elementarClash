@@ -20,6 +20,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * <p>
  * Tactical Use: Tanky frontline fighter.
  * High health and defense. Strongest on lava terrain. Weak against ranged units and air.
+ *
+ * @author crstmkt
  */
 class InfernoWarrior extends Unit {
     public InfernoWarrior(String id, UnitStats stats) {

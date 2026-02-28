@@ -8,6 +8,8 @@ import java.util.List;
 
 /**
  * Logs all game events for replay functionality.
+ *
+ * @author @crstmk
  */
 public class EventLogObserver implements GameObserver {
 

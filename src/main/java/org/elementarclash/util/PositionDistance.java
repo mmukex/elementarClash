@@ -2,6 +2,8 @@ package org.elementarclash.util;
 
 /**
  * Utility for distance calculations between positions.
+ * 
+ * @author mmukex
  */
 public final class PositionDistance {
 

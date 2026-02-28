@@ -99,7 +99,7 @@ public class Battlefield implements BattlefieldComponent {
     /**
      * Set terrain at position and notify game (for Observer Pattern).
      *
-     * @author @crstmkt (Observer integration)
+     * @author crstmkt (Observer integration)
      */
     public void setTerrainAt(Position position, Terrain newTerrain, Game game) {
         Cell cell = getCell(position.x(), position.y());
@@ -132,7 +132,7 @@ public class Battlefield implements BattlefieldComponent {
      * Get a random region for dynamic events.
      * Used by EventPhase for forest fires, geysers, etc.
      *
-     * @author @crstmkt (integration helper for State Pattern)
+     * @author crstmkt (integration helper for State Pattern)
      */
     public Region getRandomRegion() {
         if (rows.isEmpty()) {

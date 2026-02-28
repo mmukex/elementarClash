@@ -14,7 +14,7 @@ import org.elementarclash.units.Faction;
  * - Each phase has different allowed actions
  * - Clean state transitions (no complex if-else chains)
  *
- * @author @crstmkt
+ * @author crstmkt
  */
 public interface GamePhaseState {
 

@@ -132,7 +132,7 @@ Entscheidend an dieser Implementierung ist, dass \texttt{Cell} sich selbst als e
 Methode \texttt{applyEffect()} auf allen drei Ebenen identisch per \texttt{forEach} iterieren, ohne dass \texttt{instanceof}-Prüfungen
 oder Fallunterscheidungen zwischen Einzelzellen und Gruppen notwendig sind. Alternativ hätte man \texttt{Cell} und \texttt{Region}
 mit getrennten Schnittstellen modellieren können, was jedoch dazu geführt hätte, dass Clients wie die \texttt{EventPhase}
-für jede Granularitätsstufe eigene Methoden benötigt hätten. Zusätzlich bietet \texttt{Battlefield} die Methode \texttt{getRegion(x1, y1, x2, y2)},
+für jede Stufe eigene Methoden benötigt hätten. Zusätzlich bietet \texttt{Battlefield} die Methode \texttt{getRegion(x1, y1, x2, y2)},
 um beliebige Teilbereiche des Spielfelds zu erreichen. Die Events der \texttt{EventPhase} nutzen diese Composite-Struktur
 und wenden ihre Effekte per \texttt{applyEffect()} auf Zelle, Region oder das gesamte Spielfeld an.
 
@@ -177,8 +177,8 @@ Im Fall von Lava sind das \texttt{visitFireUnit()} mit +2 Angriff und \texttt{vi
 pro Runde. Die übrigen 18 der insgesamt 20 Gelände-Fraktions-Kombinationen benötigen dadurch keinen eigenen Code, was den
 Implementierungsaufwand beim Hinzufügen eines neuen Geländetyps auf die tatsächlich betroffenen Fraktionen beschränkt. Das
 Ergebnis jedes Visitor-Aufrufs ist ein unveränderliches \texttt{TerrainEffectResult}-Record mit Angriffs- und Verteidigungsbonus,
-einem LP-pro-Runde-Effekt sowie einer optionalen Geländetransformation (z.\,B. Eis →\rightarrow
-→ Wüste bei Feuer-Einheiten). Der \texttt{Unit.accept(TerrainVisitor)} realisiert den Double Dispatch über einen \texttt{switch}
+einem LP-pro-Runde-Effekt sowie einer optionalen Geländetransformation (z.\,B. Eis \rightarrow Wüste bei Feuer-Einheiten).
+Der \texttt{Unit.accept(TerrainVisitor)} realisiert den Double Dispatch über einen \texttt{switch}
 über die Fraktionen (vgl. \texttt{Unit.java} Z.\,168ff). Die \texttt{TerrainVisitorFactory} hält die fünf Visitor-Instanzen
 in einer \texttt{EnumMap} und gibt diese zurück (vgl. \texttt{TerrainVisitorFactory.java} Z.\,36ff).
 
@@ -378,7 +378,8 @@ Listing~\ref{lst:damage-calculator} zeigt, wie \texttt{DamageCalculator} die Ket
 \texttt{calculateDamage()} erstellt einen frischen \texttt{DamageContext} für jeden Angriff, startet die Kette mit \texttt{handlerChain.handle(context)} und wandelt das fertige Kontextobjekt in ein unveränderliches \texttt{DamageResult}-Record um.
 
 Die abstrakte Basisklasse \texttt{DamageHandler} hält eine Referenz auf den jeweils nächsten Handler und leitet den Kontext nach getaner Arbeit via \texttt{super.handle()} weiter (vgl. \texttt{DamageHandler.java Z.\,22, 40ff}).
-Der erste Handler, \texttt{BaseDamageHandler}, liest den Grundschaden über das Strategy Pattern aus (\texttt{attacker.getAttackStrategy().calculateBaseDamage()}) und schreibt ihn in den Kontext (vgl. \texttt{BaseDamageHandler.java Z.\,14ff}).
+Der erste Handler, \texttt{BaseDamageHandler}, liest den Grundschaden über das Strategy Pattern aus
+(\texttt{attacker.getAttackStrategy()}\newline\texttt{.calculateBaseDamage()}) und schreibt ihn in den Kontext (vgl. \texttt{BaseDamageHandler.java Z.\,14ff}).
 Der \texttt{FactionAdvantageHandler} wendet anschließend einen Multiplikator aus einer statischen Fraktionsmatrix an, etwa $\times 1{,}25$ bei Vorteil oder $\times 0{,}75$ bei Nachteil (vgl. \texttt{FactionAdvantageHandler.java Z.\,25ff}, Tabelle~\ref{tab:fraktions-korrelationsmatrix}).
 
 Der \texttt{TerrainEffectHandler} integriert das Visitor Pattern: Für Angreifer und Verteidiger wird je ein \texttt{TerrainVisitor} dispatcht, dessen Boni in den Kontext einfließen (vgl. \texttt{TerrainEffectHandler.java Z. 21ff}).

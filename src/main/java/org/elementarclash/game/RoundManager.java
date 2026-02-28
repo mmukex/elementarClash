@@ -4,6 +4,8 @@ import lombok.Getter;
 
 /**
  * Manages turn and round counting for the game.
+ *
+ * @author mmukex
  */
 @Getter
 public class RoundManager {

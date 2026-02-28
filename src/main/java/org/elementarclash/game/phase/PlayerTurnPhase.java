@@ -10,6 +10,8 @@ import org.elementarclash.units.bonus.BuffDebuffManager;
 /**
  * Player turn phase: Commands are allowed.
  * Max 2 actions per unit (move + attack/ability).
+ *
+ * @author @crstmk
  */
 public record PlayerTurnPhase(Faction activeFaction) implements GamePhaseState {
 

@@ -16,6 +16,8 @@ import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
  * <p>
  * Tactical: Air superiority unit. Flying movement + long range allows attacking
  * while staying out of melee range. Strong against ground units.
+ *
+ * @author crstmkt
  */
 class StormCaller extends Unit {
     public StormCaller(String id, UnitStats stats) {

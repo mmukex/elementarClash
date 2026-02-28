@@ -21,6 +21,8 @@ import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
  * Tactical Use: Anti-forest ranged attacker.
  * Counters units hiding in forests. Good range but vulnerable to melee rushes.
  * Positioning critical for maximizing range advantage.
+ *
+ * @author crstmkt
  */
 class FlameArcher extends Unit {
 

@@ -21,6 +21,8 @@ import org.elementarclash.units.strategy.attack.MeleeAttackStrategy;
  * Tactical Use: High-risk scout and flanker.
  * Flying mobility allows bypassing terrain obstacles. Resurrection provides second chance in combat.
  * Vulnerable to ranged attacks and area damage.
+ *
+ * @author crstmkt
  */
 class Phoenix extends Unit {
 

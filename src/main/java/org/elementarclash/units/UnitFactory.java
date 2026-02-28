@@ -10,7 +10,7 @@ import lombok.Getter;
  * - Encapsulates unit creation logic
  * - Makes adding new factions easy without modifying existing code
  *
- * @author @crstmkt
+ * @author crstmkt
  */
 public abstract class UnitFactory {
     @Getter

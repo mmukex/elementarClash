@@ -16,6 +16,8 @@ import org.elementarclash.units.strategy.attack.RangedAttackStrategy;
  * <p>
  * Tactical: Versatile air unit. Good HP (85) and defense (5) for a flying unit.
  * Can engage at range while maintaining defensive position.
+ *
+ * @author crstmkt
  */
 class SkyGuardian extends Unit {
     public SkyGuardian(String id, UnitStats stats) {
