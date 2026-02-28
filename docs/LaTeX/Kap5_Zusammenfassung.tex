@@ -29,9 +29,9 @@ Alle Aktionen einer Runde können in beliebiger Reihenfolge rückgängig gemacht
 Spielereingaben erfolgen über ein buchstabenbasiertes Menü (\texttt{[B]}, \texttt{[A]}, \texttt{[U]}, \texttt{[R]}, \texttt{[Z]}, \texttt{[Q]}).
 
 \paragraph{Nicht-funktionale Anforderungen.}
-Das Projekt wurde in Java~21 mit Gradle~8.14 umgesetzt und übertrifft die geforderte Mindestanzahl von acht GoF-Patterns: Insgesamt zehn Patterns aus allen drei Kategorien (Erzeugung, Struktur, Verhalten) wurden sinnvoll integriert (vgl. Tabelle~\ref{tab:pattern-uebersicht}).
-Die Paketstruktur trennt Datenmodell, Spiellogik und Darstellung klar voneinander; neue Fraktionen, Geländetypen oder Dekoratoren lassen sich hinzufügen, ohne bestehende Klassen zu verändern.
-Für alle zehn Design Patterns wurden JUnit-5-Tests erstellt, die die korrekte Funktionsweise der Pattern-Mechanismen sicherstellen.
+Das Projekt wurde in Java~21~\cite{java21} mit Gradle~8.14~\cite{gradle} umgesetzt und übertrifft die geforderte Mindestanzahl von acht GoF-Patterns: Insgesamt zehn Patterns aus allen drei Kategorien (Erzeugung, Struktur, Verhalten) wurden sinnvoll integriert (vgl. Tabelle~\ref{tab:pattern-uebersicht}).
+Die Paketstruktur trennt Datenmodell, Spiellogik und Darstellung klar voneinander~\cite{cleancode}; neue Fraktionen, Geländetypen oder Dekoratoren lassen sich hinzufügen, ohne bestehende Klassen zu verändern.
+Für alle zehn Design Patterns wurden JUnit-5-Tests~\cite{junit5} erstellt, die die korrekte Funktionsweise der Pattern-Mechanismen sicherstellen.
 Die Architekturdokumentation umfasst PlantUML-Diagramme für alle Patterns sowie diese schriftliche Ausarbeitung in \LaTeX.
 
 \subsection{Ausblick}
@@ -56,5 +56,25 @@ Addison-Wesley, 1994.
 Matthias Geirhos:
 \textit{Entwurfsmuster Das umfassende Handbuch}
 Rheinwerk Computing, 1. Auflage 2015, 4., korrigierter Nachdruck 2021, ISBN 978-3-8362-2762-9
+
+\bibitem{java21}
+Oracle Corporation:
+\textit{Java SE 21 -- Documentation}.
+\url{https://docs.oracle.com/en/java/javase/21/}, 2023.
+
+\bibitem{cleancode}
+Martin, R.\,C.:
+\textit{Clean Code: A Handbook of Agile Software Craftsmanship}.
+Prentice Hall, 2008, ISBN 978-0-13-235088-4.
+
+\bibitem{junit5}
+The JUnit Team:
+\textit{JUnit 5 User Guide}.
+\url{https://junit.org/junit5/docs/current/user-guide/}, 2024.
+
+\bibitem{gradle}
+Gradle Inc.:
+\textit{Gradle User Manual}.
+\url{https://docs.gradle.org/8.14/userguide/userguide.html}, 2024.
 
 \end{thebibliography}
