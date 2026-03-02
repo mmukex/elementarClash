@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElementarClash &mdash; Design Patterns in der OOP</title>
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js@5/dist/reveal.css">
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js@5/dist/theme/black.css">
+    <link rel="stylesheet" href="https://unpkg.com/reveal.js@5/plugin/highlight/monokai.css">
+    <style>
+        :root {
+            --fire:  #e74c3c;
+            --water: #3498db;
+            --earth: #27ae60;
+            --air:   #ecf0f1;
+        }
+        .reveal { font-size: 32px; }
+        .reveal h1, .reveal h2, .reveal h3 { text-transform: none; }
+        .reveal h1 { font-size: 2em; }
+        .reveal h2 { font-size: 1.4em; }
+        .reveal h3 { font-size: 1.1em; }
+
+        /* Speaker tag */
+        .speaker-tag {
+            display: inline-block;
+            font-size: 0.5em;
+            padding: 2px 10px;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.12);
+            color: #aaa;
+            vertical-align: middle;
+            margin-left: 12px;
+        }
+
+        /* Faction colors */
+        .fire  { color: var(--fire);  }
+        .water { color: var(--water); }
+        .earth { color: var(--earth); }
+        .air   { color: var(--air);   }
+
+        .reveal table { font-size: 0.65em; margin: 0 auto; }
+        .reveal table th { background: rgba(255,255,255,0.08); }
+        .reveal table td, .reveal table th { padding: 6px 14px; border: 1px solid rgba(255,255,255,0.15); }
+
+        .reveal pre { font-size: 0.48em; width: 95%; }
+        .reveal pre code { max-height: 480px; }
+
+        .reveal img { border: none !important; background: none !important; box-shadow: none !important; }
+
+        .faction-grid { display: flex; justify-content: center; gap: 30px; flex-wrap: wrap; }
+        .faction-grid .faction-card { text-align: center; }
+        .faction-grid img { height: 140px; }
+
+        .pattern-problem { color: #e67e22; font-style: italic; }
+
+        /* Smaller lists */
+        .reveal ul, .reveal ol { font-size: 0.85em; }
+        .reveal li { margin-bottom: 6px; }
+
+        .two-col { display: flex; gap: 30px; align-items: flex-start; }
+        .two-col > * { flex: 1; }
+
+        .highlight-box {
+            background: rgba(255,255,255,0.06);
+            border-left: 4px solid var(--water);
+            padding: 12px 18px;
+            margin: 12px 0;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- 1. TITELFOLIE -->
+<!-- ============================================================ -->
+<section>
+    <h1 style="font-size:1.8em;">
+        <span class="fire">Elemental</span><span class="water">Clash</span>
+    </h1>
+    <p>Rundenbasiertes Strategiespiel mit Design Patterns</p>
+    <p style="font-size:0.7em; margin-top:1.5em;">
+        <strong>Max Meier</strong> &amp; <strong>Christian Stiens</strong><br>
+        FH S&uuml;dwestfalen &mdash; Modul: Design Pattern in der OOP
+    </p>
+    <aside class="notes">[Christian] Begr&uuml;&szlig;ung, Vorstellung des Projekts und der Vortragenden.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 2. AGENDA -->
+<!-- ============================================================ -->
+<section>
+    <h2>Agenda <span class="speaker-tag">Christian</span></h2>
+    <ol>
+        <li>Spielkonzept</li>
+        <li>Anforderungen</li>
+        <li>Pattern-&Uuml;bersicht</li>
+        <li>Patterns im Detail (10 GoF-Patterns)</li>
+        <li>Pattern-Zusammenspiel</li>
+        <li>Testing</li>
+        <li>Fazit &amp; Ausblick</li>
+    </ol>
+    <aside class="notes">[Christian] Kurzer &Uuml;berblick &uuml;ber den Ablauf.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 3. SPIELKONZEPT -->
+<!-- ============================================================ -->
+<section>
+    <h2>Was ist ElementarClash? <span class="speaker-tag">Max</span></h2>
+    <ul>
+        <li><strong>Rundenbasiertes Strategiespiel</strong> f&uuml;r 2&ndash;4 Spieler</li>
+        <li>4 elementare Fraktionen: <span class="fire">Feuer</span>, <span class="water">Wasser</span>, <span class="earth">Erde</span>, <span class="air">Luft</span></li>
+        <li>10&times;10 Raster mit 5 Gel&auml;ndetypen</li>
+        <li>Jede Fraktion: 3 Einheitentypen (Warrior, Archer, Special)</li>
+        <li>Konsolenbasierte Benutzeroberfl&auml;che</li>
+    </ul>
+    <div class="faction-grid" style="margin-top:20px;">
+        <div class="faction-card"><img src="../LaTeX/images/FireFaction.png" alt="Fire"><br><span class="fire">Feuer</span></div>
+        <div class="faction-card"><img src="../LaTeX/images/WaterFaction.png" alt="Water"><br><span class="water">Wasser</span></div>
+        <div class="faction-card"><img src="../LaTeX/images/EarthFaction.png" alt="Earth"><br><span class="earth">Erde</span></div>
+        <div class="faction-card"><img src="../LaTeX/images/AirFaction.png" alt="Air"><br><span class="air">Luft</span></div>
+    </div>
+    <aside class="notes">[Max] Spielkonzept erkl&auml;ren: 4 Fraktionen, rundenbasiert, Konsolen-UI.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 4. KORRELATIONSMATRIX & UI -->
+<!-- ============================================================ -->
+<section>
+    <h2>Fraktionen &amp; Spielfeld <span class="speaker-tag">Max</span></h2>
+    <div class="two-col">
+        <div>
+            <h3>Korrelationsmatrix</h3>
+            <img src="../LaTeX/images/Fraktions_Korrelationsmatrix.png" alt="Korrelationsmatrix" style="max-height:320px;">
+        </div>
+        <div>
+            <h3>Konsolen-UI</h3>
+            <img src="../LaTeX/images/UI.png" alt="UI Screenshot" style="max-height:320px;">
+        </div>
+    </div>
+    <aside class="notes">[Max] St&auml;rken/Schw&auml;chen zwischen Fraktionen erkl&auml;ren. Kurz die Konsolen-UI zeigen.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 5. ANFORDERUNGEN -->
+<!-- ============================================================ -->
+<section>
+    <h2>Anforderungen <span class="speaker-tag">Max</span></h2>
+    <div class="two-col">
+        <div>
+            <h3>Funktional</h3>
+            <ul style="font-size:0.75em;">
+                <li><strong>F1:</strong> 4 spielbare Fraktionen</li>
+                <li><strong>F2:</strong> 10&times;10 Spielfeld mit Gel&auml;nde</li>
+                <li><strong>F3:</strong> Rundenbasierter Ablauf</li>
+                <li><strong>F4:</strong> Kampfsystem mit Boni/Mali</li>
+                <li><strong>F5:</strong> Undo/Redo von Z&uuml;gen</li>
+                <li><strong>F6:</strong> Konsolen-UI</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Nicht-funktional</h3>
+            <ul style="font-size:0.75em;">
+                <li>Java 21</li>
+                <li>Gradle 8.14</li>
+                <li>&ge; 8 GoF Design Patterns &rarr; <strong>10 umgesetzt</strong></li>
+                <li>JUnit 5 Tests</li>
+                <li>Clean Code Prinzipien</li>
+            </ul>
+        </div>
+    </div>
+    <aside class="notes">[Max] Anforderungen aus der Aufgabenstellung. Mindestens 8 Patterns, wir haben 10 umgesetzt.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 6. PATTERN-&Uuml;BERSICHT -->
+<!-- ============================================================ -->
+<section>
+    <h2>10 GoF Design Patterns <span class="speaker-tag">Christian</span></h2>
+    <table>
+        <thead><tr><th>Kategorie</th><th>Pattern</th><th>Einsatzzweck</th></tr></thead>
+        <tbody>
+            <tr><td rowspan="2"><strong>Erzeugung</strong></td><td>Factory Method</td><td>Fraktionsspez. Einheitenerstellung</td></tr>
+            <tr><td>Builder</td><td>Spielkonfiguration</td></tr>
+            <tr><td rowspan="2"><strong>Struktur</strong></td><td>Composite</td><td>Battlefield-Hierarchie</td></tr>
+            <tr><td>Decorator</td><td>Dynamische Buffs/Debuffs</td></tr>
+            <tr><td rowspan="6"><strong>Verhalten</strong></td><td>Strategy</td><td>Bewegung &amp; Angriff</td></tr>
+            <tr><td>State</td><td>Spiel- &amp; Unit-Phasen</td></tr>
+            <tr><td>Observer</td><td>Event-System</td></tr>
+            <tr><td>Command</td><td>Undo/Redo</td></tr>
+            <tr><td>Visitor</td><td>Gel&auml;ndeeffekte</td></tr>
+            <tr><td>Chain of Resp.</td><td>Schadensberechnung</td></tr>
+        </tbody>
+    </table>
+    <aside class="notes">[Christian] &Uuml;bersicht: 2 Erzeugungs-, 2 Struktur-, 6 Verhaltensmuster.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 7. FACTORY METHOD &mdash; Problem & UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>Factory Method <span class="speaker-tag">Christian</span></h2>
+    <p class="pattern-problem">Problem: 4 Fraktionen &times; 3 Einheiten = 12 Klassen &mdash; wie einheitlich erzeugen?</p>
+    <img src="../LaTeX/images/Factory_Method_Pattern___ElementarClash.png" alt="Factory Method UML" style="max-height:420px;">
+    <aside class="notes">[Christian] Jede Fraktion hat eigene Factory. Template-Method-Ansatz in createUnit().</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 8. FACTORY METHOD &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>Factory Method &mdash; Code <span class="speaker-tag">Christian</span></h2>
+    <pre><code class="language-java">// UnitFactory.java (Abstract Creator)
+public abstract class UnitFactory {
+    public final Unit createUnit(UnitType type) {
+        if (!isValidTypeForFaction(type))
+            throw new IllegalArgumentException(/*...*/);
+        return createUnitInternal(generateUnitId(), type);
+    }
+    protected abstract Unit createUnitInternal(String id, UnitType type);
+}</code></pre>
+    <pre><code class="language-java">// FireUnitFactory.java (Concrete Creator)
+protected Unit createUnitInternal(String id, UnitType type) {
+    return switch (type) {
+        case INFERNO_WARRIOR -> new InfernoWarrior(id, new UnitStats(100, 15, 5, 3, 1));
+        case FLAME_ARCHER   -> new FlameArcher(id, new UnitStats(70, 12, 3, 4, 3));
+        case PHOENIX         -> new Phoenix(id, new UnitStats(80, 10, 4, 5, 1));
+        default -> throw new IllegalArgumentException("Unknown type");
+    };
+}</code></pre>
+    <aside class="notes">[Christian] createUnit() als Template Method. Switch-Expression in Java 21.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 9. BUILDER &mdash; Problem & UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>Builder <span class="speaker-tag">Max</span></h2>
+    <p class="pattern-problem">Problem: Komplexe Spielkonfiguration mit vielen optionalen Parametern</p>
+    <img src="../LaTeX/images/Builder_Pattern___ElementarClash.png" alt="Builder UML" style="max-height:420px;">
+    <aside class="notes">[Max] GameBuilder erm&ouml;glicht schrittweisen Aufbau der Spielkonfiguration.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 10. BUILDER &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>Builder &mdash; Code <span class="speaker-tag">Max</span></h2>
+    <pre><code class="language-java">// GameBuilder.java &mdash; Fluent API
+public class GameBuilder {
+    private final Set&lt;Faction&gt; factions = new LinkedHashSet&lt;&gt;();
+    private Map&lt;Terrain, Integer&gt; customTerrainDistribution = null;
+
+    public GameBuilder withFactions(Faction... factions) {
+        this.factions.addAll(Arrays.asList(factions));
+        return this;
+    }
+
+    public GameBuilder withCustomTerrain(Map&lt;Terrain, Integer&gt; dist) {
+        this.customTerrainDistribution = new EnumMap&lt;&gt;(dist);
+        return this;
+    }
+
+    public Game build() {
+        validate();
+        Battlefield battlefield = createAndInitializeBattlefield();
+        Game game = new Game(battlefield);
+        placeUnitsOnBattlefield(game);
+        return game;
+    }
+}</code></pre>
+    <aside class="notes">[Max] Fluent API mit Method Chaining. build() validiert und erzeugt das Game-Objekt.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 11. COMPOSITE &mdash; Problem & UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>Composite <span class="speaker-tag">Max</span></h2>
+    <p class="pattern-problem">Problem: Einheitliche Operationen auf Zellen, Regionen und dem gesamten Battlefield</p>
+    <img src="../LaTeX/images/Composite_Pattern___ElementarClash.png" alt="Composite UML" style="max-height:420px;">
+    <aside class="notes">[Max] Cell &rarr; Region &rarr; Battlefield: gleiche Schnittstelle, applyEffect() propagiert.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 12. COMPOSITE &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>Composite &mdash; Code <span class="speaker-tag">Max</span></h2>
+    <pre><code class="language-java">// BattlefieldComponent.java
+public interface BattlefieldComponent {
+    List&lt;Cell&gt; cells();
+
+    default void applyEffect(Consumer&lt;Cell&gt; effect) {
+        cells().forEach(effect);
+    }
+}</code></pre>
+    <pre><code class="language-java">// Cell.java (Leaf)
+public class Cell implements BattlefieldComponent {
+    @Override
+    public List&lt;Cell&gt; cells() { return List.of(this); }
+}
+
+// Region.java (Composite)
+public record Region(List&lt;Cell&gt; cells) implements BattlefieldComponent {
+    @Override
+    public List&lt;Cell&gt; cells() { return new ArrayList&lt;&gt;(cells); }
+}</code></pre>
+    <aside class="notes">[Max] Default-Methode applyEffect() iteriert &uuml;ber cells(). Leaf und Composite implementieren cells() unterschiedlich.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 13. DECORATOR &mdash; Problem & UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>Decorator <span class="speaker-tag">Christian</span></h2>
+    <p class="pattern-problem">Problem: Dynamische Buffs/Debuffs ohne Klassenexplosion</p>
+    <img src="../LaTeX/images/Decorator_Pattern___ElementarClash.png" alt="Decorator UML" style="max-height:420px;">
+    <aside class="notes">[Christian] Decorators werden zur Laufzeit hinzugef&uuml;gt und k&ouml;nnen ablaufen (isExpired).</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 14. DECORATOR &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>Decorator &mdash; Code <span class="speaker-tag">Christian</span></h2>
+    <pre><code class="language-java">// UnitDecorator.java
+public abstract class UnitDecorator {
+    public abstract int getAttackBonus(Unit unit);
+    public abstract int getDefenseBonus(Unit unit);
+    public abstract boolean isExpired();
+    public abstract void tick();
+}</code></pre>
+    <pre><code class="language-java">// Unit.java &mdash; Aggregation der Decorators
+public int getAttack() {
+    int attack = baseStats.attack();
+    for (UnitDecorator decorator : decorators) {
+        if (!decorator.isExpired()) {
+            attack += decorator.getAttackBonus(this);
+        }
+    }
+    return attack;
+}</code></pre>
+    <aside class="notes">[Christian] Unit aggregiert Decorators. getAttack() summiert alle aktiven Boni. tick() z&auml;hlt Runden herunter.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 15. STRATEGY &mdash; Problem & UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>Strategy <span class="speaker-tag">Max</span></h2>
+    <p class="pattern-problem">Problem: Unterschiedliche Bewegungs- und Angriffslogik pro Einheitentyp</p>
+    <img src="../LaTeX/images/Strategy_Pattern___ElementarClash.png" alt="Strategy UML" style="max-height:420px;">
+    <aside class="notes">[Max] Ground vs. Flying Movement, Melee vs. Ranged Attack. Gel&auml;ndeabh&auml;ngige Kosten.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 16. STRATEGY &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>Strategy &mdash; Code <span class="speaker-tag">Max</span></h2>
+    <pre><code class="language-java">// MovementStrategy.java
+public interface MovementStrategy {
+    double calculateMovementCost(Terrain terrain);
+    boolean canMoveTo(Game game, Position current,
+                      Position target, int maxMovement);
+}</code></pre>
+    <pre><code class="language-java">// FlyingMovementStrategy.java
+public class FlyingMovementStrategy implements MovementStrategy {
+    private static final double FLYING_TERRAIN_COST = 1.0;
+
+    @Override
+    public double calculateMovementCost(Terrain terrain) {
+        return FLYING_TERRAIN_COST; // Gel&auml;nde ignorieren
+    }
+
+    @Override
+    public boolean canMoveTo(Game game, Position current,
+                             Position target, int maxMovement) {
+        if (game.isPositionOccupied(target)) return false;
+        return current.manhattanDistanceTo(target) &lt;= maxMovement;
+    }
+}</code></pre>
+    <aside class="notes">[Max] Fliegende Einheiten ignorieren Gel&auml;ndekosten. Bodeneinheiten haben variable Kosten.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 17. STATE &mdash; Problem & UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>State <span class="speaker-tag">Christian</span></h2>
+    <p class="pattern-problem">Problem: Komplexe Zustands&uuml;berg&auml;nge f&uuml;r Spiel und Einheiten</p>
+    <img src="../LaTeX/images/State_Pattern___ElementarClash.png" alt="State UML" style="max-height:400px;">
+    <aside class="notes">[Christian] Zwei State Machines: GamePhaseState (4 Zust&auml;nde) und UnitState (5 Zust&auml;nde).</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 18. STATE &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>State &mdash; Code <span class="speaker-tag">Christian</span></h2>
+    <pre><code class="language-java">// GamePhaseState.java
+public interface GamePhaseState {
+    boolean canExecuteCommand(Game game, Command command);
+    void onEnter(Game game);
+    void onExit(Game game);
+    GamePhaseState transitionToPlayerTurn(Game game, Faction faction);
+    GamePhaseState transitionToEventPhase(Game game);
+    GamePhaseState transitionToGameOver(Game game, Faction winner);
+}</code></pre>
+    <pre><code class="language-java">// UnitState.java
+public interface UnitState {
+    boolean hasActionsLeft(Unit unit);
+    UnitState transitionToMoving(Unit unit);
+    UnitState transitionToAttacking(Unit unit);
+    UnitState transitionToDead(Unit unit);
+    void onTurnEnd(Unit unit);
+}</code></pre>
+    <aside class="notes">[Christian] Phasen: Setup &rarr; PlayerTurn &rarr; EventPhase &rarr; GameOver. Unit: Idle &rarr; Moving/Attacking &rarr; Stunned/Dead.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 19. OBSERVER & COMMAND -->
+<!-- ============================================================ -->
+<section>
+    <h2>Observer &amp; Command <span class="speaker-tag">Max</span></h2>
+    <div class="two-col">
+        <div>
+            <h3>Observer</h3>
+            <pre><code class="language-java">public interface GameObserver {
+    void onEvent(GameEvent event);
+}
+
+// EventLogObserver.java
+public class EventLogObserver
+        implements GameObserver {
+    private final List&lt;GameEvent&gt;
+        eventLog = new ArrayList&lt;&gt;();
+
+    @Override
+    public void onEvent(GameEvent event) {
+        eventLog.add(event);
+    }
+}</code></pre>
+        </div>
+        <div>
+            <h3>Command</h3>
+            <pre><code class="language-java">// MoveCommand.java
+public void execute(Game game) {
+    previousPosition =
+        actor.getPosition();
+    game.moveUnitInternal(
+        actor, targetPosition);
+}
+
+public void undo(Game game) {
+    game.moveUnitInternal(
+        actor, previousPosition);
+}</code></pre>
+        </div>
+    </div>
+    <aside class="notes">[Max] Observer f&uuml;r lose Kopplung des Event-Systems. Command erm&ouml;glicht Undo/Redo.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 20. OBSERVER & COMMAND &mdash; UML -->
+<!-- ============================================================ -->
+<section>
+    <h2>Observer &amp; Command &mdash; UML <span class="speaker-tag">Max</span></h2>
+    <div class="two-col">
+        <div>
+            <img src="../LaTeX/images/Observer_Pattern___ElementarClash.png" alt="Observer UML" style="max-height:350px;">
+        </div>
+        <div>
+            <img src="../LaTeX/images/Command_Pattern___ElementarClash.png" alt="Command UML" style="max-height:350px;">
+        </div>
+    </div>
+    <p style="font-size:0.7em; text-align:center;">Command: Dual-Stack History (Undo-Stack &amp; Redo-Stack)</p>
+    <aside class="notes">[Max] Observer: Game als Subject, ConsoleGameRenderer und EventLogObserver als Observers. Command: Dual-Stack f&uuml;r History.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 21. VISITOR -->
+<!-- ============================================================ -->
+<section>
+    <h2>Visitor <span class="speaker-tag">Christian</span></h2>
+    <p class="pattern-problem">Problem: 5 Gel&auml;nde &times; 4 Fraktionen = 20 Effekte &mdash; ohne if-Kaskade</p>
+    <pre><code class="language-java">// TerrainVisitor.java
+public interface TerrainVisitor {
+    TerrainEffectResult visitFireUnit(Unit unit);
+    TerrainEffectResult visitWaterUnit(Unit unit);
+    TerrainEffectResult visitEarthUnit(Unit unit);
+    TerrainEffectResult visitAirUnit(Unit unit);
+}</code></pre>
+    <pre><code class="language-java">// Unit.java &mdash; accept()
+public TerrainEffectResult accept(TerrainVisitor visitor) {
+    return switch (faction) {
+        case FIRE  -> visitor.visitFireUnit(this);
+        case WATER -> visitor.visitWaterUnit(this);
+        case EARTH -> visitor.visitEarthUnit(this);
+        case AIR   -> visitor.visitAirUnit(this);
+    };
+}</code></pre>
+    <aside class="notes">[Christian] Jeder Gel&auml;ndetyp hat eigenen Visitor. Double Dispatch &uuml;ber accept().</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 22. VISITOR UML & CHAIN OF RESPONSIBILITY -->
+<!-- ============================================================ -->
+<section>
+    <h2>Visitor &amp; Chain of Responsibility <span class="speaker-tag">Christian</span></h2>
+    <div class="two-col">
+        <div>
+            <img src="../LaTeX/images/Visitor_Pattern___ElementarClash.png" alt="Visitor UML" style="max-height:320px;">
+        </div>
+        <div>
+            <img src="../LaTeX/images/Chain_of_Responsibility_Pattern___ElementarClash.png" alt="Chain UML" style="max-height:320px;">
+        </div>
+    </div>
+    <aside class="notes">[Christian] Visitor UML links. Chain of Responsibility rechts: 5-stufige Schadensberechnung.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 23. CHAIN OF RESPONSIBILITY &mdash; Code -->
+<!-- ============================================================ -->
+<section>
+    <h2>Chain of Responsibility <span class="speaker-tag">Christian</span></h2>
+    <p class="pattern-problem">5-stufige Schadensberechnung: Base &rarr; Faction &rarr; Terrain &rarr; Synergy &rarr; Defense</p>
+    <pre><code class="language-java">// DamageHandler.java
+public abstract class DamageHandler {
+    private DamageHandler next;
+
+    public DamageHandler setNext(DamageHandler next) {
+        this.next = next;
+        return next;
+    }
+
+    public void handle(DamageContext context) {
+        if (next != null) next.handle(context);
+    }
+}</code></pre>
+    <pre><code class="language-java">// BaseDamageHandler.java
+public class BaseDamageHandler extends DamageHandler {
+    @Override
+    public void handle(DamageContext context) {
+        int baseDamage = context.getAttacker().getAttackStrategy()
+            .calculateBaseDamage(context.getAttacker(), context.getTarget());
+        context.setBaseDamage(baseDamage);
+        super.handle(context); // weiter in der Kette
+    }
+}</code></pre>
+    <aside class="notes">[Christian] Jeder Handler modifiziert den DamageContext und reicht ihn weiter. Leicht erweiterbar.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 24. PATTERN-ZUSAMMENSPIEL -->
+<!-- ============================================================ -->
+<section>
+    <h2>Pattern-Zusammenspiel <span class="speaker-tag">Max</span></h2>
+    <div style="font-size:0.72em; text-align:left; max-width:800px; margin:0 auto;">
+        <div class="highlight-box" style="border-color:var(--fire);">
+            <strong>Erzeugung:</strong> <em>Builder</em> erstellt Game mit <em>Composite</em>-Battlefield &amp; Einheiten via <em>Factory Method</em>
+        </div>
+        <div class="highlight-box" style="border-color:var(--water);">
+            <strong>Spielablauf:</strong> <em>State</em> steuert Phasen &rarr; <em>Command</em> kapselt Z&uuml;ge &rarr; <em>Strategy</em> bestimmt Bewegung/Angriff
+        </div>
+        <div class="highlight-box" style="border-color:var(--earth);">
+            <strong>Kampf:</strong> <em>Chain of Resp.</em> berechnet Schaden &rarr; nutzt <em>Visitor</em> (Gel&auml;nde) &amp; <em>Decorator</em> (Buffs)
+        </div>
+        <div class="highlight-box" style="border-color:var(--air);">
+            <strong>Events:</strong> <em>Observer</em> benachrichtigt UI &uuml;ber alle &Auml;nderungen &rarr; <em>State</em> &amp; <em>Decorator</em> reagieren
+        </div>
+    </div>
+    <aside class="notes">[Max] Patterns arbeiten zusammen: Builder baut das Spiel, State/Command steuern den Ablauf, Chain/Visitor/Decorator berechnen Kampf, Observer koppelt die UI.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 25. TESTING -->
+<!-- ============================================================ -->
+<section>
+    <h2>Testing <span class="speaker-tag">Christian</span></h2>
+    <ul>
+        <li><strong>JUnit 5</strong> f&uuml;r alle 10 Design Patterns</li>
+        <li>5 Testklassen mit fokussierten Unit-Tests</li>
+        <li>Testbare Architektur durch lose Kopplung</li>
+    </ul>
+    <table>
+        <thead><tr><th>Testklasse</th><th>Gepr&uuml;fte Patterns</th></tr></thead>
+        <tbody>
+            <tr><td>FactoryMethodPatternTest</td><td>Factory Method</td></tr>
+            <tr><td>BuilderPatternTest</td><td>Builder</td></tr>
+            <tr><td>StructuralPatternTest</td><td>Composite, Decorator</td></tr>
+            <tr><td>BehavioralPatternTest</td><td>Strategy, State, Observer, Command</td></tr>
+            <tr><td>AdvancedBehavioralPatternTest</td><td>Visitor, Chain of Resp.</td></tr>
+        </tbody>
+    </table>
+    <aside class="notes">[Christian] Alle Patterns getestet. Tests verifizieren Verhalten, nicht nur Struktur.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 26. FAZIT & AUSBLICK -->
+<!-- ============================================================ -->
+<section>
+    <h2>Fazit &amp; Ausblick <span class="speaker-tag">Max</span></h2>
+    <div class="two-col">
+        <div>
+            <h3>Erreicht</h3>
+            <ul>
+                <li>Alle funktionalen Anforderungen erf&uuml;llt</li>
+                <li><strong>10 von 8</strong> geforderten GoF-Patterns</li>
+                <li>Saubere Architektur &amp; Testabdeckung</li>
+            </ul>
+        </div>
+        <div>
+            <h3>Ausblick</h3>
+            <ul>
+                <li>KI-Gegner (Strategy Pattern)</li>
+                <li>Grafische Oberfl&auml;che (Observer)</li>
+                <li>Netzwerk-Multiplayer</li>
+                <li>Weitere Fraktionen &amp; Einheiten</li>
+            </ul>
+        </div>
+    </div>
+    <div class="highlight-box" style="margin-top:20px; border-color:var(--earth);">
+        <strong>Lessons Learned:</strong> Design Patterns f&ouml;rdern Erweiterbarkeit und Wartbarkeit &mdash; das Hinzuf&uuml;gen neuer Fraktionen oder Einheiten erfordert minimale &Auml;nderungen am bestehenden Code.
+    </div>
+    <aside class="notes">[Max] Alle Anforderungen erf&uuml;llt, 10 Patterns. Erweiterbar dank Patterns. Open/Closed Principle in der Praxis.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- 27. FRAGEN -->
+<!-- ============================================================ -->
+<section>
+    <h1 style="font-size:2.2em;">Fragen?</h1>
+    <p style="font-size:0.8em; margin-top:1em;">Max Meier &amp; Christian Stiens</p>
+    <p style="font-size:0.65em; color:#888;">ElementarClash &mdash; FH S&uuml;dwestfalen</p>
+    <aside class="notes">[Beide] Fragen beantworten.</aside>
+</section>
+
+</div><!-- .slides -->
+</div><!-- .reveal -->
+
+<script src="https://unpkg.com/reveal.js@5/dist/reveal.js"></script>
+<script src="https://unpkg.com/reveal.js@5/plugin/highlight/highlight.js"></script>
+<script src="https://unpkg.com/reveal.js@5/plugin/notes/notes.js"></script>
+<script>
+    Reveal.initialize({
+        hash: true,
+        slideNumber: true,
+        plugins: [ RevealHighlight, RevealNotes ],
+        transition: 'slide',
+        backgroundTransition: 'fade'
+    });
+</script>
+</body>
+</html>
